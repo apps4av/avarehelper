@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">AvareHelper</string>
-    <string name="dummy_content">DUMMY\nCONTENT</string>
-    <string name="dummy_button">Dummy Button</string>
-
+    <string name="app_name">Avare Plus</string>
+    <string name="Connect">Connect</string>
+    <string name="ADSB">ADSB</string>
+    <string name="Disconnect">Disconnect</string>
+    
 </resources>

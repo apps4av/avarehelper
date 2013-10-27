@@ -12,22 +12,21 @@ Redistribution and use in source and binary forms, with or without modification,
 
 package com.apps4av.avarehelper.gdl90;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+
+import com.ds.avare.IHelper;
 
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
-import android.location.Location;
 import android.os.Handler;
 import android.os.Message;
+import android.util.Log;
 
 /**
  * 
@@ -43,11 +42,9 @@ public class BlueToothConnection {
     
     private static BlueToothConnection mConnection;
     
-    private static final String mStoreFile = null;
-    private static final String mLoadFile = null;
     private static AdsbStatus mAdsbStatus;
-    private static final String device = "XGPS170";
-    
+    private static IHelper mHelper;
+
     /*
      *  Well known SPP UUID
      */
@@ -79,17 +76,6 @@ public class BlueToothConnection {
     /**
      * 
      */
-    private void sleepit() {
-        try {
-            Thread.sleep(1000);
-        }
-        catch(Exception e) {            
-        }
-    }
-    
-    /**
-     * 
-     */
     public void stop() {
         if(mAdsbStatus.getState() != AdsbStatus.CONNECTED) {
             return;
@@ -102,7 +88,7 @@ public class BlueToothConnection {
      */
     public void start() {
         
-        if(mAdsbStatus.getState() != AdsbStatus.DISCONNECTED) {
+        if(mAdsbStatus.getState() != AdsbStatus.CONNECTED) {
             return;
         }
         
@@ -118,35 +104,7 @@ public class BlueToothConnection {
                 byte[] buffer = new byte[32768];
                 DataBuffer dbuffer = new DataBuffer(32768);
                 Decode decode = new Decode();
-                File file;
-                BufferedOutputStream bos = null;
-                BufferedInputStream bis = null;
                 
-                if(!connect(device)) {
-                    return;
-                }
-                /*
-                 * Store file for debug? 
-                 */
-                if(mStoreFile != null) {
-                    try {
-                        file = new File(mStoreFile);
-                        if(!file.exists()){
-                            file.createNewFile();
-                        }
-                        bos = new BufferedOutputStream(new FileOutputStream(file, true));                    
-                    }
-                    catch (Exception e) {
-                    }
-                }               
-                if(mLoadFile != null) {
-                    try {
-                        file = new File(mLoadFile);
-                        bis = new BufferedInputStream(new FileInputStream(file));                    
-                    }
-                    catch (Exception e) {
-                    }
-                }               
                 
                 /*
                  * This state machine will keep trying to connect to 
@@ -156,44 +114,20 @@ public class BlueToothConnection {
                     
                     int red = 0;
                     
-                    if(mLoadFile == null) {
-                        /*
-                         * Read.
-                         */
-                        red = read(buffer);
-                        if(red <= 0) {
-                            BlueToothConnection.this.stop();
-                            continue;
-                        }
-                    }
-                    else {
+                    /*
+                     * Read.
+                     */
+                    red = read(buffer);
+                    if(red <= 0) {
                         try {
-                            red = bis.read(buffer, 0, buffer.length);
+                            Thread.sleep(100);
+                        } catch (Exception e) {
+                            
                         }
-                        catch (Exception e) {
-                            sleepit();
-                            continue;
-                        }
-                        if(red <= 0) {
-                            sleepit();
-                            continue;
-                        }
+                        continue;
                     }
-                    
                     dbuffer.put(buffer, red);
                  
-                    /**
-                     * Store data to file for debugging if set to debug
-                     */
-                    if(mStoreFile != null) {
-                        try {
-                            bos.write(buffer, 0, red);
-                            bos.flush();
-                        } 
-                        catch (Exception e) {
-                        }
-                    }
-                    
                     byte[] buf;
                     while(null != (buf = dbuffer.get())) {
 
@@ -209,37 +143,7 @@ public class BlueToothConnection {
                         mHandler.sendMessage(msg);
                     }
                 }
-
-                if(mStoreFile != null) {
-                    try {
-                        bos.close();
-                    } 
-                    catch (Exception e) {
-                    }
-                }
-                if(mLoadFile != null) {
-                    try {
-                        bis.close();
-                    } 
-                    catch (Exception e) {
-                    }
-                }
                 
-                /*
-                 * Exit
-                 */
-                try {
-                    mStream.close();
-                } 
-                catch(Exception e2) {
-                }
-                
-                try {
-                    mBtSocket.close();
-                } 
-                catch(Exception e2) {
-                }    
-                setState(AdsbStatus.DISCONNECTED);
             }
         };
         thread.start();
@@ -258,11 +162,32 @@ public class BlueToothConnection {
     
     /**
      * 
+     * @return
+     */
+    public List<String> getDevices() {
+        Set<BluetoothDevice> pairedDevices = mBtAdapter.getBondedDevices();
+        List<String> list = new ArrayList<String>();
+        
+        /*
+         * Find devices
+         */
+        if(null == pairedDevices) {            
+            return null;
+        }
+        for(BluetoothDevice bt : pairedDevices) {
+            list.add((String)bt.getName());
+        }
+        
+        return list;
+    }
+    
+    /**
+     * 
      * A device name devNameMatch, will connect to first device whose
      * name matched this string.
      * @return
      */
-    private boolean connect(String devNameMatch) {
+    public boolean connect(String devNameMatch) {
         /*
          * Only when not connected, connect
          */
@@ -285,7 +210,7 @@ public class BlueToothConnection {
         }
         BluetoothDevice device = null;
         for(BluetoothDevice bt : pairedDevices) {
-           if(bt.getName().contains(devNameMatch)) {
+           if(bt.getName().equals(devNameMatch)) {
                device = bt;
            }
         }
@@ -346,6 +271,27 @@ public class BlueToothConnection {
     
     /**
      * 
+     */
+    public void disconnect() {
+        /*
+         * Exit
+         */
+        try {
+            mStream.close();
+        } 
+        catch(Exception e2) {
+        }
+        
+        try {
+            mBtSocket.close();
+        } 
+        catch(Exception e2) {
+        }    
+        setState(AdsbStatus.DISCONNECTED);
+    }
+    
+    /**
+     * 
      * @return
      */
     private int read(byte[] buffer) {
@@ -365,6 +311,15 @@ public class BlueToothConnection {
      */
     public boolean isConnected() {
         return mAdsbStatus.getState() == AdsbStatus.CONNECTED;
+    }
+
+    /**
+     * 
+     * @return
+     */
+    public boolean isConnectedOrConnecting() {
+        return mAdsbStatus.getState() == AdsbStatus.CONNECTED ||
+                mAdsbStatus.getState() == AdsbStatus.CONNECTING;
     }
 
     /**
@@ -391,17 +346,31 @@ public class BlueToothConnection {
                  * Make a GPS locaiton message from ADSB ownship message.
                  */
                 OwnshipMessage om = (OwnshipMessage)msg.obj;
-                Location l = new Location(device);
-                l.setAltitude(om.mAltitude / 3.28);  // ft to m
-                l.setLatitude(om.mLat);
-                l.setLongitude(om.mLon);
-                l.setSpeed((float)(om.mHorizontalVelocity / 1.944)); // kt to ms/s
-                l.setBearing(om.mDirection);
-                l.setTime(om.getTime());
+                String tosend = "ownship" + ",";
+                tosend += om.mLon + ",";
+                tosend += om.mLat + ",";
+                tosend += (float)(om.mHorizontalVelocity / 1.944) + ","; // kt to ms/s
+                tosend += om.mDirection + ",";
+                tosend += om.getTime();
+                if(mHelper != null) {
+                    try {
+                        mHelper.sendDataText(tosend);
+                    } catch (Exception e) {
+                    }
+                }
+                Log.d("Helper", tosend);
             }
             else if(msg.obj instanceof AdsbStatus) {
             }
         }
     };
+    
+    /**
+     * 
+     * @param helper
+     */
+    public void setHelper(IHelper helper) {
+        mHelper = helper;
+    }
 
 }
