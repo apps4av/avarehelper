@@ -65,12 +65,6 @@ public class MainActivity extends Activity {
         View view = layoutInflater.inflate(R.layout.activity_main, null);
         setContentView(view);
 
-        /*
-         * Start the helper service in Avare.
-         */
-        Intent i = new Intent("com.ds.avare.START_SERVICE");
-        i.setClassName("com.ds.avare", "com.ds.avare.IHelperService");
-        bindService(i, mConnection, Context.BIND_AUTO_CREATE);
         
         mConnectButton = (Button)view.findViewById(R.id.button_connect);
         mConnectButton.setOnClickListener(new OnClickListener() {
@@ -84,6 +78,7 @@ public class MainActivity extends Activity {
                     mBt.stop();
                     mBt.disconnect();
                     mConnectButton.setText(getApplicationContext().getString(R.string.Connect));
+                    unbindService(mConnection);
                     return;
                 }
                 /*
@@ -95,6 +90,12 @@ public class MainActivity extends Activity {
                     if(mBt.isConnected()) {
                         mConnectButton.setText(getApplicationContext().getString(R.string.Disconnect));
                         mBt.start();
+                        /*
+                         * Start the helper service in Avare.
+                         */
+                        Intent i = new Intent("com.ds.avare.START_SERVICE");
+                        i.setClassName("com.ds.avare", "com.ds.avare.IHelperService");
+                        bindService(i, mConnection, Context.BIND_AUTO_CREATE);
                     }
                 }
             }
@@ -110,8 +111,7 @@ public class MainActivity extends Activity {
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(MainActivity.this,
                 android.R.layout.simple_spinner_item, mList);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        mSpinner.setAdapter(adapter);
-        
+        mSpinner.setAdapter(adapter);       
     }
 
     @Override

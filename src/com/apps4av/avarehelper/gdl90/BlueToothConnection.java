@@ -24,9 +24,6 @@ import com.ds.avare.IHelper;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
-import android.os.Handler;
-import android.os.Message;
-import android.util.Log;
 
 /**
  * 
@@ -138,9 +135,38 @@ public class BlueToothConnection {
                         /*
                          * Post on UI thread.
                          */
-                        Message msg = mHandler.obtainMessage();
-                        msg.obj = m;
-                        mHandler.sendMessage(msg);
+                        
+                        if(m instanceof UplinkMessage) {
+                            /*
+                             * Send an uplink nexrad message
+                             */
+                            LinkedList<Product> pds = ((UplinkMessage) m).getFis().getProducts();
+                            for(Product p : pds) {
+                                if(p instanceof Id6364Product) {
+                                    Id6364Product pn = (Id6364Product)p;
+                                }
+                            }
+                        }
+                        else if(m instanceof OwnshipMessage) {
+                            
+                            /*
+                             * Make a GPS locaiton message from ADSB ownship message.
+                             */
+                            OwnshipMessage om = (OwnshipMessage)m;
+                            String tosend = "ownship" + ",";
+                            tosend += om.mLon + ",";
+                            tosend += om.mLat + ",";
+                            tosend += (float)(om.mHorizontalVelocity / 1.944) + ","; // kt to ms/s
+                            tosend += om.mDirection + ",";
+                            tosend += (om.mAltitude / 3.28084) + ",";
+                            tosend += om.getTime();
+                            if(mHelper != null) {
+                                try {
+                                    mHelper.sendDataText(tosend);
+                                } catch (Exception e) {
+                                }
+                            }
+                        }
                     }
                 }
                 
@@ -155,9 +181,6 @@ public class BlueToothConnection {
      */
     private void setState(int state) {
         mAdsbStatus.setState(state);
-        Message msg = mHandler.obtainMessage();
-        msg.obj = mAdsbStatus;
-        mHandler.sendMessage(msg);
     }
     
     /**
@@ -322,49 +345,6 @@ public class BlueToothConnection {
                 mAdsbStatus.getState() == AdsbStatus.CONNECTING;
     }
 
-    /**
-     * Send a message to the lone listener.
-     */
-    private static Handler mHandler = new Handler() {
-        @Override
-        public void handleMessage(Message msg) {            
-                
-            if(msg.obj instanceof UplinkMessage) {
-                /*
-                 * Send an uplink nexrad message
-                 */
-                LinkedList<Product> pds = ((UplinkMessage) msg.obj).getFis().getProducts();
-                for(Product p : pds) {
-                    if(p instanceof Id6364Product) {
-                        Id6364Product pn = (Id6364Product)p;
-                    }
-                }
-            }
-            else if(msg.obj instanceof OwnshipMessage) {
-                
-                /*
-                 * Make a GPS locaiton message from ADSB ownship message.
-                 */
-                OwnshipMessage om = (OwnshipMessage)msg.obj;
-                String tosend = "ownship" + ",";
-                tosend += om.mLon + ",";
-                tosend += om.mLat + ",";
-                tosend += (float)(om.mHorizontalVelocity / 1.944) + ","; // kt to ms/s
-                tosend += om.mDirection + ",";
-                tosend += om.getTime();
-                if(mHelper != null) {
-                    try {
-                        mHelper.sendDataText(tosend);
-                    } catch (Exception e) {
-                    }
-                }
-                Log.d("Helper", tosend);
-            }
-            else if(msg.obj instanceof AdsbStatus) {
-            }
-        }
-    };
-    
     /**
      * 
      * @param helper
