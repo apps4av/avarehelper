@@ -11,6 +11,8 @@ Redistribution and use in source and binary forms, with or without modification,
 */
 package com.apps4av.avarehelper.gdl90;
 
+import com.apps4av.avarehelper.Logger;
+
 /**
  * 
  * @author zkhan
@@ -18,8 +20,8 @@ package com.apps4av.avarehelper.gdl90;
  */
 public class OwnshipMessage extends Message {
 
-    float mLat;
-    float mLon;
+    public float mLat;
+    public float mLon;
     
     
     boolean mIsAirborne;
@@ -28,16 +30,16 @@ public class OwnshipMessage extends Message {
     
     int mNIC;
     int mNACP;
-    int mHorizontalVelocity;
-    int mVerticalVelocity;
+    public int mHorizontalVelocity;
+    public int mVerticalVelocity;
     
-    int mAltitude;
+    public int mAltitude;
     
     boolean mIsTrackHeadingValid;
     boolean mIsTrackHeadingTrueTrackAngle;
     boolean mIsTrackHeadingHeading;
     boolean mIsTrackHeadingTrueHeading;
-    float   mDirection;
+    public float   mDirection;
 
     
     public OwnshipMessage() {

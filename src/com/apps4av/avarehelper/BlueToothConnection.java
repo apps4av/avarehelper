@@ -10,7 +10,7 @@ Redistribution and use in source and binary forms, with or without modification,
     *     THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-package com.apps4av.avarehelper.gdl90;
+package com.apps4av.avarehelper;
 
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -22,7 +22,11 @@ import java.util.UUID;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.apps4av.avarehelper.nmea.NMEA;
+
+import com.apps4av.avarehelper.gdl90.Id6364Product;
+import com.apps4av.avarehelper.gdl90.OwnshipMessage;
+import com.apps4av.avarehelper.gdl90.Product;
+import com.apps4av.avarehelper.gdl90.UplinkMessage;
 import com.apps4av.avarehelper.nmea.Ownship;
 import com.ds.avare.IHelper;
 
@@ -44,7 +48,7 @@ public class BlueToothConnection {
     
     private static BlueToothConnection mConnection;
     
-    private static AdsbStatus mAdsbStatus;
+    private static ConnectionStatus mAdsbStatus;
     private static IHelper mHelper;
 
     /*
@@ -69,8 +73,8 @@ public class BlueToothConnection {
         if(null == mConnection) {
             mConnection = new BlueToothConnection();
             mBtAdapter = BluetoothAdapter.getDefaultAdapter();
-            mAdsbStatus = new AdsbStatus();
-            mAdsbStatus.setState(AdsbStatus.DISCONNECTED);
+            mAdsbStatus = new ConnectionStatus();
+            mAdsbStatus.setState(ConnectionStatus.DISCONNECTED);
         }
         return mConnection;
     }
@@ -79,7 +83,7 @@ public class BlueToothConnection {
      * 
      */
     public void stop() {
-        if(mAdsbStatus.getState() != AdsbStatus.CONNECTED) {
+        if(mAdsbStatus.getState() != ConnectionStatus.CONNECTED) {
             return;
         }
         mRunning = false;
@@ -90,7 +94,7 @@ public class BlueToothConnection {
      */
     public void start() {
         
-        if(mAdsbStatus.getState() != AdsbStatus.CONNECTED) {
+        if(mAdsbStatus.getState() != ConnectionStatus.CONNECTED) {
             return;
         }
         
@@ -103,16 +107,21 @@ public class BlueToothConnection {
             @Override
             public void run() {
                 
-                byte[] buffer = new byte[32768];
-                DataBuffer dbuffer = new DataBuffer(32768);
-                Decode decode = new Decode();
-                NMEA nmea = new NMEA();
+                byte[] buffer = new byte[16384];
+                com.apps4av.avarehelper.gdl90.DataBuffer dbuffer = 
+                        new com.apps4av.avarehelper.gdl90.DataBuffer(16384);
+                com.apps4av.avarehelper.nmea.DataBuffer nbuffer = 
+                        new com.apps4av.avarehelper.nmea.DataBuffer(16384);
+                com.apps4av.avarehelper.gdl90.Decode decode = 
+                        new com.apps4av.avarehelper.gdl90.Decode();
+                com.apps4av.avarehelper.nmea.Decode ndecode = 
+                        new com.apps4av.avarehelper.nmea.Decode();
                 Ownship nmeaOwnship = new Ownship();
                 
                 
                 /*
                  * This state machine will keep trying to connect to 
-                 * ADBS receiver
+                 * ADBS/GPS receiver
                  */
                 while(mRunning) {
                     
@@ -132,12 +141,15 @@ public class BlueToothConnection {
                     }
 
                     /*
-                     * See if it is GPS NMEA data, and not ADS-B sequence
+                     * Put both in Decode and ADBS buffers
                      */
-                    if(NMEA.isNMEA(buffer, red)) {
-                        byte buff[] = new byte[red];
-                        System.arraycopy(buffer, 0, buff, 0, red);
-                        com.apps4av.avarehelper.nmea.Message m = nmea.decode(buff);
+                    nbuffer.put(buffer, red);                     
+                    dbuffer.put(buffer, red);
+                 
+                    byte[] buf;
+                    
+                    while(null != (buf = nbuffer.get())) {
+                        com.apps4av.avarehelper.nmea.Message m = ndecode.decode(buf);
                         if(nmeaOwnship.addMessage(m)) {
                                 
                             /*
@@ -167,10 +179,7 @@ public class BlueToothConnection {
                         }
                         continue;
                     }
-                     
-                    dbuffer.put(buffer, red);
-                 
-                    byte[] buf;
+
                     while(null != (buf = dbuffer.get())) {
 
                         /*
@@ -265,12 +274,12 @@ public class BlueToothConnection {
         /*
          * Only when not connected, connect
          */
-        if(mAdsbStatus.getState() != AdsbStatus.DISCONNECTED) {
+        if(mAdsbStatus.getState() != ConnectionStatus.DISCONNECTED) {
             return false;
         }
-        setState(AdsbStatus.CONNECTING);
+        setState(ConnectionStatus.CONNECTING);
         if(null == mBtAdapter) {
-            setState(AdsbStatus.DISCONNECTED);
+            setState(ConnectionStatus.DISCONNECTED);
             return false;
         }
         Set<BluetoothDevice> pairedDevices = mBtAdapter.getBondedDevices();
@@ -279,7 +288,7 @@ public class BlueToothConnection {
          * Find device
          */
         if(null == pairedDevices) {            
-            setState(AdsbStatus.DISCONNECTED);
+            setState(ConnectionStatus.DISCONNECTED);
             return false;
         }
         BluetoothDevice device = null;
@@ -295,7 +304,7 @@ public class BlueToothConnection {
         mBtAdapter.cancelDiscovery();
  
         if(null == device) {
-            setState(AdsbStatus.DISCONNECTED);
+            setState(ConnectionStatus.DISCONNECTED);
             return false;
         }
         
@@ -306,7 +315,7 @@ public class BlueToothConnection {
             mBtSocket = device.createRfcommSocketToServiceRecord(MY_UUID);
         } 
         catch(Exception e) {
-            setState(AdsbStatus.DISCONNECTED);
+            setState(ConnectionStatus.DISCONNECTED);
             return false;
         }
     
@@ -322,7 +331,7 @@ public class BlueToothConnection {
             } 
             catch(Exception e2) {
             }
-            setState(AdsbStatus.DISCONNECTED);
+            setState(ConnectionStatus.DISCONNECTED);
             return false;
         } 
 
@@ -335,10 +344,10 @@ public class BlueToothConnection {
             } 
             catch(Exception e2) {
             }
-            setState(AdsbStatus.DISCONNECTED);
+            setState(ConnectionStatus.DISCONNECTED);
         } 
 
-        setState(AdsbStatus.CONNECTED);
+        setState(ConnectionStatus.CONNECTED);
 
         return true;
     }
@@ -361,7 +370,7 @@ public class BlueToothConnection {
         } 
         catch(Exception e2) {
         }    
-        setState(AdsbStatus.DISCONNECTED);
+        setState(ConnectionStatus.DISCONNECTED);
     }
     
     /**
@@ -384,7 +393,7 @@ public class BlueToothConnection {
      * @return
      */
     public boolean isConnected() {
-        return mAdsbStatus.getState() == AdsbStatus.CONNECTED;
+        return mAdsbStatus.getState() == ConnectionStatus.CONNECTED;
     }
 
     /**
@@ -392,8 +401,8 @@ public class BlueToothConnection {
      * @return
      */
     public boolean isConnectedOrConnecting() {
-        return mAdsbStatus.getState() == AdsbStatus.CONNECTED ||
-                mAdsbStatus.getState() == AdsbStatus.CONNECTING;
+        return mAdsbStatus.getState() == ConnectionStatus.CONNECTED ||
+                mAdsbStatus.getState() == ConnectionStatus.CONNECTING;
     }
 
     /**

@@ -11,6 +11,8 @@ Redistribution and use in source and binary forms, with or without modification,
 */
 package com.apps4av.avarehelper.nmea;
 
+import com.apps4av.avarehelper.Logger;
+
 /**
  * 
  * @author zkhan
@@ -65,6 +67,10 @@ public class RMCMessage extends Message {
              */
             mHorizontalVelocity = (int)(Double.parseDouble(tokens[7]) * 0.514444);
             mDirection = (int)Double.parseDouble(tokens[8]);
+            
+            Logger.Logit("lat " + mLat + " lon " + mLon + " horzVel " + mHorizontalVelocity +
+                    " direction " + mDirection);
+
         }
         catch (Exception e) {
             

@@ -21,6 +21,50 @@ public class MessageFactory {
     
     public static Message buildMessage(byte bufin[]) {
         
+        int len = bufin.length;
+        
+        if(len < 6) {
+            /*
+             * A simple check for length
+             */
+            return null;
+        }
+        
+        /*
+         * Check checksum
+         */
+        byte cs[];
+        cs = new byte[2];
+        /*
+         * Starts with $GP, ends with checksum *DD
+         */
+        if(bufin[0] == 36 && bufin[1] == 71 && bufin[2] == 80 &&
+                bufin[len - 3] == 42) {
+            int xor = 0;
+            int i = 1;
+            /*
+             * Find checksum from after $ to before *
+             */
+            while(i < len) {
+                if(bufin[i] == 42) {
+                    break;
+                }
+                xor = xor ^ ((int)bufin[i] & 0xFF);
+                i++;
+            }
+            
+            /*
+             * Checksum is in xor data[len - 1] and data[len - 2] has checksum in Hex
+             */
+            System.arraycopy(bufin, len - 2, cs, 0, 2);
+            String css = new String(cs);
+            String ma = Integer.toHexString(xor);
+            if(!ma.equals(css)) {
+                return null;
+            }
+        }
+
+        
         /*
          * data has actual data and type is its type
          * Parse now

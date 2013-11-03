@@ -11,6 +11,8 @@ Redistribution and use in source and binary forms, with or without modification,
 */
 package com.apps4av.avarehelper.gdl90;
 
+import com.apps4av.avarehelper.Logger;
+
 /**
  * 
  * @author zkhan

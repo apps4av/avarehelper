@@ -11,6 +11,8 @@ Redistribution and use in source and binary forms, with or without modification,
 */
 package com.apps4av.avarehelper.nmea;
 
+import com.apps4av.avarehelper.Logger;
+
 /**
  * 
  * @author zkhan
@@ -60,6 +62,8 @@ public class GGAMessage extends Message {
                 mLon = -mLon;
             }
             mAltitude = (int)Double.parseDouble(tokens[9]);
+            
+            Logger.Logit("lat " + mLat + " lon " + mLon + " mAltitude "  + mAltitude);
         }
         catch (Exception e) {
             

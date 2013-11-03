@@ -21,52 +21,7 @@ import com.apps4av.avarehelper.nmea.MessageFactory;
  *
  * http://www.gpsinformation.org/dale/nmea.htm#RMC
  */
-public class NMEA {
-
-    /**
-     * 
-     * @param buffer
-     * @param len
-     * @return
-     */
-    public static boolean isNMEA(byte buffer[], int len) {
-        byte data[];
-        data = new byte[len];
-        byte cs[];
-        cs = new byte[2];
-        System.arraycopy(buffer, 0, data, 0, len);
-        /*
-         * Starts with $GP, ends with checksum *DD\r\n
-         */
-        if(data[0] == 36 && data[1] == 71 && data[2] == 80 &&
-                data[len - 5] == 42 &&
-                data[len - 2] == 13 && data[len - 1] == 10) {
-            int xor = 0;
-            int i = 1;
-            /*
-             * Find checksum from after $ to before *
-             */
-            while(i < len) {
-                if(data[i] == 42) {
-                    break;
-                }
-                xor = xor ^ ((int)data[i] & 0xFF);
-                i++;
-            }
-            
-            /*
-             * Checksum is in xor data[len - 3] and data[len - 4] has checksum in Hex
-             */
-            System.arraycopy(data, len - 4, cs, 0, 2);
-            String css = new String(cs);
-            String ma = Integer.toHexString(xor);
-            if(ma.equals(css)) {
-                return true;
-            }
-        }
-        return false;
-    }
-    
+public class Decode {    
     /**
      * 
      * @param bufin

@@ -3,7 +3,6 @@ package com.apps4av.avarehelper;
 
 import java.util.List;
 
-import com.apps4av.avarehelper.gdl90.BlueToothConnection;
 import com.ds.avare.IHelper;
 
 import android.app.Activity;
@@ -29,6 +28,7 @@ public class MainActivity extends Activity {
     private List<String> mList;
     private Button mConnectButton;
     private BlueToothConnection mBt;
+    private boolean mBound;
 
     /**
      * 
@@ -43,6 +43,7 @@ public class MainActivity extends Activity {
                 IBinder service) {
             
              mBt.setHelper(IHelper.Stub.asInterface(service));
+             mBound = true;
         }
 
         /* (non-Javadoc)
@@ -50,6 +51,7 @@ public class MainActivity extends Activity {
          */
         @Override
         public void onServiceDisconnected(ComponentName arg0) {
+            mBound = false;
         }
     };
 
@@ -64,6 +66,7 @@ public class MainActivity extends Activity {
         LayoutInflater layoutInflater = (LayoutInflater)getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View view = layoutInflater.inflate(R.layout.activity_main, null);
         setContentView(view);
+        mBound = false;
 
         
         mConnectButton = (Button)view.findViewById(R.id.button_connect);
@@ -78,7 +81,10 @@ public class MainActivity extends Activity {
                     mBt.stop();
                     mBt.disconnect();
                     mConnectButton.setText(getApplicationContext().getString(R.string.Connect));
-                    unbindService(mConnection);
+                    if(mBound) {
+                        unbindService(mConnection);
+                        mBound = false;
+                    }
                     return;
                 }
                 /*
@@ -93,9 +99,11 @@ public class MainActivity extends Activity {
                         /*
                          * Start the helper service in Avare.
                          */
-                        Intent i = new Intent("com.ds.avare.START_SERVICE");
-                        i.setClassName("com.ds.avare", "com.ds.avare.IHelperService");
-                        bindService(i, mConnection, Context.BIND_AUTO_CREATE);
+                        if(!mBound) {
+                            Intent i = new Intent("com.ds.avare.START_SERVICE");
+                            i.setClassName("com.ds.avare", "com.ds.avare.IHelperService");
+                            bindService(i, mConnection, Context.BIND_AUTO_CREATE);
+                        }
                     }
                 }
             }
@@ -116,7 +124,10 @@ public class MainActivity extends Activity {
 
     @Override
     protected void onDestroy() {
-        unbindService(mConnection);
+        if(mBound) {
+            unbindService(mConnection);
+            mBound = false;
+        }
         if(mBt.isConnected()) {
             mBt.stop();
         }
