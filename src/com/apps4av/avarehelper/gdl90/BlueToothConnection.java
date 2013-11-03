@@ -19,6 +19,9 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import com.ds.avare.IHelper;
 
 import android.bluetooth.BluetoothAdapter;
@@ -152,17 +155,23 @@ public class BlueToothConnection {
                             /*
                              * Make a GPS locaiton message from ADSB ownship message.
                              */
+                            JSONObject object = new JSONObject();
                             OwnshipMessage om = (OwnshipMessage)m;
-                            String tosend = "ownship" + ",";
-                            tosend += om.mLon + ",";
-                            tosend += om.mLat + ",";
-                            tosend += (float)(om.mHorizontalVelocity / 1.944) + ","; // kt to ms/s
-                            tosend += om.mDirection + ",";
-                            tosend += (om.mAltitude / 3.28084) + ",";
-                            tosend += om.getTime();
+                            try {
+                                object.put("type", "ownship");
+                                object.put("longitude", (double)om.mLon);
+                                object.put("latitude", (double)om.mLat);
+                                object.put("speed", (double)(om.mHorizontalVelocity / 1.944f));
+                                object.put("bearing", (double)om.mDirection);
+                                object.put("altitude", (double)((double)om.mAltitude / 3.28084));
+                                object.put("time", (long)om.getTime());
+                            } catch (JSONException e1) {
+                                return;
+                            }
+                            
                             if(mHelper != null) {
                                 try {
-                                    mHelper.sendDataText(tosend);
+                                    mHelper.sendDataText(object.toString());
                                 } catch (Exception e) {
                                 }
                             }
