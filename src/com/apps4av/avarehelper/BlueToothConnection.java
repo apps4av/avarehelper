@@ -50,6 +50,8 @@ public class BlueToothConnection {
     
     private static ConnectionStatus mAdsbStatus;
     private static IHelper mHelper;
+    
+    private Thread mThread;
 
     /*
      *  Well known SPP UUID
@@ -87,6 +89,9 @@ public class BlueToothConnection {
             return;
         }
         mRunning = false;
+        if(null != mThread) {
+            mThread.interrupt();
+        }
     }
 
     /**
@@ -103,7 +108,7 @@ public class BlueToothConnection {
         /*
          * Thread that reads BT
          */
-        Thread thread = new Thread() {
+        mThread = new Thread() {
             @Override
             public void run() {
                 
@@ -232,7 +237,7 @@ public class BlueToothConnection {
                 
             }
         };
-        thread.start();
+        mThread.start();
     }
     
     /**
