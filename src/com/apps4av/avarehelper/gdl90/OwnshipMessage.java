@@ -65,7 +65,10 @@ public class OwnshipMessage extends Message {
         int alt = upper + lower;
         alt *= 25;
         alt -= 1000;
-        mAltitude = alt;
+        /*
+         * In meters
+         */
+        mAltitude = (int)((double)alt / 3.28084);
         
         /*
          * Misc.
@@ -85,7 +88,10 @@ public class OwnshipMessage extends Message {
          */
         upper = ((int)(msg[13] & 0xFF)) << 4;
         lower = ((int)(msg[14] & 0xF0)) >> 4;
-        mHorizontalVelocity = upper + lower;
+        /*
+         * Knots to m/s
+         */
+        mHorizontalVelocity = (int)(((float)upper + (float)lower) * 0.514444f);
 
         /*
          * VS

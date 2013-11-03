@@ -22,6 +22,8 @@ import java.util.UUID;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.apps4av.avarehelper.nmea.NMEA;
+import com.apps4av.avarehelper.nmea.Ownship;
 import com.ds.avare.IHelper;
 
 import android.bluetooth.BluetoothAdapter;
@@ -104,6 +106,8 @@ public class BlueToothConnection {
                 byte[] buffer = new byte[32768];
                 DataBuffer dbuffer = new DataBuffer(32768);
                 Decode decode = new Decode();
+                NMEA nmea = new NMEA();
+                Ownship nmeaOwnship = new Ownship();
                 
                 
                 /*
@@ -126,6 +130,44 @@ public class BlueToothConnection {
                         }
                         continue;
                     }
+
+                    /*
+                     * See if it is GPS NMEA data, and not ADS-B sequence
+                     */
+                    if(NMEA.isNMEA(buffer, red)) {
+                        byte buff[] = new byte[red];
+                        System.arraycopy(buffer, 0, buff, 0, red);
+                        com.apps4av.avarehelper.nmea.Message m = nmea.decode(buff);
+                        if(nmeaOwnship.addMessage(m)) {
+                                
+                            /*
+                             * Make a GPS locaiton message from ADSB ownship message.
+                             */
+                            JSONObject object = new JSONObject();
+                            Ownship om = nmeaOwnship;
+                            try {
+                                object.put("type", "ownship");
+                                object.put("longitude", (double)om.mLon);
+                                object.put("latitude", (double)om.mLat);
+                                object.put("speed", (double)(om.mHorizontalVelocity));
+                                object.put("bearing", (double)om.mDirection);
+                                object.put("altitude", (double)((double)om.mAltitude));
+                                object.put("time", (long)om.getTime());
+                            } catch (JSONException e1) {
+                                return;
+                            }
+                            
+                            if(mHelper != null) {
+                                try {
+                                    mHelper.sendDataText(object.toString());
+                                } catch (Exception e) {
+                                }
+                            }
+
+                        }
+                        continue;
+                    }
+                     
                     dbuffer.put(buffer, red);
                  
                     byte[] buf;
@@ -161,9 +203,9 @@ public class BlueToothConnection {
                                 object.put("type", "ownship");
                                 object.put("longitude", (double)om.mLon);
                                 object.put("latitude", (double)om.mLat);
-                                object.put("speed", (double)(om.mHorizontalVelocity / 1.944f));
+                                object.put("speed", (double)(om.mHorizontalVelocity));
                                 object.put("bearing", (double)om.mDirection);
-                                object.put("altitude", (double)((double)om.mAltitude / 3.28084));
+                                object.put("altitude", (double)((double)om.mAltitude));
                                 object.put("time", (long)om.getTime());
                             } catch (JSONException e1) {
                                 return;
