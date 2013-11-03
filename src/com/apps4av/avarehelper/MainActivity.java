@@ -18,6 +18,7 @@ import android.view.View.OnClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.Spinner;
+import android.widget.TextView;
 
 /**
  * author zkhan
@@ -29,6 +30,7 @@ public class MainActivity extends Activity {
     private Button mConnectButton;
     private BlueToothConnection mBt;
     private boolean mBound;
+    private TextView mText;
 
     /**
      * 
@@ -44,6 +46,7 @@ public class MainActivity extends Activity {
             
              mBt.setHelper(IHelper.Stub.asInterface(service));
              mBound = true;
+             mText.setText(getString(R.string.Connected));
         }
 
         /* (non-Javadoc)
@@ -68,6 +71,7 @@ public class MainActivity extends Activity {
         setContentView(view);
         mBound = false;
 
+        mText = (TextView)view.findViewById(R.id.text);
         
         mConnectButton = (Button)view.findViewById(R.id.button_connect);
         mConnectButton.setOnClickListener(new OnClickListener() {
@@ -83,6 +87,7 @@ public class MainActivity extends Activity {
                     mConnectButton.setText(getApplicationContext().getString(R.string.Connect));
                     if(mBound) {
                         unbindService(mConnection);
+                        mText.setText(getString(R.string.NotConnected));
                         mBound = false;
                     }
                     return;
@@ -125,6 +130,7 @@ public class MainActivity extends Activity {
     @Override
     protected void onDestroy() {
         if(mBound) {
+            mText.setText(getString(R.string.NotConnected));
             unbindService(mConnection);
             mBound = false;
         }

@@ -52,6 +52,7 @@ public class BlueToothConnection {
     private static IHelper mHelper;
     
     private Thread mThread;
+    private String mDevName;
 
     /*
      *  Well known SPP UUID
@@ -142,6 +143,12 @@ public class BlueToothConnection {
                         } catch (Exception e) {
                             
                         }
+                        
+                        /*
+                         * Try to reconnect
+                         */
+                        disconnect();
+                        connect(mDevName);
                         continue;
                     }
 
@@ -276,6 +283,12 @@ public class BlueToothConnection {
      * @return
      */
     public boolean connect(String devNameMatch) {
+        if(devNameMatch == null) {
+            return false;
+        }
+        
+        mDevName = devNameMatch;
+        
         /*
          * Only when not connected, connect
          */
