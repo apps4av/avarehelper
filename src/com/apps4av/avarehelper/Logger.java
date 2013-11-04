@@ -20,7 +20,11 @@ import android.util.Log;
  */
 public class Logger {
 
+    private static boolean mLog = false;
+    
     public static void Logit(String msg) {
-        Log.d("Avare ADS-B", msg);
+        if(mLog) {
+            Log.d("Avare Addon", msg);
+        }
     }
 }

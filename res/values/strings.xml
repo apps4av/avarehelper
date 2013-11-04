@@ -1,12 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">Avare Plus</string>
+    <string name="app_name">Avare Addon</string>
     <string name="Connect">Connect</string>
     <string name="Avare">Avare</string>
     <string name="Connected">Avare Connected and Linked</string>
     <string name="NotConnected">Avare Not Connected</string>
     <string name="ADSB">ADSB</string>
+    <string name="Exit">Exit</string>
+    <string name="Yes">Yes</string>
+    <string name="No">No</string>
     <string name="Disconnect">Disconnect</string>
     
 </resources>
