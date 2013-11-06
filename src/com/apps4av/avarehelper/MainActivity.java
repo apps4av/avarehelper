@@ -45,6 +45,7 @@ public class MainActivity extends Activity {
     private BlueToothConnection mBt;
     private boolean mBound;
     private TextView mText;
+    private TextView mTextLog;
 
     /**
      * Shows exit dialog
@@ -138,6 +139,9 @@ public class MainActivity extends Activity {
 
         mText = (TextView)view.findViewById(R.id.main_text);
         
+        mTextLog = (TextView)view.findViewById(R.id.main_text_log);
+        Logger.setTextView(mTextLog);
+        
         mConnectButton = (Button)view.findViewById(R.id.main_button_connect);
         mConnectButton.setOnClickListener(new OnClickListener() {
             
@@ -216,6 +220,8 @@ public class MainActivity extends Activity {
             catch (Exception e) {
             }
         }
+        
+        Logger.setTextView(null);
 
         super.onDestroy();
     }

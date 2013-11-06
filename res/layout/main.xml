@@ -61,5 +61,17 @@ Redistribution and use in source and binary forms, with or without modification,
 	        android:layout_height="wrap_content"
 	        android:text="@string/Connect"/>
     </LinearLayout>
-    
+
+    <ScrollView
+	    android:layout_width="fill_parent"
+	    android:layout_below="@+android/main_bluetooth"
+	    android:layout_height="wrap_content"
+	    android:scrollbars="vertical"
+	    android:fillViewport="true">
+	    <TextView
+	            android:id="@+id/main_text_log"
+	            android:layout_margin="10dp"
+	            android:layout_width="fill_parent"
+	            android:layout_height="wrap_content"/>
+    </ScrollView>
 </RelativeLayout>

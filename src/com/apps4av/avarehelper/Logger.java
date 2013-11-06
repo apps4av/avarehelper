@@ -11,7 +11,9 @@ Redistribution and use in source and binary forms, with or without modification,
 */
 package com.apps4av.avarehelper;
 
-import android.util.Log;
+import android.os.Handler;
+import android.os.Message;
+import android.widget.TextView;
 
 /**
  * 
@@ -20,11 +22,32 @@ import android.util.Log;
  */
 public class Logger {
 
-    private static boolean mLog = false;
+    private static TextView mTv;
     
     public static void Logit(String msg) {
-        if(mLog) {
-            Log.d("Avare Addon", msg);
-        }
+        Message m = mHandler.obtainMessage();
+        m.obj = (Object)msg;
+        mHandler.sendMessage(m);
     }
+    
+    /**
+     * 
+     * @param tv
+     */
+    public static void setTextView(TextView tv) {
+        mTv = tv;
+    }
+    
+    /**
+     * This leak warning is not an issue if we do not post delayed messages, which is true here.
+     */
+    private static Handler mHandler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            if(null != msg && null != mTv) {
+                mTv.setText((String)msg.obj + "\n" + mTv.getText());
+            }
+        }
+    };
+    
 }
