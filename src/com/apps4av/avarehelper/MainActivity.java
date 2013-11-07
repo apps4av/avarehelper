@@ -31,6 +31,8 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
 
@@ -43,9 +45,12 @@ public class MainActivity extends Activity {
     private List<String> mList;
     private Button mConnectButton;
     private BlueToothConnection mBt;
+    private XplaneConnection mXp;
     private boolean mBound;
     private TextView mText;
     private TextView mTextLog;
+    private EditText mTextXplanePort;
+    private CheckBox mXplaneCb;
 
     /**
      * Shows exit dialog
@@ -110,6 +115,7 @@ public class MainActivity extends Activity {
               * Get interface to Avare
               */
              mBt.setHelper(IHelper.Stub.asInterface(service));
+             mXp.setHelper(IHelper.Stub.asInterface(service));
              mBound = true;
              mText.setText(getString(R.string.Connected));
         }
@@ -141,7 +147,32 @@ public class MainActivity extends Activity {
         
         mTextLog = (TextView)view.findViewById(R.id.main_text_log);
         Logger.setTextView(mTextLog);
-        
+
+        mTextXplanePort = (EditText)view.findViewById(R.id.main_xplane_port);
+        mXplaneCb = (CheckBox)view.findViewById(R.id.main_button_xplane_connect);
+        mXplaneCb.setOnClickListener(new OnClickListener() {
+            
+            @Override
+            public void onClick(View v) {
+              if (((CheckBox) v).isChecked()) {
+                  try {
+                      mXp.connect(Integer.parseInt(mTextXplanePort.getText().toString()));
+                  }
+                  catch (Exception e) {
+                      /*
+                       * Number parse
+                       */
+                      Logger.Logit("Invalid port");
+                  }
+                  mXp.start();
+              }
+              else {
+                  mXp.stop();
+                  mXp.disconnect();
+              }
+            }
+          });
+
         mConnectButton = (Button)view.findViewById(R.id.main_button_connect);
         mConnectButton.setOnClickListener(new OnClickListener() {
             
@@ -154,11 +185,7 @@ public class MainActivity extends Activity {
                     mBt.stop();
                     mBt.disconnect();
                     mConnectButton.setText(getApplicationContext().getString(R.string.Connect));
-                    if(mBound) {
-                        unbindService(mConnection);
-                        mText.setText(getString(R.string.NotConnected));
-                        mBound = false;
-                    }
+                    mText.setText(getString(R.string.NotConnected));
                     return;
                 }
                 /*
@@ -170,14 +197,6 @@ public class MainActivity extends Activity {
                     if(mBt.isConnected()) {
                         mConnectButton.setText(getApplicationContext().getString(R.string.Disconnect));
                         mBt.start();
-                        /*
-                         * Start the helper service in Avare.
-                         */
-                        if(!mBound) {
-                            Intent i = new Intent("com.ds.avare.START_SERVICE");
-                            i.setClassName("com.ds.avare", "com.ds.avare.IHelperService");
-                            bindService(i, mConnection, Context.BIND_AUTO_CREATE);
-                        }
                     }
                 }
             }
@@ -187,6 +206,12 @@ public class MainActivity extends Activity {
          * BT connection
          */
         mBt = BlueToothConnection.getInstance();
+        
+        /*
+         * Xplane connection
+         */
+        mXp = XplaneConnection.getInstance();
+        
         /*
          * For selecting adsb/nmea device
          */
@@ -196,6 +221,14 @@ public class MainActivity extends Activity {
                 android.R.layout.simple_spinner_item, mList);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         mSpinner.setAdapter(adapter);       
+
+        /*
+         * Start the helper service in Avare.
+         */
+        Intent i = new Intent("com.ds.avare.START_SERVICE");
+        i.setClassName("com.ds.avare", "com.ds.avare.IHelperService");
+        bindService(i, mConnection, Context.BIND_AUTO_CREATE);
+
     }
 
     @Override
@@ -212,6 +245,10 @@ public class MainActivity extends Activity {
         if(mBt.isConnected()) {
             mBt.stop();
         }
+        
+        mXp.disconnect();
+        mXp.stop();
+        
         
         if(null != mAlertDialogExit) {
             try {

@@ -62,9 +62,39 @@ Redistribution and use in source and binary forms, with or without modification,
 	        android:text="@string/Connect"/>
     </LinearLayout>
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+android/main_xplane"
+        android:layout_below="@+android/main_bluetooth"
+        android:background="@drawable/border_green_small">
+    
+        <ImageView
+            android:contentDescription="@string/XPlane"
+            android:layout_margin="10dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/xplane"
+            />
+        <EditText
+            android:id="@+id/main_xplane_port"
+            android:layout_margin="10dp"
+            android:inputType="number"
+            android:text="@string/XPlanePort"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+    
+        <CheckBox
+            android:id="@+id/main_button_xplane_connect"
+            android:layout_width="wrap_content"
+            android:layout_margin="10dp"
+            android:layout_height="wrap_content"
+            android:text="@string/Listen"/>
+    </LinearLayout>
+    
     <ScrollView
 	    android:layout_width="fill_parent"
-	    android:layout_below="@+android/main_bluetooth"
+	    android:layout_below="@+android/main_xplane"
 	    android:layout_height="wrap_content"
 	    android:scrollbars="vertical"
 	    android:fillViewport="true">
