@@ -50,6 +50,7 @@ public class MainActivity extends Activity {
     private TextView mText;
     private TextView mTextLog;
     private EditText mTextXplanePort;
+    private TextView mTextXplaneIp;
     private CheckBox mXplaneCb;
 
     /**
@@ -148,9 +149,12 @@ public class MainActivity extends Activity {
         mTextLog = (TextView)view.findViewById(R.id.main_text_log);
         Logger.setTextView(mTextLog);
 
+        mTextXplaneIp = (TextView)view.findViewById(R.id.main_xplane_ip);
         mTextXplanePort = (EditText)view.findViewById(R.id.main_xplane_port);
         mXplaneCb = (CheckBox)view.findViewById(R.id.main_button_xplane_connect);
+        mTextXplaneIp.setText(Util.getIpAddr(this));
         mXplaneCb.setOnClickListener(new OnClickListener() {
+            
             
             @Override
             public void onClick(View v) {
