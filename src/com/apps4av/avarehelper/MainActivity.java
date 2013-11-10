@@ -192,7 +192,12 @@ public class MainActivity extends Activity {
                 if(mBt.isConnected()) {
                     mBt.stop();
                     mBt.disconnect();
-                    mConnectButton.setText(getApplicationContext().getString(R.string.Connect));
+                    if(mBt.isConnected()) {
+                        mConnectButton.setText(getApplicationContext().getString(R.string.Disconnect));
+                    }
+                    else {
+                        mConnectButton.setText(getApplicationContext().getString(R.string.Connect));                        
+                    }
                     return;
                 }
                 /*
@@ -200,10 +205,16 @@ public class MainActivity extends Activity {
                  */
                 String val = (String)mSpinner.getSelectedItem();
                 if(null != val && (!mBt.isConnected())) {                    
+                    mConnectButton.setText(getApplicationContext().getString(R.string.Connect));
                     mBt.connect(val);
                     if(mBt.isConnected()) {
-                        mConnectButton.setText(getApplicationContext().getString(R.string.Disconnect));
                         mBt.start();
+                    }
+                    if(mBt.isConnected()) {
+                        mConnectButton.setText(getApplicationContext().getString(R.string.Disconnect));
+                    }
+                    else {
+                        mConnectButton.setText(getApplicationContext().getString(R.string.Connect));                        
                     }
                 }
             }
@@ -220,7 +231,12 @@ public class MainActivity extends Activity {
                 if(mBtOut.isConnected()) {
                     mBtOut.stop();
                     mBtOut.disconnect();
-                    mConnectButtonOut.setText(getApplicationContext().getString(R.string.Connect));
+                    if(mBtOut.isConnected()) {
+                        mConnectButtonOut.setText(getApplicationContext().getString(R.string.Disconnect));
+                    }
+                    else {
+                        mConnectButtonOut.setText(getApplicationContext().getString(R.string.Connect));                        
+                    }
                     return;
                 }
                 /*
@@ -230,8 +246,13 @@ public class MainActivity extends Activity {
                 if(null != val && (!mBtOut.isConnected())) {                    
                     mBtOut.connect(val);
                     if(mBtOut.isConnected()) {
-                        mConnectButtonOut.setText(getApplicationContext().getString(R.string.Disconnect));
                         mBtOut.start();
+                    }
+                    if(mBtOut.isConnected()) {
+                        mConnectButtonOut.setText(getApplicationContext().getString(R.string.Disconnect));
+                    }
+                    else {
+                        mConnectButtonOut.setText(getApplicationContext().getString(R.string.Connect));                        
                     }
                 }
             }
