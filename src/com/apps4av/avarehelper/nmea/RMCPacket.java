@@ -101,6 +101,18 @@ public class RMCPacket {
         }
 
         /*
+         * Put speed in m/s
+         */
+        mPacket += String.format("%05.1f", speed);
+        mPacket += ",";
+
+        /*
+         * Put bearing
+         */
+        mPacket += String.format("%05.1f", bearing);
+        mPacket += ",";
+
+        /*
          * Put date
          */
         sdf = new SimpleDateFormat("ddMMyy", Locale.US);

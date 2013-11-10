@@ -23,7 +23,7 @@ public abstract class Message {
     
     public Message(String type) {
         mType = type; 
-        mTime = System.nanoTime();
+        mTime = System.currentTimeMillis();
     }
     
     public long getTime() {
