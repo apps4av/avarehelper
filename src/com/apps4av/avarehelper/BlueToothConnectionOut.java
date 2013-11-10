@@ -39,14 +39,14 @@ import android.bluetooth.BluetoothSocket;
  * @author zkhan
  *
  */
-public class CopyOfBlueToothConnectionOut {
+public class BlueToothConnectionOut {
 
     private static BluetoothAdapter mBtAdapter = null;
     private static BluetoothSocket mBtSocket = null;
     private static InputStream mStream = null;
     private static boolean mRunning = false;
     
-    private static CopyOfBlueToothConnectionOut mConnection;
+    private static BlueToothConnectionOut mConnection;
     
     private static ConnectionStatus mAdsbStatus;
     private static IHelper mHelper;
@@ -63,7 +63,7 @@ public class CopyOfBlueToothConnectionOut {
     /**
      * 
      */
-    private CopyOfBlueToothConnectionOut() {
+    private BlueToothConnectionOut() {
     }
 
     
@@ -71,10 +71,10 @@ public class CopyOfBlueToothConnectionOut {
      * 
      * @return
      */
-    public static CopyOfBlueToothConnectionOut getInstance() {
+    public static BlueToothConnectionOut getInstance() {
 
         if(null == mConnection) {
-            mConnection = new CopyOfBlueToothConnectionOut();
+            mConnection = new BlueToothConnectionOut();
             mBtAdapter = BluetoothAdapter.getDefaultAdapter();
             mAdsbStatus = new ConnectionStatus();
             mAdsbStatus.setState(ConnectionStatus.DISCONNECTED);
