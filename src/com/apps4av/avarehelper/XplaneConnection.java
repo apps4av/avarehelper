@@ -122,7 +122,7 @@ public class XplaneConnection {
                     }
 
                     String input = new String(buffer);
-                    if(input.startsWith("XGPSG")) {
+                    if(input.startsWith("XGPS")) {
                         String tokens[] = input.split(",");
                         if(tokens.length >= 6) {
                             /*

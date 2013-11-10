@@ -8,7 +8,7 @@
     <string name="NotConnected">Avare Not Connected</string>
     <string name="ADSB">ADSB</string>
     <string name="XPlane">XPlane</string>
-    <string name="XPlanePort">49000</string>
+    <string name="XPlanePort">49002</string>
     <string name="Exit">Exit</string>
     <string name="Yes">Yes</string>
     <string name="No">No</string>
