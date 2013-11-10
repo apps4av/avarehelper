@@ -12,20 +12,19 @@ Redistribution and use in source and binary forms, with or without modification,
 
 package com.apps4av.avarehelper;
 
-import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-import org.json.JSONException;
 import org.json.JSONObject;
-
 
 import com.ds.avare.IHelper;
 
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
-import android.os.RemoteException;
 
 /**
  * 
@@ -36,7 +35,7 @@ public class BlueToothConnectionOut {
 
     private static BluetoothAdapter mBtAdapter = null;
     private static BluetoothSocket mBtSocket = null;
-    private static InputStream mStream = null;
+    private static OutputStream mStream = null;
     private static boolean mRunning = false;
     
     private static BlueToothConnectionOut mConnection;
@@ -110,28 +109,84 @@ public class BlueToothConnectionOut {
             @Override
             public void run() {
                 
-                Logger.Logit("BT sending data");
+                Logger.Logit("BT writing data");
 
-                
                 /*
                  * This state machine will keep trying to connect to 
                  * ADBS/GPS receiver
                  */
                 while(mRunning) {
+                    
+                    /*
+                     * Read data from Avare
+                     */
+                    String recvd = null;
                     try {
-                        String data = mHelper.recvDataText();
-                        Logger.Logit(data);
-                    } catch (Exception e) {
+                        recvd = mHelper.recvDataText();
+                    } catch (Exception e1) {
                         try {
-                            Thread.sleep(100);
-                        }
-                        catch (Exception e1) {
+                            Thread.sleep(1000);
+                        } catch (Exception e) {
                             
                         }
+                        continue;
                     }
-                }
                     
-                
+                    if(null == recvd) {
+                        continue;
+                    }
+
+                    /*
+                     * Send to BT
+                     */
+                    try {
+                        JSONObject object;
+                        object = new JSONObject(recvd);
+                        Logger.Logit("sending message to BT " + mDevName + " " + 
+                                object.toString());
+                        String type = object.getString("type");
+                        if(type == null) {
+                            continue;
+                        }
+                        if(type.equals("ownship")) {
+                            object.getDouble("longitude");
+                            object.getDouble("latitude");
+                            object.getDouble("speed");
+                            object.getDouble("bearing");
+                            object.getDouble("altitude");
+                            object.getLong("time");
+                        }
+                    } catch (Exception e) {
+                        continue;
+                    }
+                    
+                    int wrote = 0;
+                    byte buffer[] = "GPG".getBytes();
+                    /*
+                     * Read.
+                     */
+                    wrote = write(buffer);
+                    if(wrote <= 0) {
+                        if(!mRunning) {
+                            break;
+                        }
+                        try {
+                            Thread.sleep(1000);
+                        } catch (Exception e) {
+                            
+                        }
+                        
+                        /*
+                         * Try to reconnect
+                         */
+                        Logger.Logit("Disconnected from BT device, retrying to connect");
+
+                        disconnect();
+                        connect(mDevName);
+                        continue;
+                    }
+
+                }
             }
         };
         mThread.start();
@@ -143,6 +198,27 @@ public class BlueToothConnectionOut {
      */
     private void setState(int state) {
         mConnectionStatus.setState(state);
+    }
+    
+    /**
+     * 
+     * @return
+     */
+    public List<String> getDevices() {
+        Set<BluetoothDevice> pairedDevices = mBtAdapter.getBondedDevices();
+        List<String> list = new ArrayList<String>();
+        
+        /*
+         * Find devices
+         */
+        if(null == pairedDevices) {            
+            return null;
+        }
+        for(BluetoothDevice bt : pairedDevices) {
+            list.add((String)bt.getName());
+        }
+        
+        return list;
     }
     
     /**
@@ -246,7 +322,7 @@ public class BlueToothConnectionOut {
         Logger.Logit("Getting input stream");
 
         try {
-            mStream = mBtSocket.getInputStream();
+            mStream = mBtSocket.getOutputStream();
         } 
         catch (Exception e) {
             try {
@@ -297,15 +373,15 @@ public class BlueToothConnectionOut {
      * 
      * @return
      */
-    private int read(byte[] buffer) {
-        int red = -1;
+    private int write(byte[] buffer) {
+        int wrote = buffer.length;
         try {
-            red = mStream.read(buffer, 0, buffer.length);
+            mStream.write(buffer, 0, buffer.length);
         } 
         catch(Exception e) {
-            red = -1;
+            wrote = -1;
         }
-        return red;
+        return wrote;
     }
 
     /**
