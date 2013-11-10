@@ -60,7 +60,14 @@ Redistribution and use in source and binary forms, with or without modification,
             android:layout_margin="10dp"
 	        android:layout_height="wrap_content"
 	        android:text="@string/Connect"/>
-    </LinearLayout>
+        
+        <TextView
+            android:layout_margin="10dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text ="@string/DescExt"
+            />
+	    </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -94,7 +101,13 @@ Redistribution and use in source and binary forms, with or without modification,
             android:layout_margin="10dp"
             android:layout_height="wrap_content"
             android:text="@string/Listen"/>
-    </LinearLayout>
+        <TextView
+            android:layout_margin="10dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text ="@string/DescFS"
+            />
+        </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -122,7 +135,13 @@ Redistribution and use in source and binary forms, with or without modification,
             android:layout_margin="10dp"
             android:layout_height="wrap_content"
             android:text="@string/Connect"/>
-    </LinearLayout>
+        <TextView
+            android:layout_margin="10dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text ="@string/DescAP"
+            />
+        </LinearLayout>
     
     <ScrollView
 	    android:layout_width="fill_parent"

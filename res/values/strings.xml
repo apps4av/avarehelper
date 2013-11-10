@@ -4,7 +4,7 @@
     <string name="app_name">Avare Addon</string>
     <string name="Connect">Connect</string>
     <string name="Avare">Avare</string>
-    <string name="Connected">Avare Connected and Linked</string>
+    <string name="Connected">Avare Connected and Linked. Make sure the phone/tablet internal GPS is disabled.</string>
     <string name="NotConnected">Avare Not Connected</string>
     <string name="ADSB">ADSB</string>
     <string name="XPlane">XPlane</string>
@@ -14,5 +14,7 @@
     <string name="No">No</string>
     <string name="Disconnect">Disconnect</string>
     <string name="Listen">Listen</string>
-    
+    <string name="DescFS">Connect to GPS/ADSB units on Bluetooth</string>
+    <string name="DescExt">Connect to Flight Simulators on WIFI</string>
+    <string name="DescAP">Connect to Autopilots on Bluetooth</string>
 </resources>
