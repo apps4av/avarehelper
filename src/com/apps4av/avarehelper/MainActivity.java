@@ -44,7 +44,7 @@ public class MainActivity extends Activity {
     private Spinner mSpinner;
     private List<String> mList;
     private Button mConnectButton;
-    private BlueToothConnection mBt;
+    private BlueToothConnectionIn mBt;
     private XplaneConnection mXp;
     private boolean mBound;
     private TextView mText;
@@ -209,7 +209,7 @@ public class MainActivity extends Activity {
         /*
          * BT connection
          */
-        mBt = BlueToothConnection.getInstance();
+        mBt = BlueToothConnectionIn.getInstance();
         
         /*
          * Xplane connection
