@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">Avare Addon</string>
+    <string name="app_name">Avare External I/O Plugin</string>
     <string name="Connect">Connect</string>
     <string name="Avare">Avare</string>
     <string name="Connected">Avare Connected and Linked. Make sure the phone/tablet internal GPS is disabled.</string>
