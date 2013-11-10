@@ -20,6 +20,7 @@ import java.util.UUID;
 
 import org.json.JSONObject;
 
+import com.apps4av.avarehelper.nmea.RMCPacket;
 import com.ds.avare.IHelper;
 
 import android.bluetooth.BluetoothAdapter;
@@ -139,6 +140,7 @@ public class BlueToothConnectionOut {
                     /*
                      * Send to BT
                      */
+                    byte buffer[] = null;
                     try {
                         JSONObject object;
                         object = new JSONObject(recvd);
@@ -149,23 +151,30 @@ public class BlueToothConnectionOut {
                             continue;
                         }
                         if(type.equals("ownship")) {
-                            object.getDouble("longitude");
-                            object.getDouble("latitude");
-                            object.getDouble("speed");
-                            object.getDouble("bearing");
-                            object.getDouble("altitude");
-                            object.getLong("time");
+
+                            RMCPacket pkt = new RMCPacket(object.getLong("time"),
+                                    object.getDouble("latitude"),
+                                    object.getDouble("longitude"),
+                                    object.getDouble("speed"),
+                                    object.getDouble("bearing"));
+                            buffer = pkt.getPacket().getBytes();
                         }
                     } catch (Exception e) {
                         continue;
                     }
                     
-                    int wrote = 0;
-                    byte buffer[] = "GPG".getBytes();
+                    if(null == buffer) {
+                        continue;
+                    }
+                                        
+                    /*
+                     * Make NMEA messages.
+                     */
+                    
                     /*
                      * Read.
                      */
-                    wrote = write(buffer);
+                    int wrote = write(buffer);
                     if(wrote <= 0) {
                         if(!mRunning) {
                             break;
