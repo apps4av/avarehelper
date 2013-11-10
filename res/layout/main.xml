@@ -95,10 +95,38 @@ Redistribution and use in source and binary forms, with or without modification,
             android:layout_height="wrap_content"
             android:text="@string/Listen"/>
     </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+android/main_bluetooth_out"
+        android:layout_below="@+android/main_xplane"
+        android:background="@drawable/border_green_small">
+    
+        <ImageView
+            android:contentDescription="@string/ADSB"
+            android:layout_margin="10dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/satellite"
+            />
+        <Spinner
+            android:id="@+id/main_spinner_out"
+            android:layout_margin="10dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+    
+        <Button
+            android:id="@+id/main_button_connect_out"
+            android:layout_width="wrap_content"
+            android:layout_margin="10dp"
+            android:layout_height="wrap_content"
+            android:text="@string/Connect"/>
+    </LinearLayout>
     
     <ScrollView
 	    android:layout_width="fill_parent"
-	    android:layout_below="@+android/main_xplane"
+	    android:layout_below="@+android/main_bluetooth_out"
 	    android:layout_height="wrap_content"
 	    android:scrollbars="vertical"
 	    android:fillViewport="true">

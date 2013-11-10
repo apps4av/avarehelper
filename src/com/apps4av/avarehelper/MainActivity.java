@@ -42,9 +42,12 @@ import android.widget.TextView;
 public class MainActivity extends Activity {
 
     private Spinner mSpinner;
+    private Spinner mSpinnerOut;
     private List<String> mList;
     private Button mConnectButton;
+    private Button mConnectButtonOut;
     private BlueToothConnectionIn mBt;
+    private BlueToothConnectionOut mBtOut;
     private XplaneConnection mXp;
     private boolean mBound;
     private TextView mText;
@@ -116,6 +119,7 @@ public class MainActivity extends Activity {
               * Get interface to Avare
               */
              mBt.setHelper(IHelper.Stub.asInterface(service));
+             mBtOut.setHelper(IHelper.Stub.asInterface(service));
              mXp.setHelper(IHelper.Stub.asInterface(service));
              mBound = true;
              mText.setText(getString(R.string.Connected));
@@ -189,7 +193,6 @@ public class MainActivity extends Activity {
                     mBt.stop();
                     mBt.disconnect();
                     mConnectButton.setText(getApplicationContext().getString(R.string.Connect));
-                    mText.setText(getString(R.string.NotConnected));
                     return;
                 }
                 /*
@@ -205,11 +208,44 @@ public class MainActivity extends Activity {
                 }
             }
         });
-        
+
+        mConnectButtonOut = (Button)view.findViewById(R.id.main_button_connect_out);
+        mConnectButtonOut.setOnClickListener(new OnClickListener() {
+            
+            @Override
+            public void onClick(View v) {
+                /*
+                 * If connected, disconnect
+                 */
+                if(mBtOut.isConnected()) {
+                    mBtOut.stop();
+                    mBtOut.disconnect();
+                    mConnectButtonOut.setText(getApplicationContext().getString(R.string.Connect));
+                    return;
+                }
+                /*
+                 * Connect to the given device in list
+                 */
+                String val = (String)mSpinnerOut.getSelectedItem();
+                if(null != val && (!mBtOut.isConnected())) {                    
+                    mBtOut.connect(val);
+                    if(mBtOut.isConnected()) {
+                        mConnectButtonOut.setText(getApplicationContext().getString(R.string.Disconnect));
+                        mBtOut.start();
+                    }
+                }
+            }
+        });
+
         /*
          * BT connection
          */
         mBt = BlueToothConnectionIn.getInstance();
+        
+        /*
+         * BT out connection
+         */
+        mBtOut = BlueToothConnectionOut.getInstance();
         
         /*
          * Xplane connection
@@ -220,11 +256,17 @@ public class MainActivity extends Activity {
          * For selecting adsb/nmea device
          */
         mSpinner = (Spinner)view.findViewById(R.id.main_spinner);
+        mSpinnerOut = (Spinner)view.findViewById(R.id.main_spinner_out);
         mList = mBt.getDevices();
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(MainActivity.this,
                 android.R.layout.simple_spinner_item, mList);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        
+        /*
+         * List of BT devices is same
+         */
         mSpinner.setAdapter(adapter);       
+        mSpinnerOut.setAdapter(adapter);
 
         /*
          * Start the helper service in Avare.
@@ -248,6 +290,9 @@ public class MainActivity extends Activity {
         }
         if(mBt.isConnected()) {
             mBt.stop();
+        }
+        if(mBtOut.isConnected()) {
+            mBtOut.stop();
         }
         
         mXp.disconnect();

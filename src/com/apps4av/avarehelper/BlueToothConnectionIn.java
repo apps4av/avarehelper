@@ -48,7 +48,7 @@ public class BlueToothConnectionIn {
     
     private static BlueToothConnectionIn mConnection;
     
-    private static ConnectionStatus mAdsbStatus;
+    private static ConnectionStatus mConnectionStatus;
     private static IHelper mHelper;
     
     private Thread mThread;
@@ -76,8 +76,8 @@ public class BlueToothConnectionIn {
         if(null == mConnection) {
             mConnection = new BlueToothConnectionIn();
             mBtAdapter = BluetoothAdapter.getDefaultAdapter();
-            mAdsbStatus = new ConnectionStatus();
-            mAdsbStatus.setState(ConnectionStatus.DISCONNECTED);
+            mConnectionStatus = new ConnectionStatus();
+            mConnectionStatus.setState(ConnectionStatus.DISCONNECTED);
         }
         return mConnection;
     }
@@ -87,7 +87,7 @@ public class BlueToothConnectionIn {
      */
     public void stop() {
         Logger.Logit("Stopping BT");
-        if(mAdsbStatus.getState() != ConnectionStatus.CONNECTED) {
+        if(mConnectionStatus.getState() != ConnectionStatus.CONNECTED) {
             Logger.Logit("Stopping BT failed because already stopped");
             return;
         }
@@ -103,7 +103,7 @@ public class BlueToothConnectionIn {
     public void start() {
         
         Logger.Logit("Starting BT");
-        if(mAdsbStatus.getState() != ConnectionStatus.CONNECTED) {
+        if(mConnectionStatus.getState() != ConnectionStatus.CONNECTED) {
             Logger.Logit("Starting BT failed because already started");
             return;
         }
@@ -263,7 +263,7 @@ public class BlueToothConnectionIn {
      * @param state
      */
     private void setState(int state) {
-        mAdsbStatus.setState(state);
+        mConnectionStatus.setState(state);
     }
     
     /**
@@ -306,7 +306,7 @@ public class BlueToothConnectionIn {
         /*
          * Only when not connected, connect
          */
-        if(mAdsbStatus.getState() != ConnectionStatus.DISCONNECTED) {
+        if(mConnectionStatus.getState() != ConnectionStatus.DISCONNECTED) {
             Logger.Logit("Failed! Already connected?");
 
             return false;
@@ -455,7 +455,7 @@ public class BlueToothConnectionIn {
      * @return
      */
     public boolean isConnected() {
-        return mAdsbStatus.getState() == ConnectionStatus.CONNECTED;
+        return mConnectionStatus.getState() == ConnectionStatus.CONNECTED;
     }
 
     /**
@@ -463,8 +463,8 @@ public class BlueToothConnectionIn {
      * @return
      */
     public boolean isConnectedOrConnecting() {
-        return mAdsbStatus.getState() == ConnectionStatus.CONNECTED ||
-                mAdsbStatus.getState() == ConnectionStatus.CONNECTING;
+        return mConnectionStatus.getState() == ConnectionStatus.CONNECTED ||
+                mConnectionStatus.getState() == ConnectionStatus.CONNECTING;
     }
 
     /**
