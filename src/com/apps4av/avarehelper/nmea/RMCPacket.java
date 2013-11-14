@@ -101,9 +101,9 @@ public class RMCPacket {
         }
 
         /*
-         * Put speed in m/s
+         * Put speed in m/s, convert to knots (this is because NMEA speed is in knots)
          */
-        mPacket += String.format("%05.1f", speed);
+        mPacket += String.format("%05.1f", speed / 0.514444);
         mPacket += ",";
 
         /*
