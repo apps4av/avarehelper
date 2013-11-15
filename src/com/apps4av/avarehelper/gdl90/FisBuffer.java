@@ -47,7 +47,7 @@ public class FisBuffer {
      */
     public void makeProducts() {
         int i = 0;
-        while(i < mSize) {
+        while(i < (mSize - 1)) {
             
             int iFrameLength = (((int)mBuffer[i]) & 0xFF) << 1;
             iFrameLength += (((int)mBuffer[i + 1]) & 0x80) >> 7;
@@ -57,6 +57,13 @@ public class FisBuffer {
             }
             
             int frameType = (((int)mBuffer[i + 1]) & 0x0F);
+            
+            /*
+             * Bad frame
+             */
+            if((i + 2 + iFrameLength) > mSize) {
+                break;
+            }
             
             Fis f = new Fis(frameType, mBuffer, i + 2, iFrameLength);
             
