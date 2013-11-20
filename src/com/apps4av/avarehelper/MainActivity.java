@@ -49,12 +49,16 @@ public class MainActivity extends Activity {
     private BlueToothConnectionIn mBt;
     private BlueToothConnectionOut mBtOut;
     private XplaneConnection mXp;
+    private MsfsConnection mMsfs;
     private boolean mBound;
     private TextView mText;
     private TextView mTextLog;
     private EditText mTextXplanePort;
     private TextView mTextXplaneIp;
+    private EditText mTextMsfsPort;
+    private TextView mTextMsfsIp;
     private CheckBox mXplaneCb;
+    private CheckBox mMsfsCb;
 
     /**
      * Shows exit dialog
@@ -156,7 +160,7 @@ public class MainActivity extends Activity {
         mTextXplaneIp = (TextView)view.findViewById(R.id.main_xplane_ip);
         mTextXplanePort = (EditText)view.findViewById(R.id.main_xplane_port);
         mXplaneCb = (CheckBox)view.findViewById(R.id.main_button_xplane_connect);
-        mTextXplaneIp.setText(Util.getIpAddr(this));
+        mTextXplaneIp.setText(mTextXplaneIp.getText() + "(" + Util.getIpAddr(this) + ")");
         mXplaneCb.setOnClickListener(new OnClickListener() {
             
             
@@ -179,7 +183,35 @@ public class MainActivity extends Activity {
                   mXp.disconnect();
               }
             }
-          });
+        });
+
+        mTextMsfsIp = (TextView)view.findViewById(R.id.main_msfs_ip);
+        mTextMsfsPort = (EditText)view.findViewById(R.id.main_msfs_port);
+        mMsfsCb = (CheckBox)view.findViewById(R.id.main_button_msfs_connect);
+        mTextMsfsIp.setText(mTextMsfsIp.getText() + "(" + Util.getIpAddr(this) + ")");
+        mMsfsCb.setOnClickListener(new OnClickListener() {
+            
+            
+            @Override
+            public void onClick(View v) {
+              if (((CheckBox) v).isChecked()) {
+                  try {
+                      mMsfs.connect(Integer.parseInt(mTextMsfsPort.getText().toString()));
+                  }
+                  catch (Exception e) {
+                      /*
+                       * Number parse
+                       */
+                      Logger.Logit("Invalid port");
+                  }
+                  mMsfs.start();
+              }
+              else {
+                  mMsfs.stop();
+                  mMsfs.disconnect();
+              }
+            }
+        });
 
         mConnectButton = (Button)view.findViewById(R.id.main_button_connect);
         mConnectButton.setOnClickListener(new OnClickListener() {
@@ -272,7 +304,12 @@ public class MainActivity extends Activity {
          * Xplane connection
          */
         mXp = XplaneConnection.getInstance();
-        
+
+        /*
+         * MSFS connection
+         */
+        mMsfs = MsfsConnection.getInstance();
+
         /*
          * For selecting adsb/nmea device
          */

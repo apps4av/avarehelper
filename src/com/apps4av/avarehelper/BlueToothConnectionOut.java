@@ -214,8 +214,12 @@ public class BlueToothConnectionOut {
      * @return
      */
     public List<String> getDevices() {
-        Set<BluetoothDevice> pairedDevices = mBtAdapter.getBondedDevices();
         List<String> list = new ArrayList<String>();
+        if(null == mBtAdapter) {
+            return list;
+        }
+
+        Set<BluetoothDevice> pairedDevices = mBtAdapter.getBondedDevices();
         
         /*
          * Find devices

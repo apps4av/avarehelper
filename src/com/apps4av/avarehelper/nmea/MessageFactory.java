@@ -71,7 +71,7 @@ public class MessageFactory {
             System.arraycopy(bufin, len - 2, cs, 0, 2);
             String css = new String(cs);
             String ma = Integer.toHexString(xor);
-            if(!ma.equals(css)) {
+            if(!ma.equalsIgnoreCase(css)) {
                 return null;
             }
         }

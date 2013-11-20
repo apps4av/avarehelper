@@ -8,13 +8,16 @@
     <string name="NotConnected">Avare Not Connected</string>
     <string name="ADSB">ADSB</string>
     <string name="XPlane">XPlane</string>
+    <string name="MSFS">MSFS</string>
     <string name="XPlanePort">49002</string>
     <string name="Exit">Exit</string>
+    <string name="Output">---- Output ----\n</string>
     <string name="Yes">Yes</string>
     <string name="No">No</string>
     <string name="Disconnect">Disconnect</string>
     <string name="Listen">Listen</string>
-    <string name="DescFS">Connect to Flight Simulators on WIFI</string>
+    <string name="DescFS">Connect to XPlane, Flightgear on WIFI</string>
+    <string name="DescMSFS">Connect to MSFS on WIFI-NMEA</string>
     <string name="DescExt">Connect to GPS/ADSB units on Bluetooth</string>
-    <string name="DescAP">Connect to Autopilots on Bluetooth</string>
+    <string name="DescAP">Connect to autopilots on Bluetooth</string>
 </resources>
