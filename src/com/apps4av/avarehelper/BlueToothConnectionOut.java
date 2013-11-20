@@ -20,6 +20,7 @@ import java.util.UUID;
 
 import org.json.JSONObject;
 
+import com.apps4av.avarehelper.nmea.GGAPacket;
 import com.apps4av.avarehelper.nmea.RMCPacket;
 import com.ds.avare.IHelper;
 
@@ -141,6 +142,7 @@ public class BlueToothConnectionOut {
                      * Send to BT
                      */
                     byte buffer[] = null;
+                    byte buffer2[] = null;
                     try {
                         JSONObject object;
                         object = new JSONObject(recvd);
@@ -158,12 +160,17 @@ public class BlueToothConnectionOut {
                                     object.getDouble("speed"),
                                     object.getDouble("bearing"));
                             buffer = pkt.getPacket().getBytes();
+                            GGAPacket pkt2 = new GGAPacket(object.getLong("time"),
+                                    object.getDouble("latitude"),
+                                    object.getDouble("longitude"),
+                                    object.getDouble("altitude"));
+                            buffer2 = pkt2.getPacket().getBytes();
                         }
                     } catch (Exception e) {
                         continue;
                     }
                     
-                    if(null == buffer) {
+                    if(null == buffer || null == buffer2) {
                         continue;
                     }
                                         
@@ -172,9 +179,30 @@ public class BlueToothConnectionOut {
                      */
                     
                     /*
-                     * Read.
+                     * Write.
                      */
                     int wrote = write(buffer);
+                    if(wrote <= 0) {
+                        if(!mRunning) {
+                            break;
+                        }
+                        try {
+                            Thread.sleep(1000);
+                        } catch (Exception e) {
+                            
+                        }
+                        
+                        /*
+                         * Try to reconnect
+                         */
+                        Logger.Logit("Disconnected from BT device, retrying to connect");
+
+                        disconnect();
+                        connect(mDevName);
+                        continue;
+                    }
+
+                    wrote = write(buffer2);
                     if(wrote <= 0) {
                         if(!mRunning) {
                             break;

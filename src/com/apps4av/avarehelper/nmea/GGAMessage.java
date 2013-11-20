@@ -27,7 +27,7 @@ public class GGAMessage extends Message {
 
     
     public GGAMessage() {
-        super(MessageType.RecommendedMinimumSentence);
+        super(MessageType.EssentialFix);
     }
 
     /**
