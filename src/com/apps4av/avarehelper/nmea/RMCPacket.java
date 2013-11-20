@@ -139,7 +139,7 @@ public class RMCPacket {
         mPacket += "*";
         
         int xor = MessageFactory.checkSum(mPacket.getBytes());
-        String ma = Integer.toHexString(xor);
+        String ma = Integer.toHexString(xor).toUpperCase(Locale.getDefault());
         mPacket += ma;
         
     }

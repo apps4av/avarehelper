@@ -45,7 +45,14 @@ public class Logger {
         @Override
         public void handleMessage(Message msg) {
             if(null != msg && null != mTv) {
-                mTv.setText((String)msg.obj + "\n" + mTv.getText());
+                String txt = mTv.getText().toString();
+                /*
+                 * Limit buffer size
+                 */
+                if(txt.length() > 8192) {
+                    txt = txt.substring(0, 1023);
+                }
+                mTv.setText((String)msg.obj + "\n" + txt);
             }
         }
     };

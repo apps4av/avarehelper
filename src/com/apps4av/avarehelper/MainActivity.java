@@ -125,6 +125,7 @@ public class MainActivity extends Activity {
              mBt.setHelper(IHelper.Stub.asInterface(service));
              mBtOut.setHelper(IHelper.Stub.asInterface(service));
              mXp.setHelper(IHelper.Stub.asInterface(service));
+             mMsfs.setHelper(IHelper.Stub.asInterface(service));
              mBound = true;
              mText.setText(getString(R.string.Connected));
         }
