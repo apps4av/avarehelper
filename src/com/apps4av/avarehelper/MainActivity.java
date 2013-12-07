@@ -49,11 +49,14 @@ public class MainActivity extends Activity {
     private BlueToothConnectionIn mBt;
     private BlueToothConnectionOut mBtOut;
     private XplaneConnection mXp;
+    private FileConnectionIn mFile;
+    private Button mConnectFileButton;
     private MsfsConnection mMsfs;
     private boolean mBound;
     private TextView mText;
     private TextView mTextLog;
     private EditText mTextXplanePort;
+    private EditText mTextFile;
     private TextView mTextXplaneIp;
     private EditText mTextMsfsPort;
     private TextView mTextMsfsIp;
@@ -125,6 +128,7 @@ public class MainActivity extends Activity {
              mBt.setHelper(IHelper.Stub.asInterface(service));
              mBtOut.setHelper(IHelper.Stub.asInterface(service));
              mXp.setHelper(IHelper.Stub.asInterface(service));
+             mFile.setHelper(IHelper.Stub.asInterface(service));
              mMsfs.setHelper(IHelper.Stub.asInterface(service));
              mBound = true;
              mText.setText(getString(R.string.Connected));
@@ -158,6 +162,7 @@ public class MainActivity extends Activity {
         mTextLog = (TextView)view.findViewById(R.id.main_text_log);
         Logger.setTextView(mTextLog);
 
+        mTextFile = (EditText)view.findViewById(R.id.main_file_name);
         mTextXplaneIp = (TextView)view.findViewById(R.id.main_xplane_ip);
         mTextXplanePort = (EditText)view.findViewById(R.id.main_xplane_port);
         mXplaneCb = (CheckBox)view.findViewById(R.id.main_button_xplane_connect);
@@ -291,6 +296,47 @@ public class MainActivity extends Activity {
             }
         });
 
+        
+        mConnectFileButton = (Button)view.findViewById(R.id.main_button_connect_file);
+        mConnectFileButton.setOnClickListener(new OnClickListener() {
+            
+            @Override
+            public void onClick(View v) {
+                /*
+                 * If connected, disconnect
+                 */
+                if(mFile.isConnected()) {
+                    mFile.stop();
+                    mFile.disconnect();
+                    if(mFile.isConnected()) {
+                        mConnectFileButton.setText(getApplicationContext().getString(R.string.Stop));
+                    }
+                    else {
+                        mConnectFileButton.setText(getApplicationContext().getString(R.string.Start));                        
+                    }
+                    return;
+                }
+                
+                /*
+                 * Connect to the given file
+                 */
+                String val = mTextFile.getText().toString();
+                if(null != val && (!mFile.isConnected())) {                    
+                    mConnectFileButton.setText(getApplicationContext().getString(R.string.Start));
+                    mFile.connect(val);
+                    if(mFile.isConnected()) {
+                        mFile.start();
+                    }
+                    if(mFile.isConnected()) {
+                        mConnectFileButton.setText(getApplicationContext().getString(R.string.Stop));
+                    }
+                    else {
+                        mConnectFileButton.setText(getApplicationContext().getString(R.string.Start));                        
+                    }
+                }
+            }
+        });
+
         /*
          * BT connection
          */
@@ -306,6 +352,11 @@ public class MainActivity extends Activity {
          */
         mXp = XplaneConnection.getInstance();
 
+        /**
+         * File In connection
+         */
+        mFile = FileConnectionIn.getInstance();
+        
         /*
          * MSFS connection
          */
@@ -357,6 +408,13 @@ public class MainActivity extends Activity {
         mXp.disconnect();
         mXp.stop();
         
+        mMsfs.disconnect();
+        mMsfs.stop();
+
+        if(mFile.isConnected()) {
+            mFile.disconnect();
+            mFile.stop();
+        }
         
         if(null != mAlertDialogExit) {
             try {

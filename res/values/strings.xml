@@ -14,6 +14,8 @@ Redistribution and use in source and binary forms, with or without modification,
 
     <string name="app_name">Avare External I/O Plugin</string>
     <string name="Connect">Connect</string>
+    <string name="Start">Start</string>
+    <string name="Stop">Stop</string>
     <string name="Avare">Avare</string>
     <string name="Connected">Avare Connected and Linked. Make sure the phone/tablet internal GPS is disabled.</string>
     <string name="NotConnected">Avare Not Connected</string>
@@ -22,6 +24,7 @@ Redistribution and use in source and binary forms, with or without modification,
     <string name="MSFS">MSFS</string>
     <string name="XPlanePort">49002</string>
     <string name="Exit">Exit</string>
+    <string name="File">/mnt/sdcard/input.bin</string>
     <string name="Output">---- Output ----\n</string>
     <string name="Yes">Yes</string>
     <string name="No">No</string>
@@ -30,5 +33,6 @@ Redistribution and use in source and binary forms, with or without modification,
     <string name="DescFS">Connect to XPlane, Flightgear on WIFI</string>
     <string name="DescMSFS">Connect to MSFS on WIFI-NMEA</string>
     <string name="DescExt">Connect to GPS/ADSB units on Bluetooth</string>
+    <string name="DescFile">Feed NMEA / ADSB data from a binary file</string>
     <string name="DescAP">Connect to autopilots on Bluetooth</string>
 </resources>

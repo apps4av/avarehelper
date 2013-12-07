@@ -199,10 +199,51 @@ Redistribution and use in source and binary forms, with or without modification,
             android:layout_height="wrap_content"
             android:text="@string/Connect"/>
     </RelativeLayout>
-        
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+android/main_file"
+        android:layout_below="@+android/main_bluetooth_out"
+        android:background="@drawable/border_green_small">
+    
+        <ImageView
+            android:contentDescription="@string/ADSB"
+            android:layout_margin="10dp"
+            android:id="@+id/main_image_file"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/file"
+            />
+        <TextView
+            android:layout_margin="10dp"
+            android:layout_toRightOf="@+id/main_image_file"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text ="@string/DescFile"
+            />
+
+        <EditText
+            android:id="@+id/main_file_name"
+            android:layout_margin="10dp"
+            android:inputType="textUri"
+            android:layout_below="@+id/main_image_file"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/File"/>        
+        <Button
+            android:id="@+id/main_button_connect_file"
+            android:layout_width="wrap_content"
+            android:layout_below="@+id/main_image_file"
+            android:layout_toRightOf="@+id/main_file_name"
+            android:layout_margin="10dp"
+            android:layout_height="wrap_content"
+            android:text="@string/Start"/>
+    </RelativeLayout>
+    
     <TextView
             android:id="@+id/main_text_log"
-            android:layout_below="@+android/main_bluetooth_out"
+            android:layout_below="@+android/main_file"
             android:layout_margin="10dp"
             android:text="@string/Output"
             android:layout_width="fill_parent"
