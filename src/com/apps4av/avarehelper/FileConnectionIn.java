@@ -148,7 +148,13 @@ public class FileConnectionIn {
                     dbuffer.put(buffer, red);
                  
                     byte[] buf;
-                    
+
+                    try {
+                        Thread.sleep(100);
+                    } catch (Exception e) {
+                        
+                    }
+
                     while(null != (buf = nbuffer.get())) {
                         com.apps4av.avarehelper.nmea.Message m = ndecode.decode(buf);
                         if(nmeaOwnship.addMessage(m)) {
