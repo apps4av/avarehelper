@@ -104,7 +104,7 @@ public class FileConnectionIn {
                 
                 Logger.Logit("Reading file data");
 
-                byte[] buffer = new byte[16384];
+                byte[] buffer = new byte[8192];
                 com.apps4av.avarehelper.gdl90.DataBuffer dbuffer = 
                         new com.apps4av.avarehelper.gdl90.DataBuffer(16384);
                 com.apps4av.avarehelper.nmea.DataBuffer nbuffer = 
@@ -138,13 +138,6 @@ public class FileConnectionIn {
                             
                         }
                         
-                        /*
-                         * Try to reconnect
-                         */
-                        Logger.Logit("Disconnected from file, retrying to connect");
-
-                        disconnect();
-                        connect(mFileName);
                         continue;
                     }
 
@@ -284,7 +277,6 @@ public class FileConnectionIn {
             mStream = new BufferedInputStream(new FileInputStream(mFileName));
         } 
         catch (Exception e) {
-            e.printStackTrace();
             Logger.Logit("Failed! Input stream error");
 
             setState(ConnectionStatus.DISCONNECTED);

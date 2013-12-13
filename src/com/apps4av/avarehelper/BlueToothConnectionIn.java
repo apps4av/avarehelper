@@ -119,7 +119,7 @@ public class BlueToothConnectionIn {
                 
                 Logger.Logit("BT reading data");
 
-                byte[] buffer = new byte[16384];
+                byte[] buffer = new byte[8192];
                 com.apps4av.avarehelper.gdl90.DataBuffer dbuffer = 
                         new com.apps4av.avarehelper.gdl90.DataBuffer(16384);
                 com.apps4av.avarehelper.nmea.DataBuffer nbuffer = 

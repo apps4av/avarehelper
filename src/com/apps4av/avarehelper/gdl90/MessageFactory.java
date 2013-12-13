@@ -55,7 +55,7 @@ public class MessageFactory {
          * data has actual data and type is its type
          * Parse now
          */
-        Message m;
+        Message m = null;
         switch(type) {
 
             case MessageType.HEARTBEAT:

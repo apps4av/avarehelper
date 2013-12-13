@@ -59,9 +59,9 @@ public class FisBuffer {
             int frameType = (((int)mBuffer[i + 1]) & 0x0F);
             
             /*
-             * Bad frame
+             * Bad frame, or reserved frame ! = 0
              */
-            if((i + 2 + iFrameLength) > mSize) {
+            if((i + 2 + iFrameLength) > mSize || frameType != 0) {
                 break;
             }
             
