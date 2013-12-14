@@ -114,6 +114,7 @@ public class MessageFactory {
         int i = 0;
         int length = 0;
         int len = msg.length;
+        
         byte msgCrc[] = new byte[len];
         byte msgChar;
         while (i < len) {
@@ -135,6 +136,9 @@ public class MessageFactory {
             i++;
         }
         
+        if(length < 2) {
+            return null;
+        }
         /*
          *  exclude CRC in CRC compute
          */

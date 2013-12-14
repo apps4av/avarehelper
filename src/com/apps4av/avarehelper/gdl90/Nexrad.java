@@ -79,6 +79,13 @@ public class Nexrad {
             while(index < len) {
                 int numberOfBins = ((msg[index] & 0xF8) >> 3) + 1;
                 for(i = 0; i < numberOfBins; i++) {
+                    if(j >= mData.length) {
+                        /*
+                         * Some sort of error.
+                         */
+                        mData = null;
+                        return;
+                    }
                     mData[j] = INTENSITY[(msg[index] & 0x07)];
                     j++;
                 }
