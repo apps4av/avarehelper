@@ -42,44 +42,6 @@ public class Nexrad {
         mBlock = -1;
     }
 
-    /**
-     * 
-     * @param blockNumber
-     */
-    public static void convertBlockNumberToLatLon(int blockNumber, double lonlat[]) {
-
-        /*
-         *  Determine lat/lon for block number
-         */
-        int numberOfBlocksInRing = 0;
-        char blockLongitudeWidth = 0;
-        char blockLatitudeHeight = 4;
-        int completeRings = 0;
-        float blocksInPartialRing = 0;
-        float fracRings, fracLat, fracLon;
-        
-        if (blockNumber < 405000) {
-            numberOfBlocksInRing = 450;
-            blockLongitudeWidth = 48;
-        }
-        else {
-            numberOfBlocksInRing = 225;
-            blockLongitudeWidth = 96;
-        }
-        
-        fracRings = (float)blockNumber / (float)numberOfBlocksInRing;
-        completeRings = (int)Math.floor(fracRings);
-        blocksInPartialRing = (fracRings - completeRings) * numberOfBlocksInRing;
-        
-        fracLat = (float)completeRings * (float)blockLatitudeHeight / 60.0f;
-        lonlat[1] = fracLat;
-        
-        fracLon = blocksInPartialRing * (float)blockLongitudeWidth / 60.0f;
-        if (fracLon > 180) {
-            fracLon = 360.0f - fracLon;
-        }
-        lonlat[0] = -fracLon; // XXX: -ve sign?
-    }
 
     /**
      * Parse graphics

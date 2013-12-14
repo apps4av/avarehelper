@@ -17,10 +17,12 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.LinkedList;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 
+import com.apps4av.avarehelper.gdl90.Constants;
 import com.apps4av.avarehelper.gdl90.Id6364Product;
 import com.apps4av.avarehelper.gdl90.OwnshipMessage;
 import com.apps4av.avarehelper.gdl90.Product;
@@ -205,6 +207,44 @@ public class FileConnectionIn {
                             for(Product p : pds) {
                                 if(p instanceof Id6364Product) {
                                     Id6364Product pn = (Id6364Product)p;
+                                    JSONObject object = new JSONObject();
+                                    
+                                    JSONArray arrayEmpty = new JSONArray();
+                                    JSONArray arrayData = new JSONArray();
+                                    
+                                    int[] data = pn.getData();
+                                    if(null != data) {
+                                        for(int i = 0; i < data.length; i++) {
+                                            arrayData.put(data[i]);
+                                        }
+                                    }
+                                    LinkedList<Integer> empty = pn.getEmpty();
+                                    if(null != empty) {
+                                        for(int e : empty) {
+                                            arrayEmpty.put(e);
+                                        }
+                                    }
+                                
+                                    try {
+                                        object.put("type", "nexrad");
+                                        object.put("time", (long)pn.getTime().getTimeInMillis());
+                                        object.put("conus", pn.isConus());
+                                        object.put("blocknumber", (long)pn.getBlockNumber());
+                                        object.put("x", Constants.COLS_PER_BIN);
+                                        object.put("y", Constants.ROWS_PER_BIN);
+                                        object.put("empty", arrayEmpty);
+                                        object.put("data", arrayData);
+                                    } catch (JSONException e1) {
+                                        return;
+                                    }
+                                    
+                                    if(mHelper != null) {
+                                        try {
+                                            String tosend = object.toString();
+                                            mHelper.sendDataText(tosend);
+                                        } catch (Exception e) {
+                                        }
+                                    }
                                 }
                             }
                         }

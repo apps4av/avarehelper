@@ -49,7 +49,7 @@ public class Logger {
                 /*
                  * Limit buffer size
                  */
-                if(txt.length() > 8192) {
+                if(txt.length() > 1023) {
                     txt = txt.substring(0, 1023);
                 }
                 mTv.setText((String)msg.obj + "\n" + txt);
