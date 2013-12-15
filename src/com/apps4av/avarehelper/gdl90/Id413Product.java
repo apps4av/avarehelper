@@ -21,6 +21,7 @@ import com.apps4av.avarehelper.Logger;
 public class Id413Product extends Product {
 
     String mText;
+    String mParts[];
  
     public Id413Product() {
         super(ProductType.PRODUCT_TYPE_TEXT);
@@ -56,9 +57,31 @@ public class Id413Product extends Product {
         
         if(!mText.equals("")) {
             mText = mText.split("\u001E")[0];
+            mParts = mText.split(" ", 3);
             Logger.Logit(mText);
         }
         
+    }
+
+    /**
+     * Parse what type of text it is
+     */
+    public String getHeader() {
+        return mParts[0];
+    }
+
+    /**
+     * Return location for which it applies
+     */
+    public String getLocation() {
+        return mParts[1];
+    }
+
+    /**
+     * Return data
+     */
+    public String getData() {
+        return mParts[2];
     }
 
 }

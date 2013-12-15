@@ -23,6 +23,7 @@ import org.json.JSONObject;
 
 
 import com.apps4av.avarehelper.gdl90.Constants;
+import com.apps4av.avarehelper.gdl90.Id413Product;
 import com.apps4av.avarehelper.gdl90.Id6364Product;
 import com.apps4av.avarehelper.gdl90.OwnshipMessage;
 import com.apps4av.avarehelper.gdl90.Product;
@@ -234,6 +235,29 @@ public class FileConnectionIn {
                                         object.put("y", Constants.ROWS_PER_BIN);
                                         object.put("empty", arrayEmpty);
                                         object.put("data", arrayData);
+                                    } catch (JSONException e1) {
+                                        return;
+                                    }
+                                    
+                                    if(mHelper != null) {
+                                        try {
+                                            String tosend = object.toString();
+                                            mHelper.sendDataText(tosend);
+                                        } catch (Exception e) {
+                                        }
+                                    }
+                                }
+                                /*
+                                 * Text product
+                                 */
+                                else if(p instanceof Id413Product) {
+                                    Id413Product pn = (Id413Product)p;
+                                    JSONObject object = new JSONObject();
+                                    try {
+                                        object.put("type", pn.getHeader());
+                                        object.put("time", (long)pn.getTime().getTimeInMillis());
+                                        object.put("location", pn.getLocation());
+                                        object.put("data", pn.getData());
                                     } catch (JSONException e1) {
                                         return;
                                     }
