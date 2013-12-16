@@ -79,11 +79,52 @@ Redistribution and use in source and binary forms, with or without modification,
         
 	</RelativeLayout>
 
+        <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+android/main_wifi"
+        android:layout_below="@+android/main_bluetooth"
+        android:background="@drawable/border_green_small">
+    
+        <ImageView
+            android:contentDescription="@string/ADSBWifi"
+            android:id="@+id/main_connectwifi_image"
+            android:layout_margin="10dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/wireless"
+            />
+        <TextView
+            android:layout_margin="10dp"
+            android:layout_toRightOf="@+id/main_connectwifi_image"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text ="@string/DescExtWifi"
+            />
+        <EditText
+            android:id="@+id/main_wifi_port"
+            android:layout_margin="10dp"
+            android:inputType="number"
+            android:layout_below="@+id/main_connectwifi_image"
+            android:text="@string/WifiPort"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+        <CheckBox
+            android:id="@+id/main_button_connectwifi"
+            android:layout_below="@+id/main_connectwifi_image"
+            android:layout_toRightOf="@+id/main_wifi_port"
+            android:layout_width="wrap_content"
+            android:layout_margin="10dp"
+            android:layout_height="wrap_content"
+            android:text="@string/Listen"/>
+        
+    </RelativeLayout>
+    
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+android/main_xplane"
-        android:layout_below="@+android/main_bluetooth"
+        android:layout_below="@+android/main_wifi"
         android:background="@drawable/border_green_small">
     
         <ImageView

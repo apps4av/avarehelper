@@ -47,6 +47,7 @@ public class MainActivity extends Activity {
     private Button mConnectButton;
     private Button mConnectButtonOut;
     private BlueToothConnectionIn mBt;
+    private WifiConnection mWifi;
     private BlueToothConnectionOut mBtOut;
     private XplaneConnection mXp;
     private FileConnectionIn mFile;
@@ -62,6 +63,9 @@ public class MainActivity extends Activity {
     private TextView mTextMsfsIp;
     private CheckBox mXplaneCb;
     private CheckBox mMsfsCb;
+
+    private EditText mTextWifiPort;
+    private CheckBox mWifiCb;
 
     /**
      * Shows exit dialog
@@ -130,6 +134,7 @@ public class MainActivity extends Activity {
              mXp.setHelper(IHelper.Stub.asInterface(service));
              mFile.setHelper(IHelper.Stub.asInterface(service));
              mMsfs.setHelper(IHelper.Stub.asInterface(service));
+             mWifi.setHelper(IHelper.Stub.asInterface(service));
              mBound = true;
              mText.setText(getString(R.string.Connected));
         }
@@ -162,6 +167,34 @@ public class MainActivity extends Activity {
         mTextLog = (TextView)view.findViewById(R.id.main_text_log);
         Logger.setTextView(mTextLog);
 
+        
+        mWifiCb = (CheckBox)view.findViewById(R.id.main_button_connectwifi);
+        mTextWifiPort = (EditText)view.findViewById(R.id.main_wifi_port);
+        mWifiCb.setOnClickListener(new OnClickListener() {
+            
+            
+            @Override
+            public void onClick(View v) {
+              if (((CheckBox) v).isChecked()) {
+                  try {
+                      mWifi.connect(Integer.parseInt(mTextWifiPort.getText().toString()));
+                  }
+                  catch (Exception e) {
+                      /*
+                       * Number parse
+                       */
+                      Logger.Logit("Invalid port");
+                  }
+                  mWifi.start();
+              }
+              else {
+                  mWifi.stop();
+                  mWifi.disconnect();
+              }
+            }
+        });
+
+        
         mTextFile = (EditText)view.findViewById(R.id.main_file_name);
         mTextXplaneIp = (TextView)view.findViewById(R.id.main_xplane_ip);
         mTextXplanePort = (EditText)view.findViewById(R.id.main_xplane_port);
@@ -363,6 +396,11 @@ public class MainActivity extends Activity {
         mMsfs = MsfsConnection.getInstance();
 
         /*
+         * WIFI ADSB
+         */
+        mWifi = WifiConnection.getInstance();
+        
+        /*
          * For selecting adsb/nmea device
          */
         mSpinner = (Spinner)view.findViewById(R.id.main_spinner);
@@ -407,6 +445,9 @@ public class MainActivity extends Activity {
         
         mXp.disconnect();
         mXp.stop();
+        
+        mWifi.disconnect();
+        mWifi.stop();
         
         mMsfs.disconnect();
         mMsfs.stop();
