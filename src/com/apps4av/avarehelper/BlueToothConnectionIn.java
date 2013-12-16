@@ -192,7 +192,7 @@ public class BlueToothConnectionIn {
                                 object.put("altitude", (double)((double)om.mAltitude));
                                 object.put("time", (long)om.getTime());
                             } catch (JSONException e1) {
-                                return;
+                                continue;
                             }
                             
                             if(mHelper != null) {
@@ -252,7 +252,7 @@ public class BlueToothConnectionIn {
                                         object.put("empty", arrayEmpty);
                                         object.put("data", arrayData);
                                     } catch (JSONException e1) {
-                                        return;
+                                        continue;
                                     }
                                     
                                     if(mHelper != null) {
@@ -269,13 +269,140 @@ public class BlueToothConnectionIn {
                                 else if(p instanceof Id413Product) {
                                     Id413Product pn = (Id413Product)p;
                                     JSONObject object = new JSONObject();
+                                    
+                                    String data = pn.getData();
+                                    String type = pn.getHeader();
+                                    long time = (long)pn.getTime().getTimeInMillis();
+                                    
+                                    /*
+                                     * Clear garbage spaces etc. Convert to Avare format
+                                     */
+                                    try {
+                                        if(type.equals("WINDS")) {
+                                            
+                                            String tokens[] = data.split("\n");
+                                            if(tokens.length < 2) {
+                                                /*
+                                                 * Must have line like
+                                                 * MSY 230000Z  FT 3000 6000    F9000   C12000  G18000  C24000  C30000  D34000  39000   Y 
+                                                 * and second line like
+                                                 * 1410 2508+10 2521+07 2620+01 3037-12 3041-26 304843 295251 29765
+                                                 */
+                                                continue;
+                                            }
+                                            
+                                            tokens[0] = tokens[0].replaceAll("\\s+", " ");
+                                            tokens[1] = tokens[1].replaceAll("\\s+", " ");
+                                            String winds[] = tokens[1].split(" ");
+                                            String alts[] = tokens[0].split(" ");
+                                                                                    
+                                            /*
+                                             * Start from 3rd entry - alts
+                                             */
+                                            data = "";
+                                            boolean found = false;
+                                            for(int i = 2; i < alts.length; i++) {
+                                                if(alts[i].contains("3000") && !alts[i].contains("30000")) {
+                                                    data += winds[i - 2] + ",";
+                                                    found = true;
+                                                }
+                                            }
+                                            if(!found) {
+                                                data += ",";
+                                            }
+                                            found = false;
+                                            for(int i = 2; i < alts.length; i++) {
+                                                if(alts[i].contains("6000")) {
+                                                    data += winds[i - 2] + ",";
+                                                    found = true;
+                                                }
+                                            }
+                                            if(!found) {
+                                                data += ",";
+                                            }
+                                            found = false;
+                                            for(int i = 2; i < alts.length; i++) {
+                                                if(alts[i].contains("9000") && !alts[i].contains("39000")) {
+                                                    data += winds[i - 2] + ",";
+                                                    found = true;
+                                                }
+                                            }
+                                            if(!found) {
+                                                data += ",";
+                                            }
+                                            found = false;
+                                            for(int i = 2; i < alts.length; i++) {
+                                                if(alts[i].contains("12000")) {
+                                                    data += winds[i - 2] + ",";
+                                                    found = true;
+                                                }
+                                            }
+                                            if(!found) {
+                                                data += ",";
+                                            }
+                                            found = false;
+                                            for(int i = 2; i < alts.length; i++) {
+                                                if(alts[i].contains("18000")) {
+                                                    data += winds[i - 2] + ",";
+                                                    found = true;
+                                                }
+                                            }
+                                            if(!found) {
+                                                data += ",";
+                                            }
+                                            found = false;
+                                            for(int i = 2; i < alts.length; i++) {
+                                                if(alts[i].contains("24000")) {
+                                                    data += winds[i - 2] + ",";
+                                                    found = true;
+                                                }
+                                            }
+                                            if(!found) {
+                                                data += ",";
+                                            }
+                                            found = false;
+                                            for(int i = 2; i < alts.length; i++) {
+                                                if(alts[i].contains("30000")) {
+                                                    data += winds[i - 2] + ",";
+                                                    found = true;
+                                                }
+                                            }
+                                            if(!found) {
+                                                data += ",";
+                                            }
+                                            found = false;
+                                            for(int i = 2; i < alts.length; i++) {
+                                                if(alts[i].contains("34000")) {
+                                                    data += winds[i - 2] + ",";
+                                                    found = true;
+                                                }
+                                            }
+                                            if(!found) {
+                                                data += ",";
+                                            }
+                                            found = false;
+                                            for(int i = 2; i < alts.length; i++) {
+                                                if(alts[i].contains("39000")) {
+                                                    data += winds[i - 2] + ",";
+                                                    found = true;
+                                                }
+                                            }
+                                            if(!found) {
+                                                data += ",";
+                                            }
+                                        }
+                                    }
+                                    catch (Exception e) {
+                                        continue;
+                                    }
+                                    
                                     try {
                                         object.put("type", pn.getHeader());
-                                        object.put("time", (long)pn.getTime().getTimeInMillis());
+                                        object.put("time", time);
                                         object.put("location", pn.getLocation());
-                                        object.put("data", pn.getData());
+                                        object.put("data", data);
                                     } catch (JSONException e1) {
-                                        return;
+                                        continue;
                                     }
                                     
                                     if(mHelper != null) {
@@ -304,7 +431,7 @@ public class BlueToothConnectionIn {
                                 object.put("altitude", (double)((double)om.mAltitude));
                                 object.put("time", (long)om.getTime());
                             } catch (JSONException e1) {
-                                return;
+                                continue;
                             }
                             
                             if(mHelper != null) {
