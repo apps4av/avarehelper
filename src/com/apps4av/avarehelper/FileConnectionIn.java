@@ -27,6 +27,7 @@ import com.apps4av.avarehelper.gdl90.Id413Product;
 import com.apps4av.avarehelper.gdl90.Id6364Product;
 import com.apps4av.avarehelper.gdl90.OwnshipMessage;
 import com.apps4av.avarehelper.gdl90.Product;
+import com.apps4av.avarehelper.gdl90.TrafficReportMessage;
 import com.apps4av.avarehelper.gdl90.UplinkMessage;
 import com.apps4av.avarehelper.nmea.Ownship;
 import com.ds.avare.IHelper;
@@ -199,8 +200,37 @@ public class FileConnectionIn {
                         /*
                          * Post on UI thread.
                          */
+                        if(m instanceof TrafficReportMessage) {
+                            
+                            /*
+                             * Make a GPS locaiton message from ADSB ownship message.
+                             */
+                            JSONObject object = new JSONObject();
+                            TrafficReportMessage tm = (TrafficReportMessage)m;
+                            try {
+                                object.put("type", "traffic");
+                                object.put("longitude", (double)tm.mLon);
+                                object.put("latitude", (double)tm.mLat);
+                                object.put("speed", (double)(tm.mHorizVelocity));
+                                object.put("bearing", (double)tm.mHeading);
+                                object.put("altitude", (double)((double)tm.mAltitude));
+                                object.put("callsign", (String)tm.mCallSign);
+                                object.put("address", (int)tm.mIcaoAddress);
+                                object.put("time", (long)tm.getTime());
+                            } catch (JSONException e1) {
+                                continue;
+                            }
+                            
+                            if(mHelper != null) {
+                                try {
+                                    mHelper.sendDataText(object.toString());
+                                } catch (Exception e) {
+                                }
+                            }
+
+                        }
                         
-                        if(m instanceof UplinkMessage) {
+                        else if(m instanceof UplinkMessage) {
                             /*
                              * Send an uplink nexrad message
                              */
