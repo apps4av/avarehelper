@@ -280,11 +280,53 @@ Redistribution and use in source and binary forms, with or without modification,
             android:layout_margin="10dp"
             android:layout_height="wrap_content"
             android:text="@string/Start"/>
+        
+    </RelativeLayout>
+
+        <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+android/main_file_save"
+        android:layout_below="@+android/main_file"
+        android:background="@drawable/border_green_small">
+    
+        <ImageView
+            android:contentDescription="@string/ADSB"
+            android:layout_margin="10dp"
+            android:id="@+id/main_image_file_save"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/filesave"
+            />
+        <TextView
+            android:layout_margin="10dp"
+            android:layout_toRightOf="@+id/main_image_file_save"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text ="@string/DescFileSave"
+            />
+
+        <EditText
+            android:id="@+id/main_file_name_save"
+            android:layout_margin="10dp"
+            android:inputType="textUri"
+            android:layout_below="@+id/main_image_file_save"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/FileSave"/>        
+        <Button
+            android:id="@+id/main_button_connect_file_save"
+            android:layout_width="wrap_content"
+            android:layout_below="@+id/main_image_file_save"
+            android:layout_toRightOf="@+id/main_file_name_save"
+            android:layout_margin="10dp"
+            android:layout_height="wrap_content"
+            android:text="@string/Start"/>
     </RelativeLayout>
     
     <TextView
             android:id="@+id/main_text_log"
-            android:layout_below="@+android/main_file"
+            android:layout_below="@+android/main_file_save"
             android:layout_margin="10dp"
             android:text="@string/Output"
             android:layout_width="fill_parent"

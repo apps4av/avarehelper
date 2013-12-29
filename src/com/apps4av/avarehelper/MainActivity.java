@@ -52,12 +52,15 @@ public class MainActivity extends Activity {
     private XplaneConnection mXp;
     private FileConnectionIn mFile;
     private Button mConnectFileButton;
+    private Button mConnectFileSaveButton;
+    private boolean mFileSave;
     private MsfsConnection mMsfs;
     private boolean mBound;
     private TextView mText;
     private TextView mTextLog;
     private EditText mTextXplanePort;
     private EditText mTextFile;
+    private EditText mTextFileSave;
     private TextView mTextXplaneIp;
     private EditText mTextMsfsPort;
     private TextView mTextMsfsIp;
@@ -196,6 +199,7 @@ public class MainActivity extends Activity {
 
         
         mTextFile = (EditText)view.findViewById(R.id.main_file_name);
+        mTextFileSave = (EditText)view.findViewById(R.id.main_file_name_save);
         mTextXplaneIp = (TextView)view.findViewById(R.id.main_xplane_ip);
         mTextXplanePort = (EditText)view.findViewById(R.id.main_xplane_port);
         mXplaneCb = (CheckBox)view.findViewById(R.id.main_button_xplane_connect);
@@ -370,6 +374,31 @@ public class MainActivity extends Activity {
             }
         });
 
+        mFileSave = false;
+        mConnectFileSaveButton = (Button)view.findViewById(R.id.main_button_connect_file_save);
+        mConnectFileSaveButton.setOnClickListener(new OnClickListener() {
+            
+            @Override
+            public void onClick(View v) {
+                /*
+                 * If connected, disconnect
+                 */
+                String val = mTextFileSave.getText().toString();
+                if(mFileSave) {
+                    mConnectFileSaveButton.setText(getApplicationContext().getString(R.string.Start));
+                    mBt.setFileSave(null);
+                    mWifi.setFileSave(null);
+                    mFileSave = false;
+                }
+                else {
+                    mConnectFileSaveButton.setText(getApplicationContext().getString(R.string.Stop));
+                    mBt.setFileSave(val);
+                    mWifi.setFileSave(val);
+                    mFileSave = true;
+                }
+            }
+        });
+
         /*
          * BT connection
          */
@@ -405,23 +434,6 @@ public class MainActivity extends Activity {
          */
         mSpinner = (Spinner)view.findViewById(R.id.main_spinner);
         mSpinnerOut = (Spinner)view.findViewById(R.id.main_spinner_out);
-        mList = mBt.getDevices();
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(MainActivity.this,
-                android.R.layout.simple_spinner_item, mList);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        
-        /*
-         * List of BT devices is same
-         */
-        mSpinner.setAdapter(adapter);       
-        mSpinnerOut.setAdapter(adapter);
-
-        /*
-         * Start the helper service in Avare.
-         */
-        Intent i = new Intent("com.ds.avare.START_SERVICE");
-        i.setClassName("com.ds.avare", "com.ds.avare.IHelperService");
-        bindService(i, mConnection, Context.BIND_AUTO_CREATE);
 
     }
 
@@ -469,4 +481,32 @@ public class MainActivity extends Activity {
 
         super.onDestroy();
     }
+    
+    
+    /**
+     * 
+     */
+    @Override
+    protected void onResume() {
+        super.onResume();
+        /*
+         * Start the helper service in Avare.
+         */
+        Intent i = new Intent("com.ds.avare.START_SERVICE");
+        i.setClassName("com.ds.avare", "com.ds.avare.IHelperService");
+        bindService(i, mConnection, Context.BIND_AUTO_CREATE);
+
+        mList = mBt.getDevices();
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(MainActivity.this,
+                android.R.layout.simple_spinner_item, mList);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        
+        /*
+         * List of BT devices is same
+         */
+        mSpinner.setAdapter(adapter);       
+        mSpinnerOut.setAdapter(adapter);
+
+    }
+
 }

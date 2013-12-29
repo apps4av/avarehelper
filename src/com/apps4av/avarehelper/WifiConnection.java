@@ -12,6 +12,7 @@ Redistribution and use in source and binary forms, with or without modification,
 
 package com.apps4av.avarehelper;
 
+import java.io.FileOutputStream;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.util.LinkedList;
@@ -44,6 +45,7 @@ public class WifiConnection {
     private static IHelper mHelper;
     
     private Thread mThread;
+    private static String mFileSave = null;
     
     private static boolean mRunning;
     
@@ -55,6 +57,16 @@ public class WifiConnection {
      * 
      */
     private WifiConnection() {
+    }
+
+    /**
+     * 
+     * @param file
+     */
+    public void setFileSave(String file) {
+        synchronized(this) {
+            mFileSave = file;
+        }
     }
 
     
@@ -532,6 +544,23 @@ public class WifiConnection {
         catch(Exception e) {
             return -1;
         }
+        
+        if(pkt.getLength() > 0) {
+            String file = null;
+            synchronized(this) {
+                file = mFileSave;
+            }
+            if(file != null) {
+                try {
+                    FileOutputStream output = new FileOutputStream(file, true);
+                    output.write(buffer, 0, pkt.getLength());
+                    output.close();
+                } catch(Exception e) {
+                }
+            }
+        }
+
+        
         return pkt.getLength();
     }
 

@@ -12,6 +12,7 @@ Redistribution and use in source and binary forms, with or without modification,
 
 package com.apps4av.avarehelper;
 
+import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -50,6 +51,7 @@ public class BlueToothConnectionIn {
     private static BluetoothSocket mBtSocket = null;
     private static InputStream mStream = null;
     private static boolean mRunning = false;
+    private static String mFileSave = null;
     
     private static BlueToothConnectionIn mConnection;
     
@@ -71,6 +73,15 @@ public class BlueToothConnectionIn {
     private BlueToothConnectionIn() {
     }
 
+    /**
+     * 
+     * @param file
+     */
+    public void setFileSave(String file) {
+        synchronized(this) {
+            mFileSave = file;
+        }
+    }
     
     /**
      * 
@@ -676,6 +687,21 @@ public class BlueToothConnectionIn {
         } 
         catch(Exception e) {
             red = -1;
+        }
+        
+        if(red > 0) {
+            String file = null;
+            synchronized(this) {
+                file = mFileSave;
+            }
+            if(file != null) {
+                try {
+                    FileOutputStream output = new FileOutputStream(file, true);
+                    output.write(buffer, 0, red);
+                    output.close();
+                } catch(Exception e) {
+                }
+            }
         }
         return red;
     }

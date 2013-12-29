@@ -27,6 +27,7 @@ Redistribution and use in source and binary forms, with or without modification,
     <string name="WifiPort">43211</string>
     <string name="Exit">Exit</string>
     <string name="File">/mnt/sdcard/input.bin</string>
+    <string name="FileSave">/mnt/sdcard/out.bin</string>
     <string name="Output">---- Output ----\n</string>
     <string name="Yes">Yes</string>
     <string name="No">No</string>
@@ -37,5 +38,6 @@ Redistribution and use in source and binary forms, with or without modification,
     <string name="DescExt">Connect to GPS/ADSB units on Bluetooth</string>
     <string name="DescExtWifi">Connect to GPS/ADSB units on WiFi (Broadcast on Managed Network)</string>
     <string name="DescFile">Feed NMEA / ADSB data from a binary file</string>
+    <string name="DescFileSave">Save NMEA / ADSB data to a binary file</string>
     <string name="DescAP">Connect to autopilots on Bluetooth</string>
 </resources>
