@@ -20,7 +20,7 @@ import com.apps4av.avarehelper.Logger;
  */
 public class OwnshipGeometricAltitudeMessage extends Message {
 
-    int mAltitudeWGS84;
+    public int mAltitudeWGS84;
     
     public OwnshipGeometricAltitudeMessage() {
         super(MessageType.OWNSHIP_GEOMETRIC_ALTITUDE);
@@ -35,9 +35,10 @@ public class OwnshipGeometricAltitudeMessage extends Message {
         /*
          *  bytes 0-1 are the altitude
          */
-        int alt = (((int)msg[0] & 0xFF) << 8) + ((int)msg[1] & 0xFF);
+        double alt = (((int)msg[0] & 0xFF) << 8) + ((int)msg[1] & 0xFF);
         alt *= 5;
-        mAltitudeWGS84 = alt;
+        alt /= 3.28084;
+        mAltitudeWGS84 = (int)alt;
         
         Logger.Logit("mAltitude Geometric"  + mAltitudeWGS84);        
     }

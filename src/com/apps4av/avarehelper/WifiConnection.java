@@ -25,6 +25,7 @@ import com.apps4av.avarehelper.gdl90.Constants;
 import com.apps4av.avarehelper.gdl90.FisBuffer;
 import com.apps4av.avarehelper.gdl90.Id413Product;
 import com.apps4av.avarehelper.gdl90.Id6364Product;
+import com.apps4av.avarehelper.gdl90.OwnshipGeometricAltitudeMessage;
 import com.apps4av.avarehelper.gdl90.OwnshipMessage;
 import com.apps4av.avarehelper.gdl90.Product;
 import com.apps4av.avarehelper.gdl90.TrafficReportMessage;
@@ -49,6 +50,8 @@ public class WifiConnection {
     
     private static boolean mRunning;
     
+    private int mGeoAltitude;
+
     DatagramSocket mSocket;
     
     private int mPort;
@@ -100,7 +103,8 @@ public class WifiConnection {
     public void start() {
         
         Logger.Logit("Starting WiFi Listener");
-               
+        mGeoAltitude = Integer.MIN_VALUE;
+
         mRunning = true;
         
         /*
@@ -241,6 +245,10 @@ public class WifiConnection {
                                 }
                             }
 
+                        }
+
+                        else if(m instanceof OwnshipGeometricAltitudeMessage) {
+                            mGeoAltitude = ((OwnshipGeometricAltitudeMessage)m).mAltitudeWGS84;
                         }
 
                         else if(m instanceof UplinkMessage) {
@@ -459,7 +467,20 @@ public class WifiConnection {
                                 object.put("latitude", (double)om.mLat);
                                 object.put("speed", (double)(om.mHorizontalVelocity));
                                 object.put("bearing", (double)om.mDirection);
-                                object.put("altitude", (double)((double)om.mAltitude));
+                                int altitude = -1000;
+                                if(om.mAltitude == Integer.MIN_VALUE && mGeoAltitude != Integer.MIN_VALUE) {
+                                    /*
+                                     * Hack for iLevil
+                                     */
+                                    altitude = mGeoAltitude;
+                                }
+                                else {
+                                    altitude = om.mAltitude;
+                                }
+                                if(altitude < -1000) {
+                                    altitude = -1000;
+                                }
+                                object.put("altitude", (double)((double)altitude));                                    
                                 object.put("time", (long)om.getTime());
                             } catch (JSONException e1) {
                                 continue;

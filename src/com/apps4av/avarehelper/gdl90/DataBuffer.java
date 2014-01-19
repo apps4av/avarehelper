@@ -130,6 +130,13 @@ public class DataBuffer {
      * @param len
      */
     public void put(byte data[], int len) {
+        if((mElem + len) >= mBuffer.length) {
+            /*
+             * Something wrong.
+             */
+            flush();
+            return;
+        }
         System.arraycopy(data, 0, mBuffer, mElem, len);
         mElem += len;
         compute();

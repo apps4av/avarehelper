@@ -29,6 +29,7 @@ import com.apps4av.avarehelper.gdl90.Constants;
 import com.apps4av.avarehelper.gdl90.FisBuffer;
 import com.apps4av.avarehelper.gdl90.Id413Product;
 import com.apps4av.avarehelper.gdl90.Id6364Product;
+import com.apps4av.avarehelper.gdl90.OwnshipGeometricAltitudeMessage;
 import com.apps4av.avarehelper.gdl90.OwnshipMessage;
 import com.apps4av.avarehelper.gdl90.Product;
 import com.apps4av.avarehelper.gdl90.TrafficReportMessage;
@@ -52,6 +53,7 @@ public class BlueToothConnectionIn {
     private static InputStream mStream = null;
     private static boolean mRunning = false;
     private static String mFileSave = null;
+    private int mGeoAltitude;
     
     private static BlueToothConnectionIn mConnection;
     
@@ -117,7 +119,7 @@ public class BlueToothConnectionIn {
      * 
      */
     public void start() {
-        
+        mGeoAltitude = Integer.MIN_VALUE;
         Logger.Logit("Starting BT");
         if(mConnectionStatus.getState() != ConnectionStatus.CONNECTED) {
             Logger.Logit("Starting BT failed because already started");
@@ -257,6 +259,10 @@ public class BlueToothConnectionIn {
                                 }
                             }
 
+                        }
+
+                        else if(m instanceof OwnshipGeometricAltitudeMessage) {
+                            mGeoAltitude = ((OwnshipGeometricAltitudeMessage)m).mAltitudeWGS84;
                         }
 
                         else if(m instanceof UplinkMessage) {
@@ -475,7 +481,19 @@ public class BlueToothConnectionIn {
                                 object.put("latitude", (double)om.mLat);
                                 object.put("speed", (double)(om.mHorizontalVelocity));
                                 object.put("bearing", (double)om.mDirection);
-                                object.put("altitude", (double)((double)om.mAltitude));
+                                int altitude = -1000;
+                                if(om.mAltitude == Integer.MIN_VALUE && mGeoAltitude != Integer.MIN_VALUE) {
+                                    /*
+                                     * Hack for iLevil
+                                     */
+                                    altitude = mGeoAltitude;
+                                }
+                                else {
+                                    altitude = om.mAltitude;
+                                }
+                                if(altitude < -1000) {
+                                    altitude = -1000;
+                                }
                                 object.put("time", (long)om.getTime());
                             } catch (JSONException e1) {
                                 continue;
