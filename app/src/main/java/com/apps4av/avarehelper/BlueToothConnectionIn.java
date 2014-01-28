@@ -481,6 +481,7 @@ public class BlueToothConnectionIn {
                                 object.put("latitude", (double)om.mLat);
                                 object.put("speed", (double)(om.mHorizontalVelocity));
                                 object.put("bearing", (double)om.mDirection);
+                                object.put("time", (long)om.getTime());
                                 int altitude = -1000;
                                 if(om.mAltitude == Integer.MIN_VALUE && mGeoAltitude != Integer.MIN_VALUE) {
                                     /*
@@ -494,7 +495,7 @@ public class BlueToothConnectionIn {
                                 if(altitude < -1000) {
                                     altitude = -1000;
                                 }
-                                object.put("time", (long)om.getTime());
+                                object.put("altitude", (double)altitude);
                             } catch (JSONException e1) {
                                 continue;
                             }

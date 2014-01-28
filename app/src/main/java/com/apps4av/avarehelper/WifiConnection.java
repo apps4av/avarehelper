@@ -467,6 +467,7 @@ public class WifiConnection {
                                 object.put("latitude", (double)om.mLat);
                                 object.put("speed", (double)(om.mHorizontalVelocity));
                                 object.put("bearing", (double)om.mDirection);
+                                object.put("time", (long)om.getTime());
                                 int altitude = -1000;
                                 if(om.mAltitude == Integer.MIN_VALUE && mGeoAltitude != Integer.MIN_VALUE) {
                                     /*
@@ -481,7 +482,6 @@ public class WifiConnection {
                                     altitude = -1000;
                                 }
                                 object.put("altitude", (double)((double)altitude));                                    
-                                object.put("time", (long)om.getTime());
                             } catch (JSONException e1) {
                                 continue;
                             }
