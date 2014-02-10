@@ -11,6 +11,10 @@ Redistribution and use in source and binary forms, with or without modification,
 */
 package com.apps4av.avarehelper.gdl90;
 
+import java.util.Calendar;
+import java.util.GregorianCalendar;
+import java.util.TimeZone;
+
 /**
  * 
  * @author zkhan
@@ -23,7 +27,10 @@ public abstract class Message {
     
     public Message(int type) {
         mType = type; 
-        mTime = System.currentTimeMillis();
+        Calendar calendar = new GregorianCalendar();  
+        TimeZone mTimeZone = calendar.getTimeZone();  
+        int offset = mTimeZone.getRawOffset();  
+        mTime = System.currentTimeMillis() - offset;
     }
     
     public long getTime() {
