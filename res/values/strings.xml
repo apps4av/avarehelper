@@ -15,6 +15,8 @@ Redistribution and use in source and binary forms, with or without modification,
     <string name="app_name">Avare External I/O Plugin</string>
     <string name="Connect">Connect</string>
     <string name="Start">Start</string>
+    <string name="Save">Save</string>
+    <string name="Saving">Saving</string>
     <string name="Stop">Stop</string>
     <string name="Avare">Avare</string>
     <string name="Connected">Avare Connected and Linked. Make sure the phone/tablet internal GPS is disabled.</string>
@@ -38,6 +40,10 @@ Redistribution and use in source and binary forms, with or without modification,
     <string name="DescExt">Connect to GPS/ADSB units on Bluetooth</string>
     <string name="DescExtWifi">Connect to GPS/ADSB units on WiFi (Broadcast on Managed Network)</string>
     <string name="DescFile">Feed NMEA / ADSB data from a binary file</string>
-    <string name="DescFileSave">Save NMEA / ADSB data to a binary file</string>
     <string name="DescAP">Connect to autopilots on Bluetooth</string>
+    <string name="Status">Status</string>
+    <string name="Bluetooth">Bluetooth</string>
+    <string name="WIFI">WIFI</string>
+    <string name="AP">Auto Pilot</string>
+    <string name="Play">Play</string>
 </resources>

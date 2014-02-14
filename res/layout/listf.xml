@@ -1,0 +1,64 @@
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"  
+        android:layout_width="wrap_content"  
+        android:layout_height="wrap_content"  
+        android:background="#ffffff"  
+        android:gravity="left"  
+        android:orientation="vertical" >  
+
+        <Button  
+            android:id="@+id/listf_btn_status"  
+            android:layout_width="wrap_content"  
+            android:layout_height="wrap_content"  
+            android:ems="6"  
+            android:gravity="left|center_vertical"  
+            android:text="@string/Status"/>  
+        
+        <Button  
+            android:id="@+id/listf_btn_btin"  
+            android:layout_width="wrap_content"  
+            android:layout_height="wrap_content"  
+            android:ems="6"  
+            android:gravity="left|center_vertical"  
+            android:text="@string/Bluetooth"/>  
+          
+        <Button  
+            android:id="@+id/listf_btn_wifiin"  
+            android:layout_width="wrap_content"  
+            android:layout_height="wrap_content"  
+            android:ems="6"  
+            android:gravity="left|center_vertical"  
+            android:text="@string/WIFI"/>  
+          
+        <Button  
+            android:id="@+id/listf_btn_xplane"  
+            android:layout_width="wrap_content"  
+            android:layout_height="wrap_content"  
+            android:ems="6"  
+            android:gravity="left|center_vertical"  
+            android:text="@string/XPlane"/>  
+          
+        <Button  
+            android:id="@+id/listf_btn_msfs"  
+            android:layout_width="wrap_content"  
+            android:layout_height="wrap_content"  
+            android:ems="6"  
+            android:gravity="left|center_vertical"  
+            android:text="@string/MSFS"/>  
+
+        <Button  
+            android:id="@+id/listf_btn_ap"  
+            android:layout_width="wrap_content"  
+            android:layout_height="wrap_content"  
+            android:ems="6"  
+            android:gravity="left|center_vertical"  
+            android:text="@string/AP"/>  
+
+        <Button  
+            android:id="@+id/listf_btn_play"  
+            android:layout_width="wrap_content"  
+            android:layout_height="wrap_content"  
+            android:ems="6"  
+            android:gravity="left|center_vertical"  
+            android:text="@string/Play"/>  
+
+    </LinearLayout>  

@@ -1,23 +1,5 @@
-/*
-Copyright (c) 2012, Apps4Av Inc. (apps4av.com)
-All rights reserved.
-
-Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
-
-    * Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
-    *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
-    *
-    *     THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-*/
-
 package com.apps4av.avarehelper;
 
-
-import java.util.List;
-
-import com.ds.avare.IHelper;
-
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.ComponentName;
 import android.content.Context;
@@ -26,54 +8,24 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.support.v4.app.*;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.View.OnClickListener;
-import android.widget.ArrayAdapter;
-import android.widget.Button;
-import android.widget.CheckBox;
-import android.widget.EditText;
-import android.widget.Spinner;
 import android.widget.TextView;
 
-/**
- * author zkhan
- */
-public class MainActivity extends Activity {
+public class MainActivity extends FragmentActivity implements ListFragment.OnItemSelectedListener {
 
-    private Spinner mSpinner;
-    private Spinner mSpinnerOut;
-    private List<String> mList;
-    private Button mConnectButton;
-    private Button mConnectButtonOut;
-    private BlueToothConnectionIn mBt;
-    private WifiConnection mWifi;
-    private BlueToothConnectionOut mBtOut;
-    private XplaneConnection mXp;
-    private FileConnectionIn mFile;
-    private Button mConnectFileButton;
-    private Button mConnectFileSaveButton;
-    private boolean mFileSave;
-    private MsfsConnection mMsfs;
     private boolean mBound;
-    private TextView mText;
+    
     private TextView mTextLog;
-    private EditText mTextXplanePort;
-    private EditText mTextFile;
-    private EditText mTextFileSave;
-    private TextView mTextXplaneIp;
-    private EditText mTextMsfsPort;
-    private TextView mTextMsfsIp;
-    private CheckBox mXplaneCb;
-    private CheckBox mMsfsCb;
-
-    private EditText mTextWifiPort;
-    private CheckBox mWifiCb;
+    
+    private IBinder mService;
 
     /**
      * Shows exit dialog
      */
     private AlertDialog mAlertDialogExit;
+
 
     /*
      * (non-Javadoc)
@@ -81,6 +33,7 @@ public class MainActivity extends Activity {
      */
     @Override
     public void onBackPressed() {
+        
         
         /*
          * And may exit
@@ -117,6 +70,39 @@ public class MainActivity extends Activity {
 
     }
 
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        // TODO Auto-generated method stub
+        super.onCreate(savedInstanceState);
+        LayoutInflater layoutInflater = (LayoutInflater)getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        View view = layoutInflater.inflate(R.layout.activity_main, null);
+        mTextLog = (TextView)view.findViewById(R.id.main_text_log);
+        Logger.setTextView(mTextLog);
+        setContentView(view);
+        mBound = false;
+    }
+    
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        /*
+         * Clean up stuff on exit
+         */
+        if(mBound) {
+            unbindService(mConnection);
+            mBound = false;
+        }
+        
+        if(null != mAlertDialogExit) {
+            try {
+                mAlertDialogExit.dismiss();
+            }
+            catch (Exception e) {
+            }
+        }
+
+    }
+   
     /**
      * 
      */
@@ -128,18 +114,8 @@ public class MainActivity extends Activity {
         @Override
         public void onServiceConnected(ComponentName className,
                 IBinder service) {
-            
-             /*
-              * Get interface to Avare
-              */
-             mBt.setHelper(IHelper.Stub.asInterface(service));
-             mBtOut.setHelper(IHelper.Stub.asInterface(service));
-             mXp.setHelper(IHelper.Stub.asInterface(service));
-             mFile.setHelper(IHelper.Stub.asInterface(service));
-             mMsfs.setHelper(IHelper.Stub.asInterface(service));
-             mWifi.setHelper(IHelper.Stub.asInterface(service));
-             mBound = true;
-             mText.setText(getString(R.string.Connected));
+            mBound = true;
+            mService = service;
         }
 
         /* (non-Javadoc)
@@ -151,341 +127,64 @@ public class MainActivity extends Activity {
         }
     };
 
-
-    /**
-     * 
-     */
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setTheme(android.R.style.Theme_Black);            
+    public void onRssItemSelected(String link) {
+        // TODO Auto-generated method stub
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
 
-        LayoutInflater layoutInflater = (LayoutInflater)getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        View view = layoutInflater.inflate(R.layout.main, null);
-        setContentView(view);
-        mBound = false;
+        BlueToothInFragment btin;
+        StatusFragment status;
+        WiFiInFragment wfin;
+        XplaneFragment xp;
+        MsfsFragment msfs;
+        BlueToothOutFragment btout;
+        FileFragment file;
 
-        mText = (TextView)view.findViewById(R.id.main_text);
-        
-        mTextLog = (TextView)view.findViewById(R.id.main_text_log);
-        Logger.setTextView(mTextLog);
-
-        
-        mWifiCb = (CheckBox)view.findViewById(R.id.main_button_connectwifi);
-        mTextWifiPort = (EditText)view.findViewById(R.id.main_wifi_port);
-        mWifiCb.setOnClickListener(new OnClickListener() {
-            
-            
-            @Override
-            public void onClick(View v) {
-              if (((CheckBox) v).isChecked()) {
-                  try {
-                      mWifi.connect(Integer.parseInt(mTextWifiPort.getText().toString()));
-                  }
-                  catch (Exception e) {
-                      /*
-                       * Number parse
-                       */
-                      Logger.Logit("Invalid port");
-                  }
-                  mWifi.start();
-              }
-              else {
-                  mWifi.stop();
-                  mWifi.disconnect();
-              }
-            }
-        });
-
-        
-        mTextFile = (EditText)view.findViewById(R.id.main_file_name);
-        mTextFileSave = (EditText)view.findViewById(R.id.main_file_name_save);
-        mTextXplaneIp = (TextView)view.findViewById(R.id.main_xplane_ip);
-        mTextXplanePort = (EditText)view.findViewById(R.id.main_xplane_port);
-        mXplaneCb = (CheckBox)view.findViewById(R.id.main_button_xplane_connect);
-        mTextXplaneIp.setText(mTextXplaneIp.getText() + "(" + Util.getIpAddr(this) + ")");
-        mXplaneCb.setOnClickListener(new OnClickListener() {
-            
-            
-            @Override
-            public void onClick(View v) {
-              if (((CheckBox) v).isChecked()) {
-                  try {
-                      mXp.connect(Integer.parseInt(mTextXplanePort.getText().toString()));
-                  }
-                  catch (Exception e) {
-                      /*
-                       * Number parse
-                       */
-                      Logger.Logit("Invalid port");
-                  }
-                  mXp.start();
-              }
-              else {
-                  mXp.stop();
-                  mXp.disconnect();
-              }
-            }
-        });
-
-        mTextMsfsIp = (TextView)view.findViewById(R.id.main_msfs_ip);
-        mTextMsfsPort = (EditText)view.findViewById(R.id.main_msfs_port);
-        mMsfsCb = (CheckBox)view.findViewById(R.id.main_button_msfs_connect);
-        mTextMsfsIp.setText(mTextMsfsIp.getText() + "(" + Util.getIpAddr(this) + ")");
-        mMsfsCb.setOnClickListener(new OnClickListener() {
-            
-            
-            @Override
-            public void onClick(View v) {
-              if (((CheckBox) v).isChecked()) {
-                  try {
-                      mMsfs.connect(Integer.parseInt(mTextMsfsPort.getText().toString()));
-                  }
-                  catch (Exception e) {
-                      /*
-                       * Number parse
-                       */
-                      Logger.Logit("Invalid port");
-                  }
-                  mMsfs.start();
-              }
-              else {
-                  mMsfs.stop();
-                  mMsfs.disconnect();
-              }
-            }
-        });
-
-        mConnectButton = (Button)view.findViewById(R.id.main_button_connect);
-        mConnectButton.setOnClickListener(new OnClickListener() {
-            
-            @Override
-            public void onClick(View v) {
-                /*
-                 * If connected, disconnect
-                 */
-                if(mBt.isConnected()) {
-                    mBt.stop();
-                    mBt.disconnect();
-                    if(mBt.isConnected()) {
-                        mConnectButton.setText(getApplicationContext().getString(R.string.Disconnect));
-                    }
-                    else {
-                        mConnectButton.setText(getApplicationContext().getString(R.string.Connect));                        
-                    }
-                    return;
-                }
-                /*
-                 * Connect to the given device in list
-                 */
-                String val = (String)mSpinner.getSelectedItem();
-                if(null != val && (!mBt.isConnected())) {                    
-                    mConnectButton.setText(getApplicationContext().getString(R.string.Connect));
-                    mBt.connect(val);
-                    if(mBt.isConnected()) {
-                        mBt.start();
-                    }
-                    if(mBt.isConnected()) {
-                        mConnectButton.setText(getApplicationContext().getString(R.string.Disconnect));
-                    }
-                    else {
-                        mConnectButton.setText(getApplicationContext().getString(R.string.Connect));                        
-                    }
-                }
-            }
-        });
-
-        mConnectButtonOut = (Button)view.findViewById(R.id.main_button_connect_out);
-        mConnectButtonOut.setOnClickListener(new OnClickListener() {
-            
-            @Override
-            public void onClick(View v) {
-                /*
-                 * If connected, disconnect
-                 */
-                if(mBtOut.isConnected()) {
-                    mBtOut.stop();
-                    mBtOut.disconnect();
-                    if(mBtOut.isConnected()) {
-                        mConnectButtonOut.setText(getApplicationContext().getString(R.string.Disconnect));
-                    }
-                    else {
-                        mConnectButtonOut.setText(getApplicationContext().getString(R.string.Connect));                        
-                    }
-                    return;
-                }
-                /*
-                 * Connect to the given device in list
-                 */
-                String val = (String)mSpinnerOut.getSelectedItem();
-                if(null != val && (!mBtOut.isConnected())) {                    
-                    mBtOut.connect(val);
-                    if(mBtOut.isConnected()) {
-                        mBtOut.start();
-                    }
-                    if(mBtOut.isConnected()) {
-                        mConnectButtonOut.setText(getApplicationContext().getString(R.string.Disconnect));
-                    }
-                    else {
-                        mConnectButtonOut.setText(getApplicationContext().getString(R.string.Connect));                        
-                    }
-                }
-            }
-        });
-
-        
-        mConnectFileButton = (Button)view.findViewById(R.id.main_button_connect_file);
-        mConnectFileButton.setOnClickListener(new OnClickListener() {
-            
-            @Override
-            public void onClick(View v) {
-                /*
-                 * If connected, disconnect
-                 */
-                if(mFile.isConnected()) {
-                    mFile.stop();
-                    mFile.disconnect();
-                    if(mFile.isConnected()) {
-                        mConnectFileButton.setText(getApplicationContext().getString(R.string.Stop));
-                    }
-                    else {
-                        mConnectFileButton.setText(getApplicationContext().getString(R.string.Start));                        
-                    }
-                    return;
-                }
-                
-                /*
-                 * Connect to the given file
-                 */
-                String val = mTextFile.getText().toString();
-                if(null != val && (!mFile.isConnected())) {                    
-                    mConnectFileButton.setText(getApplicationContext().getString(R.string.Start));
-                    mFile.connect(val);
-                    if(mFile.isConnected()) {
-                        mFile.start();
-                    }
-                    if(mFile.isConnected()) {
-                        mConnectFileButton.setText(getApplicationContext().getString(R.string.Stop));
-                    }
-                    else {
-                        mConnectFileButton.setText(getApplicationContext().getString(R.string.Start));                        
-                    }
-                }
-            }
-        });
-
-        mFileSave = false;
-        mConnectFileSaveButton = (Button)view.findViewById(R.id.main_button_connect_file_save);
-        mConnectFileSaveButton.setOnClickListener(new OnClickListener() {
-            
-            @Override
-            public void onClick(View v) {
-                /*
-                 * If connected, disconnect
-                 */
-                String val = mTextFileSave.getText().toString();
-                if(mFileSave) {
-                    mConnectFileSaveButton.setText(getApplicationContext().getString(R.string.Start));
-                    mBt.setFileSave(null);
-                    mWifi.setFileSave(null);
-                    mFileSave = false;
-                }
-                else {
-                    mConnectFileSaveButton.setText(getApplicationContext().getString(R.string.Stop));
-                    mBt.setFileSave(val);
-                    mWifi.setFileSave(val);
-                    mFileSave = true;
-                }
-            }
-        });
-
-        /*
-         * BT connection
-         */
-        mBt = BlueToothConnectionIn.getInstance();
-        
-        /*
-         * BT out connection
-         */
-        mBtOut = BlueToothConnectionOut.getInstance();
-        
-        /*
-         * Xplane connection
-         */
-        mXp = XplaneConnection.getInstance();
-
-        /**
-         * File In connection
-         */
-        mFile = FileConnectionIn.getInstance();
-        
-        /*
-         * MSFS connection
-         */
-        mMsfs = MsfsConnection.getInstance();
-
-        /*
-         * WIFI ADSB
-         */
-        mWifi = WifiConnection.getInstance();
-        
-        /*
-         * For selecting adsb/nmea device
-         */
-        mSpinner = (Spinner)view.findViewById(R.id.main_spinner);
-        mSpinnerOut = (Spinner)view.findViewById(R.id.main_spinner_out);
-
-    }
-
-    @Override
-    protected void onDestroy() {
-        
-        /*
-         * Clean up stuff on exit
-         */
-        if(mBound) {
-            mText.setText(getString(R.string.NotConnected));
-            unbindService(mConnection);
-            mBound = false;
+        if(link.equals("layoutStatus")) {
+            status = new StatusFragment();
+            status.setBound(mBound);
+            fragmentTransaction.replace(R.id.detailFragment, status);
+            fragmentTransaction.commit();
         }
-        if(mBt.isConnected()) {
-            mBt.stop();
+        else if(link.equals("layoutBtin")) {
+            btin = new BlueToothInFragment();
+            btin.init(getApplicationContext(), mService);
+            fragmentTransaction.replace(R.id.detailFragment, btin);
+            fragmentTransaction.commit();
         }
-        if(mBtOut.isConnected()) {
-            mBtOut.stop();
+        else if(link.equals("layoutWifiin")) {
+            wfin = new WiFiInFragment();
+            wfin.init(getApplicationContext(), mService);
+            fragmentTransaction.replace(R.id.detailFragment, wfin);
+            fragmentTransaction.commit();
         }
-        
-        mXp.disconnect();
-        mXp.stop();
-        
-        mWifi.disconnect();
-        mWifi.stop();
-        
-        mMsfs.disconnect();
-        mMsfs.stop();
-
-        if(mFile.isConnected()) {
-            mFile.disconnect();
-            mFile.stop();
+        else if(link.equals("layoutXplane")) {
+            xp = new XplaneFragment();
+            xp.init(getApplicationContext(), mService);
+            fragmentTransaction.replace(R.id.detailFragment, xp);
+            fragmentTransaction.commit();
         }
-        
-        if(null != mAlertDialogExit) {
-            try {
-                mAlertDialogExit.dismiss();
-            }
-            catch (Exception e) {
-            }
+        else if(link.equals("layoutMsfs")) {
+            msfs = new MsfsFragment();
+            msfs.init(getApplicationContext(), mService);
+            fragmentTransaction.replace(R.id.detailFragment, msfs);
+            fragmentTransaction.commit();
         }
-        
-        Logger.setTextView(null);
-
-        super.onDestroy();
+        else if(link.equals("layoutAp")) {
+            btout = new BlueToothOutFragment();
+            btout.init(getApplicationContext(), mService);
+            fragmentTransaction.replace(R.id.detailFragment, btout);
+            fragmentTransaction.commit();
+        }
+        else if(link.equals("layoutPlay")) {
+            file = new FileFragment();
+            file.init(getApplicationContext(), mService);
+            fragmentTransaction.replace(R.id.detailFragment, file);
+            fragmentTransaction.commit();
+        }
     }
     
-    
-    /**
-     * 
-     */
     @Override
     protected void onResume() {
         super.onResume();
@@ -495,17 +194,7 @@ public class MainActivity extends Activity {
         Intent i = new Intent("com.ds.avare.START_SERVICE");
         i.setClassName("com.ds.avare", "com.ds.avare.IHelperService");
         bindService(i, mConnection, Context.BIND_AUTO_CREATE);
-
-        mList = mBt.getDevices();
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(MainActivity.this,
-                android.R.layout.simple_spinner_item, mList);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        
-        /*
-         * List of BT devices is same
-         */
-        mSpinner.setAdapter(adapter);       
-        mSpinnerOut.setAdapter(adapter);
+        mBound = false;
 
     }
 
