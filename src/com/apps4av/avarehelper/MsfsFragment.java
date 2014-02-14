@@ -35,10 +35,6 @@ public class MsfsFragment extends Fragment {
         
         View view = inflater.inflate(R.layout.layout_msfs, container, false);
         
-        if(null == mService) {
-            return view;
-        }
-        
         mTextMsfsIp = (TextView)view.findViewById(R.id.main_msfs_ip);
         mTextMsfsPort = (EditText)view.findViewById(R.id.main_msfs_port);
         mMsfsCb = (CheckBox)view.findViewById(R.id.main_button_msfs_connect);
@@ -73,7 +69,9 @@ public class MsfsFragment extends Fragment {
          * Get Connection
          */
         mMsfs = MsfsConnection.getInstance();
-        mMsfs.setHelper(IHelper.Stub.asInterface(mService));
+        if(null != mService) {
+            mMsfs.setHelper(IHelper.Stub.asInterface(mService));
+        }
         
         return view;  
         

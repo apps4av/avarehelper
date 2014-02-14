@@ -34,10 +34,6 @@ public class FileFragment extends Fragment {
 
         View view = inflater.inflate(R.layout.layout_play, container, false);
 
-        if (null == mService) {
-            return view;
-        }
-
         mTextFile = (EditText)view.findViewById(R.id.main_file_name);
         mConnectFileButton = (Button)view.findViewById(R.id.main_button_connect_file);
         mConnectFileButton.setOnClickListener(new OnClickListener() {
@@ -83,8 +79,9 @@ public class FileFragment extends Fragment {
          * List of BT devices is same
          */
         mFile = FileConnectionIn.getInstance();
-        mFile.setHelper(IHelper.Stub.asInterface(mService));
-
+        if (null != mService) {
+            mFile.setHelper(IHelper.Stub.asInterface(mService));
+        }
 
         return view;
 

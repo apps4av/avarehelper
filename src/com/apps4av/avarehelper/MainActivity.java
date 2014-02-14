@@ -194,7 +194,6 @@ public class MainActivity extends FragmentActivity implements ListFragment.OnIte
         Intent i = new Intent("com.ds.avare.START_SERVICE");
         i.setClassName("com.ds.avare", "com.ds.avare.IHelperService");
         bindService(i, mConnection, Context.BIND_AUTO_CREATE);
-        mBound = false;
 
     }
 

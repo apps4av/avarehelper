@@ -37,10 +37,6 @@ public class BlueToothOutFragment extends Fragment {
 
         View view = inflater.inflate(R.layout.layout_ap, container, false);
 
-        if (null == mService) {
-            return view;
-        }
-
         /*
          * BT connection
          */
@@ -88,7 +84,10 @@ public class BlueToothOutFragment extends Fragment {
          * List of BT devices is same
          */
         mBtOut = BlueToothConnectionOut.getInstance();
-        mBtOut.setHelper(IHelper.Stub.asInterface(mService));
+        if (null != mService) {
+            mBtOut.setHelper(IHelper.Stub.asInterface(mService));
+        }
+
         mList = mBtOut.getDevices();
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(mContext,
                 android.R.layout.simple_spinner_item, mList);

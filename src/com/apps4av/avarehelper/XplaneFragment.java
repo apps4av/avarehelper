@@ -35,10 +35,6 @@ public class XplaneFragment extends Fragment {
         
         View view = inflater.inflate(R.layout.layout_xplane, container, false);
         
-        if(null == mService) {
-            return view;
-        }
-        
         mTextXplaneIp = (TextView)view.findViewById(R.id.main_xplane_ip);
         mTextXplanePort = (EditText)view.findViewById(R.id.main_xplane_port);
         mXplaneCb = (CheckBox)view.findViewById(R.id.main_button_xplane_connect);
@@ -72,7 +68,10 @@ public class XplaneFragment extends Fragment {
          * List of BT devices is same
          */
         mXp = XplaneConnection.getInstance();
-        mXp.setHelper(IHelper.Stub.asInterface(mService));
+        if(null != mService) {
+            mXp.setHelper(IHelper.Stub.asInterface(mService));
+        }
+        
         
         return view;  
         

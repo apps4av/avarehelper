@@ -36,16 +36,15 @@ public class WiFiInFragment extends Fragment {
         
         View view = inflater.inflate(R.layout.layout_wifiin, container, false);
         
-        if(null == mService) {
-            return view;
-        }
-        
         /*
          * WIFI connection
          */
 
         mWifi = WifiConnection.getInstance();
-        mWifi.setHelper(IHelper.Stub.asInterface(mService));
+        if(null != mService) {
+            mWifi.setHelper(IHelper.Stub.asInterface(mService));
+        }
+        
         
         mTextFileSave = (EditText)view.findViewById(R.id.main_file_name_save);
         mWifiCb = (CheckBox)view.findViewById(R.id.main_button_connectwifi);
