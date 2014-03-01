@@ -46,4 +46,5 @@ Redistribution and use in source and binary forms, with or without modification,
     <string name="WIFI">WIFI</string>
     <string name="AP">Auto Pilot</string>
     <string name="Play">Play</string>
+    <string name="Secure">Secure</string>
 </resources>

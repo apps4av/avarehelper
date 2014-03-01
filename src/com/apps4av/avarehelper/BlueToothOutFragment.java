@@ -13,6 +13,7 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.Spinner;
 import android.support.v4.app.*;
 
@@ -29,6 +30,7 @@ public class BlueToothOutFragment extends Fragment {
     private Context mContext;
     private Button mConnectButtonOut;
     private IBinder mService;
+    private CheckBox mSecureCb;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -36,49 +38,6 @@ public class BlueToothOutFragment extends Fragment {
         // TODO Auto-generated method stub
 
         View view = inflater.inflate(R.layout.layout_ap, container, false);
-
-        /*
-         * BT connection
-         */
-        mSpinnerOut = (Spinner)view.findViewById(R.id.main_spinner_out);
-        mConnectButtonOut = (Button)view.findViewById(R.id.main_button_connect_out);
-        mConnectButtonOut.setOnClickListener(new OnClickListener() {
-            
-            @Override
-            public void onClick(View v) {
-                /*
-                 * If connected, disconnect
-                 */
-                if(mBtOut.isConnected()) {
-                    mBtOut.stop();
-                    mBtOut.disconnect();
-                    if(mBtOut.isConnected()) {
-                        mConnectButtonOut.setText(mContext.getString(R.string.Disconnect));
-                    }
-                    else {
-                        mConnectButtonOut.setText(mContext.getString(R.string.Connect));                        
-                    }
-                    return;
-                }
-                /*
-                 * Connect to the given device in list
-                 */
-                String val = (String)mSpinnerOut.getSelectedItem();
-                if(null != val && (!mBtOut.isConnected())) {                    
-                    mBtOut.connect(val);
-                    if(mBtOut.isConnected()) {
-                        mBtOut.start();
-                    }
-                    if(mBtOut.isConnected()) {
-                        mConnectButtonOut.setText(mContext.getString(R.string.Disconnect));
-                    }
-                    else {
-                        mConnectButtonOut.setText(mContext.getString(R.string.Connect));                        
-                    }
-                }
-            }
-        });
-
 
         /*
          * List of BT devices is same
@@ -93,8 +52,12 @@ public class BlueToothOutFragment extends Fragment {
                 android.R.layout.simple_spinner_item, mList);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 
+        mSpinnerOut = (Spinner)view.findViewById(R.id.main_spinner_out);
+
         mSpinnerOut.setAdapter(adapter);
 
+        mSecureCb = (CheckBox) view.findViewById(R.id.main_cb_btout);
+        
         mConnectButtonOut = (Button) view.findViewById(R.id.main_button_connect_out);
         mConnectButtonOut.setOnClickListener(new OnClickListener() {
 
@@ -119,7 +82,7 @@ public class BlueToothOutFragment extends Fragment {
                 String val = (String) mSpinnerOut.getSelectedItem();
                 if (null != val && (!mBtOut.isConnected())) {
                     mConnectButtonOut.setText(getString(R.string.Connect));
-                    mBtOut.connect(val);
+                    mBtOut.connect(val, mSecureCb.isChecked());
                     if (mBtOut.isConnected()) {
                         mBtOut.start();
                     }

@@ -39,6 +39,7 @@ public class BlueToothConnectionOut {
     private static BluetoothSocket mBtSocket = null;
     private static OutputStream mStream = null;
     private static boolean mRunning = false;
+    private boolean mSecure;
     
     private static BlueToothConnectionOut mConnection;
     
@@ -198,7 +199,7 @@ public class BlueToothConnectionOut {
                         Logger.Logit("Disconnected from BT device, retrying to connect");
 
                         disconnect();
-                        connect(mDevName);
+                        connect(mDevName, mSecure);
                         continue;
                     }
 
@@ -219,7 +220,7 @@ public class BlueToothConnectionOut {
                         Logger.Logit("Disconnected from BT device, retrying to connect");
 
                         disconnect();
-                        connect(mDevName);
+                        connect(mDevName, mSecure);
                         continue;
                     }
 
@@ -268,7 +269,7 @@ public class BlueToothConnectionOut {
      * name matched this string.
      * @return
      */
-    public boolean connect(String devNameMatch) {
+    public boolean connect(String devNameMatch, boolean secure) {
         
         Logger.Logit("Connecting to device " + devNameMatch);
 
@@ -277,6 +278,7 @@ public class BlueToothConnectionOut {
         }
         
         mDevName = devNameMatch;
+        mSecure = secure;
         
         /*
          * Only when not connected, connect
@@ -328,22 +330,29 @@ public class BlueToothConnectionOut {
         /*
          * Make socket
          */
-        Logger.Logit("Finding socket for SPP");
+        Logger.Logit("Finding socket for SPP secure = " + mSecure);
 
-        try {
-            mBtSocket = device.createRfcommSocketToServiceRecord(MY_UUID);
-        } 
-        catch(Exception e) {
-            Logger.Logit("Failed! SPP secure socket failed");
-
+        if(secure) {
+            try {
+                mBtSocket = device.createRfcommSocketToServiceRecord(MY_UUID);
+            } 
+            catch(Exception e) {
+                Logger.Logit("Failed! SPP secure socket failed");
+    
+                setState(ConnectionStatus.DISCONNECTED);
+                return false;
+            }
+        }
+        else {
             try {
                 mBtSocket = device.createInsecureRfcommSocketToServiceRecord(MY_UUID);
             } 
             catch(Exception e1) {
                 Logger.Logit("Failed! SPP insecure socket failed");
+                
                 setState(ConnectionStatus.DISCONNECTED);
                 return false;
-            }
+            }            
         }
     
         /*

@@ -13,6 +13,7 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.support.v4.app.*;
@@ -33,6 +34,7 @@ public class BlueToothInFragment extends Fragment {
     private Button mConnectFileSaveButton;
     private boolean mFileSave;
     private EditText mTextFileSave;
+    private CheckBox mSecureCb;
 
 
     @Override
@@ -63,6 +65,7 @@ public class BlueToothInFragment extends Fragment {
 
         mSpinner.setAdapter(adapter);
 
+        mSecureCb = (CheckBox) view.findViewById(R.id.main_cb_btin);
         mConnectButton = (Button) view.findViewById(R.id.main_button_connect);
         mConnectButton.setOnClickListener(new OnClickListener() {
 
@@ -87,7 +90,7 @@ public class BlueToothInFragment extends Fragment {
                 String val = (String) mSpinner.getSelectedItem();
                 if (null != val && (!mBt.isConnected())) {
                     mConnectButton.setText(getString(R.string.Connect));
-                    mBt.connect(val);
+                    mBt.connect(val, mSecureCb.isChecked());
                     if (mBt.isConnected()) {
                         mBt.start();
                     }

@@ -54,6 +54,7 @@ public class BlueToothConnectionIn {
     private static boolean mRunning = false;
     private static String mFileSave = null;
     private int mGeoAltitude;
+    private boolean mSecure;
     
     private static BlueToothConnectionIn mConnection;
     
@@ -177,7 +178,7 @@ public class BlueToothConnectionIn {
                         Logger.Logit("Disconnected from BT device, retrying to connect");
 
                         disconnect();
-                        connect(mDevName);
+                        connect(mDevName, mSecure);
                         continue;
                     }
 
@@ -553,7 +554,7 @@ public class BlueToothConnectionIn {
      * name matched this string.
      * @return
      */
-    public boolean connect(String devNameMatch) {
+    public boolean connect(String devNameMatch, boolean secure) {
         
         Logger.Logit("Connecting to device " + devNameMatch);
 
@@ -562,6 +563,7 @@ public class BlueToothConnectionIn {
         }
         
         mDevName = devNameMatch;
+        mSecure = secure;
         
         /*
          * Only when not connected, connect
@@ -613,18 +615,24 @@ public class BlueToothConnectionIn {
         /*
          * Make socket
          */
-        Logger.Logit("Finding socket for SPP");
+        Logger.Logit("Finding socket for SPP secure = " + mSecure);
 
-        try {
-            mBtSocket = device.createRfcommSocketToServiceRecord(MY_UUID);
-        } 
-        catch(Exception e) {
-            Logger.Logit("Failed! secure SPP socket failed");
-
+        if(secure) {
+            try {
+                mBtSocket = device.createRfcommSocketToServiceRecord(MY_UUID);
+            } 
+            catch(Exception e) {
+                Logger.Logit("Failed! secure SPP socket failed");
+                
+                setState(ConnectionStatus.DISCONNECTED);
+                return false;
+            }
+        }
+        else {
             try {
                 mBtSocket = device.createInsecureRfcommSocketToServiceRecord(MY_UUID);
             } 
-            catch(Exception e1) {
+            catch(Exception e) {
                 Logger.Logit("Failed! insecure SPP socket failed");
 
                 setState(ConnectionStatus.DISCONNECTED);
