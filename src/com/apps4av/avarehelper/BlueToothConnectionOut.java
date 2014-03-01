@@ -253,7 +253,7 @@ public class BlueToothConnectionOut {
          * Find devices
          */
         if(null == pairedDevices) {            
-            return null;
+            return list;
         }
         for(BluetoothDevice bt : pairedDevices) {
             list.add((String)bt.getName());
@@ -334,16 +334,22 @@ public class BlueToothConnectionOut {
             mBtSocket = device.createRfcommSocketToServiceRecord(MY_UUID);
         } 
         catch(Exception e) {
-            Logger.Logit("Failed! SPP socket failed");
+            Logger.Logit("Failed! SPP secure socket failed");
 
-            setState(ConnectionStatus.DISCONNECTED);
-            return false;
+            try {
+                mBtSocket = device.createInsecureRfcommSocketToServiceRecord(MY_UUID);
+            } 
+            catch(Exception e1) {
+                Logger.Logit("Failed! SPP insecure socket failed");
+                setState(ConnectionStatus.DISCONNECTED);
+                return false;
+            }
         }
     
         /*
          * Establish the connection.  This will block until it connects.
          */
-        Logger.Logit("Failed! Connecting socket");
+        Logger.Logit("Connecting socket");
 
         try {
             mBtSocket.connect();
