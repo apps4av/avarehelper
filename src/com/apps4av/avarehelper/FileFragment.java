@@ -23,7 +23,7 @@ public class FileFragment extends Fragment {
 
     private FileConnectionIn mFile;
     private Context mContext;
-    private IBinder mService;
+    private static IBinder mService;
     private Button mConnectFileButton;
     private EditText mTextFile;
 
@@ -31,6 +31,8 @@ public class FileFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
         // TODO Auto-generated method stub
+
+        mContext = container.getContext();
 
         View view = inflater.inflate(R.layout.layout_play, container, false);
 
@@ -98,8 +100,7 @@ public class FileFragment extends Fragment {
     /**
      * 
      */
-    public void init(Context ctx, IBinder service) {
-        mContext = ctx;
+    public static void init(IBinder service) {
         mService = service;
     }
 

@@ -19,6 +19,7 @@ public class StatusFragment extends Fragment {
     
     @Override  
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {  
+        mBound = getArguments().getBoolean("bound");
         View view = inflater.inflate(R.layout.layout_status, container, false);
         mTv = (TextView)view.findViewById(R.id.main_text);
         if(mBound) {
@@ -28,13 +29,5 @@ public class StatusFragment extends Fragment {
             mTv.setText(getString(R.string.NotConnected));            
         }
         return view;
-    }      
-    
-    /**
-     * 
-     * @param bound
-     */
-    public void setBound(boolean bound) {
-        mBound = bound;
     }
 } 

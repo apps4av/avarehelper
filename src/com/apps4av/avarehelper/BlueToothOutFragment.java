@@ -29,13 +29,15 @@ public class BlueToothOutFragment extends Fragment {
     private Spinner mSpinnerOut;
     private Context mContext;
     private Button mConnectButtonOut;
-    private IBinder mService;
+    private static IBinder mService;
     private CheckBox mSecureCb;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
         // TODO Auto-generated method stub
+        mContext = container.getContext();
+
 
         View view = inflater.inflate(R.layout.layout_ap, container, false);
 
@@ -110,8 +112,7 @@ public class BlueToothOutFragment extends Fragment {
     /**
      * 
      */
-    public void init(Context ctx, IBinder service) {
-        mContext = ctx;
+    public static void init(IBinder service) {
         mService = service;
     }
 

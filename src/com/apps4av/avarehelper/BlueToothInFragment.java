@@ -30,7 +30,7 @@ public class BlueToothInFragment extends Fragment {
     private Spinner mSpinner;
     private Context mContext;
     private Button mConnectButton;
-    private IBinder mService;
+    private static IBinder mService;
     private Button mConnectFileSaveButton;
     private boolean mFileSave;
     private EditText mTextFileSave;
@@ -42,6 +42,8 @@ public class BlueToothInFragment extends Fragment {
             Bundle savedInstanceState) {
         // TODO Auto-generated method stub
 
+        mContext = container.getContext();
+        
         View view = inflater.inflate(R.layout.layout_btin, container, false);
 
         /*
@@ -141,8 +143,7 @@ public class BlueToothInFragment extends Fragment {
     /**
      * 
      */
-    public void init(Context ctx, IBinder service) {
-        mContext = ctx;
+    public static void init(IBinder service) {
         mService = service;
     }
 

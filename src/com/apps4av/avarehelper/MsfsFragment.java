@@ -27,12 +27,14 @@ public class MsfsFragment extends Fragment {
     private TextView mTextMsfsIp;
     private CheckBox mMsfsCb;
 
-    private IBinder mService;
+    private static IBinder mService;
     private Context mContext;
 
     @Override  
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {  
         
+        mContext = container.getContext();
+
         View view = inflater.inflate(R.layout.layout_msfs, container, false);
         
         mTextMsfsIp = (TextView)view.findViewById(R.id.main_msfs_ip);
@@ -88,9 +90,8 @@ public class MsfsFragment extends Fragment {
     /**
      * 
      */
-    public void init(Context ctx, IBinder service) {
+    public static void init(IBinder service) {
         mService = service;
-        mContext = ctx;
     }
     
 } 

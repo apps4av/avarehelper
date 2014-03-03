@@ -27,12 +27,14 @@ public class XplaneFragment extends Fragment {
     private TextView mTextXplaneIp;
     private CheckBox mXplaneCb;
 
-    private IBinder mService;
+    private static IBinder mService;
     private Context mContext;
 
     @Override  
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {  
         
+        mContext = container.getContext();
+
         View view = inflater.inflate(R.layout.layout_xplane, container, false);
         
         mTextXplaneIp = (TextView)view.findViewById(R.id.main_xplane_ip);
@@ -88,9 +90,8 @@ public class XplaneFragment extends Fragment {
     /**
      * 
      */
-    public void init(Context ctx, IBinder service) {
+    public static void init(IBinder service) {
         mService = service;
-        mContext = ctx;
     }
     
 } 

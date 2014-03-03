@@ -25,7 +25,7 @@ public class WiFiInFragment extends Fragment {
     private WifiConnection mWifi;
     private EditText mTextWifiPort;
     private CheckBox mWifiCb;
-    private IBinder mService;
+    private static IBinder mService;
     private Context mContext;
     private Button mConnectFileSaveButton;
     private boolean mFileSave;
@@ -34,6 +34,8 @@ public class WiFiInFragment extends Fragment {
     @Override  
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {  
         
+        mContext = container.getContext();
+
         View view = inflater.inflate(R.layout.layout_wifiin, container, false);
         
         /*
@@ -112,9 +114,8 @@ public class WiFiInFragment extends Fragment {
     /**
      * 
      */
-    public void init(Context ctx, IBinder service) {
+    public static void init(IBinder service) {
         mService = service;
-        mContext = ctx;
     }
     
 } 

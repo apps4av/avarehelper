@@ -141,45 +141,47 @@ public class MainActivity extends FragmentActivity implements ListFragment.OnIte
         BlueToothOutFragment btout;
         FileFragment file;
 
+        Bundle args = new Bundle();
+        args.putBoolean("bound", mBound);
         if(link.equals("layoutStatus")) {
             status = new StatusFragment();
-            status.setBound(mBound);
+            status.setArguments(args);
             fragmentTransaction.replace(R.id.detailFragment, status);
             fragmentTransaction.commit();
         }
         else if(link.equals("layoutBtin")) {
+            BlueToothInFragment.init(mService);
             btin = new BlueToothInFragment();
-            btin.init(getApplicationContext(), mService);
             fragmentTransaction.replace(R.id.detailFragment, btin);
             fragmentTransaction.commit();
         }
         else if(link.equals("layoutWifiin")) {
+            WiFiInFragment.init(mService);
             wfin = new WiFiInFragment();
-            wfin.init(getApplicationContext(), mService);
             fragmentTransaction.replace(R.id.detailFragment, wfin);
             fragmentTransaction.commit();
         }
         else if(link.equals("layoutXplane")) {
+            XplaneFragment.init(mService);
             xp = new XplaneFragment();
-            xp.init(getApplicationContext(), mService);
             fragmentTransaction.replace(R.id.detailFragment, xp);
             fragmentTransaction.commit();
         }
         else if(link.equals("layoutMsfs")) {
+            MsfsFragment.init(mService);
             msfs = new MsfsFragment();
-            msfs.init(getApplicationContext(), mService);
             fragmentTransaction.replace(R.id.detailFragment, msfs);
             fragmentTransaction.commit();
         }
         else if(link.equals("layoutAp")) {
+            BlueToothOutFragment.init(mService);
             btout = new BlueToothOutFragment();
-            btout.init(getApplicationContext(), mService);
             fragmentTransaction.replace(R.id.detailFragment, btout);
             fragmentTransaction.commit();
         }
         else if(link.equals("layoutPlay")) {
+            FileFragment.init(mService);
             file = new FileFragment();
-            file.init(getApplicationContext(), mService);
             fragmentTransaction.replace(R.id.detailFragment, file);
             fragmentTransaction.commit();
         }
