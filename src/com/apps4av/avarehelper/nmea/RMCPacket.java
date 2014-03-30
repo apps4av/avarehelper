@@ -23,9 +23,7 @@ import android.hardware.GeomagneticField;
  * @author zkhan
  *
  */
-public class RMCPacket {
-
-    private String mPacket;
+public class RMCPacket extends Packet {
     
     public RMCPacket(long time, double latitude, double longitude, double speed, double bearing) {
         mPacket = "$GPRMC,";
@@ -132,23 +130,9 @@ public class RMCPacket {
             mPacket += String.format("%05.1f", dec);
             mPacket += ",W";            
         }
-        
-        /*
-         * Checksum
-         */
-        mPacket += "*";
-        
-        int xor = MessageFactory.checkSum(mPacket.getBytes());
-        String ma = Integer.toHexString(xor).toUpperCase(Locale.getDefault());
-        mPacket += ma;
+      
+        assemble();
         
     }
 
-    /**
-     * 
-     * @param msg
-     */
-    public String getPacket() {
-        return mPacket;
-    }
 }

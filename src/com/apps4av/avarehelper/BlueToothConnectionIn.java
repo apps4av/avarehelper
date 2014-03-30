@@ -54,7 +54,7 @@ public class BlueToothConnectionIn {
     private static boolean mRunning = false;
     private static String mFileSave = null;
     private int mGeoAltitude;
-    private boolean mSecure;
+    private boolean mSecure = true;
     
     private static BlueToothConnectionIn mConnection;
     
@@ -764,5 +764,28 @@ public class BlueToothConnectionIn {
     public void setHelper(IHelper helper) {
         mHelper = helper;
     }
+    
+    /**
+     * 
+     * @return
+     */
+    public boolean isSecure() {
+        return mSecure;
+    }
 
+    /**
+     * 
+     * @return
+     */
+    public String getConnDevice() {
+        return mDevName;
+    }
+    
+    /**
+     * 
+     * @return
+     */
+    public String getFileSave() {
+        return mFileSave;
+    }
 }

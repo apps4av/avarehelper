@@ -28,7 +28,6 @@ public class WiFiInFragment extends Fragment {
     private static IBinder mService;
     private Context mContext;
     private Button mConnectFileSaveButton;
-    private boolean mFileSave;
     private EditText mTextFileSave;
 
     @Override  
@@ -56,26 +55,25 @@ public class WiFiInFragment extends Fragment {
             
             @Override
             public void onClick(View v) {
-              if (((CheckBox) v).isChecked()) {
-                  try {
-                      mWifi.connect(Integer.parseInt(mTextWifiPort.getText().toString()));
-                  }
-                  catch (Exception e) {
-                      /*
-                       * Number parse
-                       */
-                      Logger.Logit("Invalid port");
-                  }
-                  mWifi.start();
-              }
-              else {
-                  mWifi.stop();
-                  mWifi.disconnect();
-              }
+                if (((CheckBox) v).isChecked()) {
+                    try {
+                        mWifi.connect(Integer.parseInt(mTextWifiPort.getText().toString()));
+                    }
+                    catch (Exception e) {
+                        /*
+                         * Number parse
+                         */
+                        Logger.Logit("Invalid port");
+                    }
+                    mWifi.start();
+                }
+                else {
+                    mWifi.stop();
+                    mWifi.disconnect();
+                }
             }
         });
 
-        mFileSave = false;
         mConnectFileSaveButton = (Button)view.findViewById(R.id.main_button_connect_file_save);
         mConnectFileSaveButton.setOnClickListener(new OnClickListener() {
             
@@ -85,29 +83,45 @@ public class WiFiInFragment extends Fragment {
                  * If connected, disconnect
                  */
                 String val = mTextFileSave.getText().toString();
-                if(mFileSave) {
-                    mConnectFileSaveButton.setText(mContext.getString(R.string.Save));
+                if(mWifi.getFileSave() != null) {
                     mWifi.setFileSave(null);
-                    mFileSave = false;
                 }
                 else {
-                    mConnectFileSaveButton.setText(mContext.getString(R.string.Saving));
                     mWifi.setFileSave(val);
-                    mFileSave = true;
                 }
+                setStates();
             }
         });
 
-        
+        setStates();
         return view;  
         
     }
+    
+    /**
+     * 
+     */
+    private void setStates() {
+        mWifiCb.setChecked(mWifi.isConnected());
+
+        if(mWifi.getFileSave() != null) {
+            mConnectFileSaveButton.setText(mContext.getString(R.string.Saving));
+            mTextFileSave.setText(mWifi.getFileSave());
+        }
+        else {
+            mConnectFileSaveButton.setText(mContext.getString(R.string.Save));
+        }
+
+        if(mWifi.getPort() != 0) {
+            mTextWifiPort.setText("" + mWifi.getPort());
+        }
+
+    }
+
 
     @Override  
     public void onDestroyView() {  
         super.onDestroyView();
-        mWifi.stop();
-        mWifi.disconnect();
     }
 
     

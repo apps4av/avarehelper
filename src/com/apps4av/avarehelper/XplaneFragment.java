@@ -46,22 +46,22 @@ public class XplaneFragment extends Fragment {
             
             @Override
             public void onClick(View v) {
-              if (((CheckBox) v).isChecked()) {
-                  try {
-                      mXp.connect(Integer.parseInt(mTextXplanePort.getText().toString()));
-                  }
-                  catch (Exception e) {
-                      /*
-                       * Number parse
-                       */
-                      Logger.Logit("Invalid port");
-                  }
-                  mXp.start();
-              }
-              else {
-                  mXp.stop();
-                  mXp.disconnect();
-              }
+                if (((CheckBox) v).isChecked()) {
+                    try {
+                        mXp.connect(Integer.parseInt(mTextXplanePort.getText().toString()));
+                    }
+                    catch (Exception e) {
+                        /*
+                         * Number parse
+                         */
+                        Logger.Logit("Invalid port");
+                    }
+                    mXp.start();
+                }
+                else {
+                    mXp.stop();
+                    mXp.disconnect();
+                }
             }
         });
 
@@ -74,16 +74,27 @@ public class XplaneFragment extends Fragment {
             mXp.setHelper(IHelper.Stub.asInterface(mService));
         }
         
+        setStates();
         
         return view;  
         
     }
 
+    /**
+     * 
+     */
+    private void setStates() {
+        mXplaneCb.setChecked(mXp.isConnected());
+
+        if(mXp.getPort() != 0) {
+            mTextXplanePort.setText("" + mXp.getPort());
+        }
+
+    }
+
     @Override  
     public void onDestroyView() {  
         super.onDestroyView();
-        mXp.disconnect();
-        mXp.stop();
     }
 
     

@@ -39,7 +39,7 @@ public class BlueToothConnectionOut {
     private static BluetoothSocket mBtSocket = null;
     private static OutputStream mStream = null;
     private static boolean mRunning = false;
-    private boolean mSecure;
+    private boolean mSecure = true;
     
     private static BlueToothConnectionOut mConnection;
     
@@ -463,6 +463,22 @@ public class BlueToothConnectionOut {
      */
     public void setHelper(IHelper helper) {
         mHelper = helper;
+    }
+    
+    /**
+     * 
+     * @return
+     */
+    public boolean isSecure() {
+        return mSecure;
+    }
+
+    /**
+     * 
+     * @return
+     */
+    public String getConnDevice() {
+        return mDevName;
     }
 
 }

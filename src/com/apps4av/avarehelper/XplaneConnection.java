@@ -35,7 +35,9 @@ public class XplaneConnection {
     
     DatagramSocket mSocket;
     
-    private int mPort;
+    private int mPort = 0;
+    
+    private boolean mConnected = false;
     
     /**
      * 
@@ -185,6 +187,8 @@ public class XplaneConnection {
 
         Logger.Logit("Success!");
 
+        mConnected = true;
+        
         return true;
     }
     
@@ -204,7 +208,9 @@ public class XplaneConnection {
         catch(Exception e2) {
             Logger.Logit("Error stream close");
         }
-        
+
+        mConnected = false;
+
         Logger.Logit("Listener stopped");
     }
     
@@ -231,5 +237,21 @@ public class XplaneConnection {
     public void setHelper(IHelper helper) {
         mHelper = helper;
     }
+
+    /**
+     * 
+     */
+    public boolean isConnected() {
+        return mConnected;
+    }
+    
+    /**
+     * 
+     * @return
+     */
+    public int getPort() {
+        return mPort;
+    }
+
 
 }

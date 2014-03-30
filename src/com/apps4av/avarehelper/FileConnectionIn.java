@@ -50,7 +50,7 @@ public class FileConnectionIn {
     private int mGeoAltitude;
 
     private Thread mThread;
-    private String mFileName;
+    private String mFileName = null;
 
     /**
      * 
@@ -594,6 +594,14 @@ public class FileConnectionIn {
      */
     public void setHelper(IHelper helper) {
         mHelper = helper;
+    }
+
+    /**
+     * 
+     * @return
+     */
+    public String getFileName() {
+        return mFileName;
     }
 
 }

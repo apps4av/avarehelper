@@ -21,10 +21,8 @@ import java.util.TimeZone;
  * @author zkhan
  *
  */
-public class GGAPacket {
+public class GGAPacket extends Packet {
 
-    private String mPacket;
-    
     public GGAPacket(long time, double latitude, double longitude, double altitude) {
         mPacket = "$GPGGA,";
         
@@ -118,22 +116,7 @@ public class GGAPacket {
          */
         mPacket += "0.0,M,,";
 
-        /*
-         * Checksum
-         */
-        mPacket += "*";
-        
-        int xor = MessageFactory.checkSum(mPacket.getBytes());
-        String ma = Integer.toHexString(xor).toUpperCase(Locale.getDefault());
-        mPacket += ma;
-        
+        assemble();
     }
 
-    /**
-     * 
-     * @param msg
-     */
-    public String getPacket() {
-        return mPacket;
-    }
 }

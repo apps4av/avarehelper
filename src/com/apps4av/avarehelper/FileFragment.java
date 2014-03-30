@@ -24,7 +24,7 @@ public class FileFragment extends Fragment {
     private FileConnectionIn mFile;
     private Context mContext;
     private static IBinder mService;
-    private Button mConnectFileButton;
+    private Button mConnectButton;
     private EditText mTextFile;
 
     @Override
@@ -37,8 +37,8 @@ public class FileFragment extends Fragment {
         View view = inflater.inflate(R.layout.layout_play, container, false);
 
         mTextFile = (EditText)view.findViewById(R.id.main_file_name);
-        mConnectFileButton = (Button)view.findViewById(R.id.main_button_connect_file);
-        mConnectFileButton.setOnClickListener(new OnClickListener() {
+        mConnectButton = (Button)view.findViewById(R.id.main_button_connect_file);
+        mConnectButton.setOnClickListener(new OnClickListener() {
             
             @Override
             public void onClick(View v) {
@@ -48,12 +48,7 @@ public class FileFragment extends Fragment {
                 if(mFile.isConnected()) {
                     mFile.stop();
                     mFile.disconnect();
-                    if(mFile.isConnected()) {
-                        mConnectFileButton.setText(mContext.getString(R.string.Stop));
-                    }
-                    else {
-                        mConnectFileButton.setText(mContext.getString(R.string.Start));                        
-                    }
+                    setStates();
                     return;
                 }
                 
@@ -62,17 +57,12 @@ public class FileFragment extends Fragment {
                  */
                 String val = mTextFile.getText().toString();
                 if(null != val && (!mFile.isConnected())) {                    
-                    mConnectFileButton.setText(mContext.getString(R.string.Start));
+                    mConnectButton.setText(mContext.getString(R.string.Start));
                     mFile.connect(val);
                     if(mFile.isConnected()) {
                         mFile.start();
                     }
-                    if(mFile.isConnected()) {
-                        mConnectFileButton.setText(mContext.getString(R.string.Stop));
-                    }
-                    else {
-                        mConnectFileButton.setText(mContext.getString(R.string.Start));                        
-                    }
+                    setStates();
                 }
             }
         });
@@ -85,16 +75,32 @@ public class FileFragment extends Fragment {
             mFile.setHelper(IHelper.Stub.asInterface(mService));
         }
 
+        setStates();
         return view;
 
     }
+    
+    /**
+     * 
+     */
+    private void setStates() {
+        if(mFile.isConnected()) {
+            mConnectButton.setText(mContext.getString(R.string.Stop));
+        }
+        else {
+            mConnectButton.setText(mContext.getString(R.string.Start));                        
+        }
+
+        if(mFile.getFileName() != null) {
+            mTextFile.setText(mFile.getFileName());
+        }
+
+    }
+
 
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        if (mFile.isConnected()) {
-            mFile.stop();
-        }
     }
 
     /**

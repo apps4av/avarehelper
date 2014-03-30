@@ -75,6 +75,7 @@ public class MsfsFragment extends Fragment {
             mMsfs.setHelper(IHelper.Stub.asInterface(mService));
         }
         
+        setStates();
         return view;  
         
     }
@@ -82,11 +83,21 @@ public class MsfsFragment extends Fragment {
     @Override  
     public void onDestroyView() {  
         super.onDestroyView();
-        mMsfs.disconnect();
-        mMsfs.stop();
     }
 
-    
+
+    /**
+     * 
+     */
+    private void setStates() {
+        mMsfsCb.setChecked(mMsfs.isConnected());
+
+        if(mMsfs.getPort() != 0) {
+            mTextMsfsPort.setText("" + mMsfs.getPort());
+        }
+
+    }
+
     /**
      * 
      */

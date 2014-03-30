@@ -39,7 +39,9 @@ public class MsfsConnection {
     
     DatagramSocket mSocket;
     
-    private int mPort;
+    private int mPort = 0;
+    
+    private boolean mConnected = false;
     
     /**
      * 
@@ -198,6 +200,7 @@ public class MsfsConnection {
             return false;
         }
 
+        mConnected = true;
         Logger.Logit("Success!");
 
         return true;
@@ -220,6 +223,7 @@ public class MsfsConnection {
             Logger.Logit("Error stream close");
         }
         
+        mConnected = false;
         Logger.Logit("Listener stopped");
     }
     
@@ -246,5 +250,21 @@ public class MsfsConnection {
     public void setHelper(IHelper helper) {
         mHelper = helper;
     }
+
+    /**
+     * 
+     */
+    public boolean isConnected() {
+        return mConnected;
+    }
+    
+    /**
+     * 
+     * @return
+     */
+    public int getPort() {
+        return mPort;
+    }
+
 
 }

@@ -32,10 +32,8 @@ public class BlueToothInFragment extends Fragment {
     private Button mConnectButton;
     private static IBinder mService;
     private Button mConnectFileSaveButton;
-    private boolean mFileSave;
     private EditText mTextFileSave;
     private CheckBox mSecureCb;
-
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -79,11 +77,7 @@ public class BlueToothInFragment extends Fragment {
                 if (mBt.isConnected()) {
                     mBt.stop();
                     mBt.disconnect();
-                    if (mBt.isConnected()) {
-                        mConnectButton.setText(getString(R.string.Disconnect));
-                    } else {
-                        mConnectButton.setText(getString(R.string.Connect));
-                    }
+                    setStates();
                     return;
                 }
                 /*
@@ -96,16 +90,11 @@ public class BlueToothInFragment extends Fragment {
                     if (mBt.isConnected()) {
                         mBt.start();
                     }
-                    if (mBt.isConnected()) {
-                        mConnectButton.setText(getString(R.string.Disconnect));
-                    } else {
-                        mConnectButton.setText(getString(R.string.Connect));
-                    }
+                    setStates();
                 }
             }
         });
 
-        mFileSave = false;
         mConnectFileSaveButton = (Button)view.findViewById(R.id.main_button_connect_file_save);
         mConnectFileSaveButton.setOnClickListener(new OnClickListener() {
             
@@ -115,29 +104,50 @@ public class BlueToothInFragment extends Fragment {
                  * If connected, disconnect
                  */
                 String val = mTextFileSave.getText().toString();
-                if(mFileSave) {
+                if(mBt.getFileSave() != null) {
                     mConnectFileSaveButton.setText(mContext.getString(R.string.Save));
                     mBt.setFileSave(null);
-                    mFileSave = false;
                 }
                 else {
                     mConnectFileSaveButton.setText(mContext.getString(R.string.Saving));
                     mBt.setFileSave(val);
-                    mFileSave = true;
                 }
+                setStates();
             }
         });
 
+        setStates();
         return view;
-
     }
 
+    /**
+     * 
+     */
+    private void setStates() {
+        if (mBt.isConnected()) {
+            mConnectButton.setText(getString(R.string.Disconnect));
+        } else {
+            mConnectButton.setText(getString(R.string.Connect));
+        }
+        mSecureCb.setChecked(mBt.isSecure());
+        int loc = mList.indexOf(mBt.getConnDevice());
+        if(loc >= 0) {
+            mSpinner.setSelection(loc);            
+        }
+
+        if(mBt.getFileSave() != null) {
+            mConnectFileSaveButton.setText(mContext.getString(R.string.Saving));
+            mTextFileSave.setText(mBt.getFileSave());
+        }
+        else {
+            mConnectFileSaveButton.setText(mContext.getString(R.string.Save));
+        }
+
+    }
+    
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        if (mBt.isConnected()) {
-            mBt.stop();
-        }
     }
 
     /**
