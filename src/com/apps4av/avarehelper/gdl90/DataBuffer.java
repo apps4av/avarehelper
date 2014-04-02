@@ -51,10 +51,25 @@ public class DataBuffer {
      * 
      */
     private void compute() {
+        int i = 0;
         mIndexes.clear();
-        for(int i = 0; i < mElem; i++) {
-            if(mBuffer[i] == (byte)0x7E) {
-                mIndexes.add(i);
+        if(mElem <= 0) {
+            return;
+        }
+        if(mBuffer[0] != (byte)0x7E) {
+            /*
+             * Partial packet
+             */
+            for(i = 0; i < mElem; i++) {
+                if(mBuffer[i] == (byte)0x7E) {
+                    i++;
+                    break;
+                }
+            }
+        }
+        for(int j = i; j < mElem; j++) {
+            if(mBuffer[j] == (byte)0x7E) {
+                mIndexes.add(j);
             }
         }        
     }
