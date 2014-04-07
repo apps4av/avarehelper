@@ -62,13 +62,13 @@ public class MessageFactory {
          * Starts with $GP, ends with checksum *DD
          */
         if(bufin[0] == 36 && bufin[1] == 71 && bufin[2] == 80 &&
-                bufin[len - 3] == 42) {
+                bufin[len - 5] == 42) {
             int xor = checkSum(bufin);
-            
+           
             /*
              * Checksum is in xor data[len - 1] and data[len - 2] has checksum in Hex
              */
-            System.arraycopy(bufin, len - 2, cs, 0, 2);
+            System.arraycopy(bufin, len - 4, cs, 0, 2);
             String css = new String(cs);
             String ma = Integer.toHexString(xor);
             if(!ma.equalsIgnoreCase(css)) {

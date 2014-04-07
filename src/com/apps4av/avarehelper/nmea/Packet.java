@@ -18,6 +18,7 @@ public class Packet {
         int xor = MessageFactory.checkSum(mPacket.getBytes());
         String ma = Integer.toHexString(xor).toUpperCase(Locale.getDefault());
         mPacket += ma;
+        mPacket += "\r\n";
     }
 
     /**
