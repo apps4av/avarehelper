@@ -21,6 +21,7 @@ import java.util.UUID;
 import org.json.JSONObject;
 
 import com.apps4av.avarehelper.nmea.GGAPacket;
+import com.apps4av.avarehelper.nmea.RMBPacket;
 import com.apps4av.avarehelper.nmea.RMCPacket;
 import com.ds.avare.IHelper;
 
@@ -144,6 +145,7 @@ public class BlueToothConnectionOut {
                      */
                     byte buffer[] = null;
                     byte buffer2[] = null;
+                    byte buffer3[] = null;
                     try {
                         JSONObject object;
                         object = new JSONObject(recvd);
@@ -166,6 +168,16 @@ public class BlueToothConnectionOut {
                                     object.getDouble("longitude"),
                                     object.getDouble("altitude"));
                             buffer2 = pkt2.getPacket().getBytes();
+                            RMBPacket pkt3 = new RMBPacket(object.getLong("time"),
+                                    object.getDouble("destDistance"),
+                                    object.getDouble("destBearing"),
+                                    object.getDouble("destLongitude"),
+                                    object.getDouble("destLatitude"),
+                                    object.getDouble("destId"),
+                                    object.getDouble("destOriginId"),
+                                    object.getDouble("destDeviation"),
+                                    object.getDouble("speed"));
+                            buffer3 = pkt3.getPacket().getBytes();
                         }
                     } catch (Exception e) {
                         continue;
@@ -204,6 +216,34 @@ public class BlueToothConnectionOut {
                     }
 
                     wrote = write(buffer2);
+                    if(wrote <= 0) {
+                        if(!mRunning) {
+                            break;
+                        }
+                        try {
+                            Thread.sleep(1000);
+                        } catch (Exception e) {
+                            
+                        }
+                        
+                        /*
+                         * Try to reconnect
+                         */
+                        Logger.Logit("Disconnected from BT device, retrying to connect");
+
+                        disconnect();
+                        connect(mDevName, mSecure);
+                        continue;
+                    }
+
+                    // RMB
+                    if(buffer3 == null) {
+                        continue;
+                    }
+                    if(buffer3.length <= 0) {
+                        continue;
+                    }
+                    wrote = write(buffer3);
                     if(wrote <= 0) {
                         if(!mRunning) {
                             break;
