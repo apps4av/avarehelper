@@ -29,7 +29,8 @@ public class ListFragment extends Fragment {
         Button mButtonXplane = (Button) view.findViewById(R.id.listf_btn_xplane);
         Button mButtonMsfs = (Button) view.findViewById(R.id.listf_btn_msfs);  
         Button mButtonAp = (Button) view.findViewById(R.id.listf_btn_ap);  
-        Button mButtonPlay = (Button) view.findViewById(R.id.listf_btn_play);  
+        Button mButtonPlay = (Button) view.findViewById(R.id.listf_btn_play); 
+        Button mButtonGPSSim = (Button) view.findViewById(R.id.listf_btn_gpssim);  
         Button mButtonStatus = (Button) view.findViewById(R.id.listf_btn_status);  
 
         mButtonStatus.setOnClickListener(new View.OnClickListener() {  
@@ -73,6 +74,12 @@ public class ListFragment extends Fragment {
                 updateDetail("layoutPlay");  
             }  
         });  
+        
+        mButtonGPSSim.setOnClickListener(new View.OnClickListener() {  
+            public void onClick(View v) {                 
+                updateDetail("layoutGPSSim");  
+            }  
+        });          
                    
         return view;  
     }  

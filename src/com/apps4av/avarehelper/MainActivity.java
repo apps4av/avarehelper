@@ -140,6 +140,7 @@ public class MainActivity extends FragmentActivity implements ListFragment.OnIte
         MsfsFragment msfs;
         BlueToothOutFragment btout;
         FileFragment file;
+        GPSSimulatorFragment gpsSim;
 
         Bundle args = new Bundle();
         args.putBoolean("bound", mBound);
@@ -185,6 +186,12 @@ public class MainActivity extends FragmentActivity implements ListFragment.OnIte
             fragmentTransaction.replace(R.id.detailFragment, file);
             fragmentTransaction.commit();
         }
+        else if(link.equals("layoutGPSSim")) {
+            GPSSimulatorFragment.init(mService);
+            gpsSim = new GPSSimulatorFragment();
+            fragmentTransaction.replace(R.id.detailFragment, gpsSim);
+            fragmentTransaction.commit();
+        }        
     }
     
     @Override

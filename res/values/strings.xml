@@ -25,9 +25,18 @@ Redistribution and use in source and binary forms, with or without modification,
     <string name="ADSBWifi">ADSB WiFi</string>
     <string name="XPlane">XPlane</string>
     <string name="MSFS">MSFS</string>
+    <string name="GPSSIM">GPS Sim</string>
     <string name="XPlanePort">49002</string>
     <string name="WifiPort">43211</string>
     <string name="Exit">Exit</string>
+    <string name="Apply">Apply</string>
+    <string name="FlyTo">Fly To Destination (if available)</string>
+    <string name="LandAt">Land at Destination (if available)</string>
+    <string name="Lat">Latitude (degrees)</string>
+    <string name="Lon">Longitude (degrees)</string>
+    <string name="Heading">Heading (degrees)</string>
+    <string name="Altitude">Altitude (feet)</string>
+    <string name="Speed">Speed (knots)</string>
     <string name="File">/mnt/sdcard/input.bin</string>
     <string name="FileSave">/mnt/sdcard/out.bin</string>
     <string name="Output">---- Output ----\n</string>
@@ -37,6 +46,7 @@ Redistribution and use in source and binary forms, with or without modification,
     <string name="Listen">Listen</string>
     <string name="DescFS">Connect to XPlane, Flightgear on WIFI</string>
     <string name="DescMSFS">Connect to MSFS on WIFI-NMEA</string>
+    <string name="DescGPSSim">Simulate GPS (Lat/Lon changes only take effect after Stop/Start, all other changes take effect with Apply)</string>
     <string name="DescExt">Connect to GPS/ADSB units on Bluetooth</string>
     <string name="DescExtWifi">Connect to GPS/ADSB units on WiFi (Broadcast on Managed Network)</string>
     <string name="DescFile">Feed NMEA / ADSB data from a binary file</string>
