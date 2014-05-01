@@ -60,5 +60,13 @@
             android:ems="6"  
             android:gravity="left|center_vertical"  
             android:text="@string/Play"/>  
+            
+        <Button  
+            android:id="@+id/listf_btn_gpssim"  
+            android:layout_width="wrap_content"  
+            android:layout_height="wrap_content"  
+            android:ems="6"  
+            android:gravity="left|center_vertical"  
+            android:text="@string/GPSSIM"/>  
 
     </LinearLayout>  
