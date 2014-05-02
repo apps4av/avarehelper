@@ -32,6 +32,7 @@ public class ListFragment extends Fragment {
         Button mButtonPlay = (Button) view.findViewById(R.id.listf_btn_play); 
         Button mButtonGPSSim = (Button) view.findViewById(R.id.listf_btn_gpssim);  
         Button mButtonStatus = (Button) view.findViewById(R.id.listf_btn_status);  
+        Button mButtonUSB = (Button) view.findViewById(R.id.listf_btn_usbin);  
 
         mButtonStatus.setOnClickListener(new View.OnClickListener() {  
             public void onClick(View v) {                 
@@ -75,12 +76,18 @@ public class ListFragment extends Fragment {
             }  
         });  
         
+        mButtonUSB.setOnClickListener(new View.OnClickListener() {  
+            public void onClick(View v) {                 
+                updateDetail("layoutUSBIn");  
+            }  
+        });  
+                   
         mButtonGPSSim.setOnClickListener(new View.OnClickListener() {  
             public void onClick(View v) {                 
                 updateDetail("layoutGPSSim");  
             }  
         });          
-                   
+
         return view;  
     }  
       

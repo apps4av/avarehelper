@@ -12,39 +12,49 @@ Redistribution and use in source and binary forms, with or without modification,
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:id="@+android/main_play"
+    android:id="@+id/main_bluetooth"
+    android:layout_below="@+android/main_avare"
     android:background="@drawable/border_green_small">
 
     <ImageView
-        android:contentDescription="@string/ADSB"
+        android:contentDescription="@string/USBIN"
+        android:id="@+id/usbin_connect_image"
         android:layout_margin="10dp"
-        android:id="@+id/main_image_file"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@drawable/file"
+        android:src="@drawable/usbin"
         />
     <TextView
         android:layout_margin="10dp"
-        android:layout_toRightOf="@+id/main_image_file"
+        android:layout_toRightOf="@+id/usbin_connect_image"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text ="@string/DescFile"
+        android:text ="@string/DescUSBIN"
         />
+    <Button
+        android:id="@+id/usbin_button_connect"
+        android:layout_below="@+id/usbin_connect_image"
+        android:layout_width="wrap_content"
+        android:layout_margin="10dp"
+        android:layout_height="wrap_content"
+        android:text="@string/Connect"/>
 
+    <Button
+        android:id="@+id/usbin_button_connect_file_save"
+        android:layout_width="wrap_content"
+        android:layout_below="@+id/usbin_button_connect"
+        android:layout_margin="10dp"
+        android:layout_height="wrap_content"
+        android:text="@string/Save"/>
+    
     <EditText
-        android:id="@+id/main_file_name"
+        android:id="@+id/usbin_file_name_save"
         android:layout_margin="10dp"
         android:inputType="textUri"
-        android:layout_below="@+id/main_image_file"
+        android:layout_below="@+id/usbin_button_connect"
+        android:layout_toRightOf="@+id/usbin_button_connect_file_save"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/File"/>        
-    <Button
-        android:id="@+id/main_button_connect_file"
-        android:layout_width="wrap_content"
-        android:layout_below="@+id/main_file_name"
-        android:layout_margin="10dp"
-        android:layout_height="wrap_content"
-        android:text="@string/Start"/>
+        android:text="@string/FileSave"/>        
     
 </RelativeLayout>

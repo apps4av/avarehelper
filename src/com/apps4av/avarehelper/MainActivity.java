@@ -141,6 +141,7 @@ public class MainActivity extends FragmentActivity implements ListFragment.OnIte
         BlueToothOutFragment btout;
         FileFragment file;
         GPSSimulatorFragment gpsSim;
+        USBInFragment usbin;
 
         Bundle args = new Bundle();
         args.putBoolean("bound", mBound);
@@ -191,7 +192,13 @@ public class MainActivity extends FragmentActivity implements ListFragment.OnIte
             gpsSim = new GPSSimulatorFragment();
             fragmentTransaction.replace(R.id.detailFragment, gpsSim);
             fragmentTransaction.commit();
-        }        
+        }  
+        else if(link.equals("layoutUSBIn")) {
+            USBInFragment.init(mService);
+            usbin = new USBInFragment();
+            fragmentTransaction.replace(R.id.detailFragment, usbin);
+            fragmentTransaction.commit();
+        }      
     }
     
     @Override
