@@ -96,9 +96,9 @@ public class USBConnectionIn {
      * 
      */
     public void stop() {
-        Logger.Logit("Stopping BT");
+        Logger.Logit("Stopping USB");
         if(mConnectionStatus.getState() != ConnectionStatus.CONNECTED) {
-            Logger.Logit("Stopping BT failed because already stopped");
+            Logger.Logit("Stopping USB failed because already stopped");
             return;
         }
         mRunning = false;
@@ -112,9 +112,9 @@ public class USBConnectionIn {
      */
     public void start() {
         mGeoAltitude = Integer.MIN_VALUE;
-        Logger.Logit("Starting BT");
+        Logger.Logit("Starting USB");
         if(mConnectionStatus.getState() != ConnectionStatus.CONNECTED) {
-            Logger.Logit("Starting BT failed because already started");
+            Logger.Logit("Starting USB failed because already started");
             return;
         }
         
@@ -127,7 +127,7 @@ public class USBConnectionIn {
             @Override
             public void run() {
                 
-                Logger.Logit("BT reading data");
+                Logger.Logit("USB reading data");
 
                 byte[] buffer = new byte[8192];
                 com.apps4av.avarehelper.gdl90.DataBuffer dbuffer = 
@@ -166,7 +166,7 @@ public class USBConnectionIn {
                         /*
                          * Try to reconnect
                          */
-                        Logger.Logit("Disconnected from BT device, retrying to connect");
+                        Logger.Logit("Disconnected from USB device, retrying to connect");
 
                         disconnect();
                         connect();
