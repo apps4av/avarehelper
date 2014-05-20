@@ -50,6 +50,7 @@ public class USBConnectionIn {
     private static UsbSerialDriver mDriver = null;
     private static boolean mRunning = false;
     private static String mFileSave = null;
+    private static String mParams = "115200,8,n,1";
     private int mGeoAltitude;
     
     private static USBConnectionIn mConnection;
@@ -163,13 +164,18 @@ public class USBConnectionIn {
                             
                         }
                         
+                        // serial driver sends 0 when no data
+                        if(red == 0) {
+                            continue;
+                        }
+                        
                         /*
                          * Try to reconnect
                          */
                         Logger.Logit("Disconnected from USB device, retrying to connect");
 
                         disconnect();
-                        connect();
+                        connect(mParams);
                         continue;
                     }
 
@@ -537,8 +543,9 @@ public class USBConnectionIn {
      * name matched this string.
      * @return
      */
-    public boolean connect() {
+    public boolean connect(String params) {
         
+        mParams = params;
         Logger.Logit("Connecting to serial device");
         mDriver = UsbSerialProber.findFirstDevice(mUsbManager);
 
@@ -560,8 +567,24 @@ public class USBConnectionIn {
 
         try {
             mDriver.open();
-            mDriver.setParameters(115200, UsbSerialDriver.DATABITS_8,
-                    UsbSerialDriver.STOPBITS_1, UsbSerialDriver.STOPBITS_1);
+            
+            String tokens[] = mParams.split(",");
+            // 115200, 8, n, 1
+            // rate, data, parity, stop
+            int rate = Integer.parseInt(tokens[0]);
+            int data = Integer.parseInt(tokens[1]);
+            int parity;
+            if(tokens[2].equals("n")) {
+                parity = UsbSerialDriver.PARITY_NONE;
+            }
+            else if (tokens[2].equals("o")) {
+                parity = UsbSerialDriver.PARITY_ODD;
+            }
+            else {
+                parity = UsbSerialDriver.PARITY_EVEN;
+            }
+            int stop = Integer.parseInt(tokens[3]);
+            mDriver.setParameters(rate, data, stop, parity);
         } 
         catch (Exception e) {
             setState(ConnectionStatus.DISCONNECTED);
@@ -658,6 +681,13 @@ public class USBConnectionIn {
     public String getFileSave() {
         return mFileSave;
     }
-    
+
+    /**
+     * 
+     * @return
+     */
+    public String getParams() {
+        return mParams;
+    }
     
 }

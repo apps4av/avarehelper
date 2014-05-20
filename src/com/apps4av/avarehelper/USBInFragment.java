@@ -27,6 +27,7 @@ public class USBInFragment extends Fragment {
     private static IBinder mService;
     private Button mConnectFileSaveButton;
     private EditText mTextFileSave;
+    private EditText mParamsText;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -37,6 +38,8 @@ public class USBInFragment extends Fragment {
         
         View view = inflater.inflate(R.layout.layout_usbin, container, false);
 
+        mParamsText = (EditText)view.findViewById(R.id.usbin_params_text);
+        
         /*
          * BT connection
          */
@@ -70,7 +73,7 @@ public class USBInFragment extends Fragment {
                  */
                 if (!mUSB.isConnected()) {
                     mConnectButton.setText(getString(R.string.Connect));
-                    mUSB.connect();
+                    mUSB.connect(mParamsText.getText().toString());
                     if (mUSB.isConnected()) {
                         mUSB.start();
                     }
@@ -121,6 +124,8 @@ public class USBInFragment extends Fragment {
         else {
             mConnectFileSaveButton.setText(mContext.getString(R.string.Save));
         }
+
+        mParamsText.setText(mUSB.getParams());
 
     }
     

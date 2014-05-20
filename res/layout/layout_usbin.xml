@@ -31,9 +31,21 @@ Redistribution and use in source and binary forms, with or without modification,
         android:layout_height="wrap_content"
         android:text ="@string/DescUSBIN"
         />
+    
+    <EditText
+        android:id="@+id/usbin_params_text"
+        android:layout_margin="10dp"
+        android:inputType="text"
+        android:layout_below="@+id/usbin_connect_image"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        />        
+    
+    
     <Button
         android:id="@+id/usbin_button_connect"
         android:layout_below="@+id/usbin_connect_image"
+        android:layout_toRightOf="@+id/usbin_params_text"
         android:layout_width="wrap_content"
         android:layout_margin="10dp"
         android:layout_height="wrap_content"

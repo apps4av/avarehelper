@@ -11,8 +11,8 @@ Redistribution and use in source and binary forms, with or without modification,
 -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.apps4av.avarehelper"
-    android:versionCode="23"
-    android:versionName="2.0.3" >
+    android:versionCode="24"
+    android:versionName="2.0.4" >
 
     <uses-sdk
         android:minSdkVersion="12"
@@ -38,6 +38,17 @@ Redistribution and use in source and binary forms, with or without modification,
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+            
+            
+                        <intent-filter>
+                <action android:name="android.hardware.usb.action.USB_DEVICE_ATTACHED" />        
+            </intent-filter>
+            
+            <meta-data
+                android:name="android.hardware.usb.action.USB_DEVICE_ATTACHED" 
+                android:resource="@xml/device_filter" />
+            
+            
         </activity>
     </application>
 
