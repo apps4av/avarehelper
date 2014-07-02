@@ -98,10 +98,20 @@ public class OwnshipMessage extends Message {
          */
         upper = ((int)(msg[13] & 0xFF)) << 4;
         lower = ((int)(msg[14] & 0xF0)) >> 4;
-        /*
-         * Knots to m/s
-         */
-        mHorizontalVelocity = (int)(((float)upper + (float)lower) * 0.514444f);
+        
+        if(upper == 0xFF0 && lower == 0xF) {
+            /*
+             * Invalid
+             */
+            mHorizontalVelocity = 0;
+        }
+        else {
+        
+            /*
+             * Knots to m/s
+             */
+            mHorizontalVelocity = (int)(((float)upper + (float)lower) * 0.514444f);
+        }
 
         /*
          * VS

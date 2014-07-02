@@ -35,12 +35,22 @@ public class OwnshipGeometricAltitudeMessage extends Message {
         /*
          *  bytes 0-1 are the altitude
          */
-        double alt = (((int)msg[0] & 0xFF) << 8) + ((int)msg[1] & 0xFF);
-        alt *= 5;
-        alt /= 3.28084;
-        mAltitudeWGS84 = (int)alt;
+        int upper = ((int)msg[0] & 0xFF) << 8;
+        int lower = ((int)msg[1] & 0xFF);
+        if(upper == 0xFF00 && lower >= 0xE0) {
+            /*
+             * Invalid
+             */
+            mAltitudeWGS84 = Integer.MIN_VALUE;
+        }
+        else {
+            double alt = upper + lower;
+            alt *= 5;
+            alt /= 3.28084;
+            mAltitudeWGS84 = (int)alt;
+        }
         
-        Logger.Logit("mAltitude Geometric"  + mAltitudeWGS84);        
+        Logger.Logit("mAltitude Geometric "  + mAltitudeWGS84);        
     }
 
 
