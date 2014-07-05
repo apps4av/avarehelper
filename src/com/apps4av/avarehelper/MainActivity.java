@@ -50,8 +50,8 @@ public class MainActivity extends FragmentActivity implements ListFragment.OnIte
                 /*
                  * Go to background
                  */
-                MainActivity.super.onBackPressed();
-                dialog.dismiss();
+                System.runFinalizersOnExit(true);
+                System.exit(0);
             }
         });
         mAlertDialogExit.setButton(AlertDialog.BUTTON_NEGATIVE, getString(R.string.No), new DialogInterface.OnClickListener() {

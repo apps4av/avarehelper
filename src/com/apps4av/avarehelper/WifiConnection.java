@@ -102,7 +102,6 @@ public class WifiConnection {
                 Logger.Logit("WiFi reading data");
 
                 BufferProcessor bp = new BufferProcessor();
-                Logger.Logit("BT reading data");
 
                 byte[] buffer = new byte[8192];
                 
