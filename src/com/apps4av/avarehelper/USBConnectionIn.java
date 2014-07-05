@@ -35,7 +35,7 @@ public class USBConnectionIn {
     private static UsbSerialDriver mDriver = null;
     private static boolean mRunning = false;
     private static String mFileSave = null;
-    private static String mParams = "115200,8,n,1";
+    private static String mParams = "230400,8,n,1";
     
     private static USBConnectionIn mConnection;
     
@@ -135,7 +135,7 @@ public class USBConnectionIn {
                             break;
                         }
                         try {
-                            Thread.sleep(1000);
+                            Thread.sleep(10);
                         } catch (Exception e) {
                             
                         }
