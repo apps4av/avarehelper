@@ -95,8 +95,8 @@ public class FileConnectionIn {
                 Logger.Logit("File reading data");
 
                 BufferProcessor bp = new BufferProcessor();
-                Logger.Logit("BT reading data");
 
+                
                 byte[] buffer = new byte[8192];
                 
                 /*

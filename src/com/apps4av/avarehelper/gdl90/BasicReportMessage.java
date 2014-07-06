@@ -183,7 +183,7 @@ public class BasicReportMessage extends Message {
         }
         
         boolean isWest = (tmp & 0x800000) > 0;
-        double mLon = ((double)(tmp & 0x7fffff)) * Constants.LON_LAT_RESOLUTION;
+        mLon = ((double)(tmp & 0x7fffff)) * Constants.LON_LAT_RESOLUTION;
         if (isWest) {
             mLon = -1 * (180.0 - mLon);
         }
