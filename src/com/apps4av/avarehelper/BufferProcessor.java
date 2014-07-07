@@ -141,7 +141,7 @@ public class BufferProcessor {
                     object.put("type", "traffic");
                     object.put("longitude", (double)tm.mLon);
                     object.put("latitude", (double)tm.mLat);
-                    object.put("speed", (double)(0 /* fix this */));
+                    object.put("speed", (double)(tm.mSpeed));
                     object.put("bearing", (double)tm.mHeading);
                     object.put("altitude", (double)((double)tm.mAltitude));
                     object.put("callsign", (String)tm.mCallSign);
@@ -165,7 +165,7 @@ public class BufferProcessor {
                     object.put("type", "traffic");
                     object.put("longitude", (double)tm.mLon);
                     object.put("latitude", (double)tm.mLat);
-                    object.put("speed", (double)(0 /* fix this */));
+                    object.put("speed", (double)(tm.mSpeed));
                     object.put("bearing", (double)tm.mHeading);
                     object.put("altitude", (double)((double)tm.mAltitude));
                     object.put("callsign", (String)tm.mCallSign);
