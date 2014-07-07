@@ -244,7 +244,7 @@ public class LongReportMessage extends Message {
             }
             mEasterlyVelocity = eastVelocityMagnitude;
             
-            mGroundSpeed = 0;
+            mSpeed = 0;
             mTrueTrackAngle = false;
             mMagneticHeading = false;
             mTrueHeading = false;
