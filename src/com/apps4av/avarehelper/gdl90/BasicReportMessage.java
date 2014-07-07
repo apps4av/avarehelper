@@ -39,18 +39,20 @@ public class BasicReportMessage extends Message {
     public int mVertVelocity;
     public double mHeading;
     public int mNic;
-    public int mGroundSpeed;
+    public int mSpeed;
     public boolean mTrueTrackAngle;
     public boolean mMagneticHeading;
     public boolean mTrueHeading;
     public String mCallSign;
 
+    
     public BasicReportMessage() {
         super(MessageType.BASIC_REPORT);
     }
 
     @Override
     protected void parse(byte[] msg) {
+        
         mCallSign = "";
         
         long timeOfReception = 0;
@@ -246,7 +248,7 @@ public class BasicReportMessage extends Message {
             mTrueTrackAngle = false;
             mMagneticHeading = false;
             mTrueHeading = false;
-            mHeading = 0;
+            mHeading = -Math.atan2(-eastVelocityMagnitude, northVelocityMagnitude);
             
             // vertical velocity
             //boolean vertVelocitySourceisBarometric = ((int)msg[18] & 0x40) > 0;
@@ -261,7 +263,7 @@ public class BasicReportMessage extends Message {
         else {    // object is on the ground
             vel  = ((int)msg[15] & 0x0f) << 6;
             vel += ((int)msg[16] & 0xfd) >> 2;
-            mGroundSpeed = (vel * multiplier) - multiplier;
+            mSpeed = (vel * multiplier) - multiplier;
             
             tracking = ((int)msg[17] & 0xFF) << 1;
             if (((int)msg[18] & 0x80) > 0) {
@@ -311,7 +313,6 @@ public class BasicReportMessage extends Message {
         Logger.Logit("Basic traffic report " + " icao addr " + mIcaoAddress + 
                 " lat/lon " + mLat + "/" + mLon + " mAltitude " + mAltitude +
                 " heading " + mHeading);
-
 
     }
 
