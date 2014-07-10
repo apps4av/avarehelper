@@ -248,7 +248,7 @@ public class LongReportMessage extends Message {
             mTrueTrackAngle = false;
             mMagneticHeading = false;
             mTrueHeading = false;
-            mHeading = -Math.atan2(-eastVelocityMagnitude, northVelocityMagnitude);
+            mHeading = (360 + Math.toDegrees(-Math.atan2(-eastVelocityMagnitude, northVelocityMagnitude))) % 360;
             
             // vertical velocity
             //boolean vertVelocitySourceisBarometric = ((int)msg[18] & 0x40) > 0;
