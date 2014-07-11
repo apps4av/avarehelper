@@ -20,4 +20,5 @@ public class MessageType {
 
     public static final String RecommendedMinimumSentence = "RMC";
     public static final String EssentialFix = "GGA";
+    public static final String Traffic = "RTM";
 }

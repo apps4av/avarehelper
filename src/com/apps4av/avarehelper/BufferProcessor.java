@@ -30,6 +30,7 @@ import com.apps4av.avarehelper.gdl90.Product;
 import com.apps4av.avarehelper.gdl90.TrafficReportMessage;
 import com.apps4av.avarehelper.gdl90.UplinkMessage;
 import com.apps4av.avarehelper.nmea.Ownship;
+import com.apps4av.avarehelper.nmea.RTMMessage;
 
 /**
  * 
@@ -72,7 +73,33 @@ public class BufferProcessor {
         
         while(null != (buf = nbuffer.get())) {
             com.apps4av.avarehelper.nmea.Message m = ndecode.decode(buf);
-            if(nmeaOwnship.addMessage(m)) {
+            
+            if(m instanceof RTMMessage) {
+                
+                /*
+                 * Make a GPS locaiton message from ADSB ownship message.
+                 */
+                JSONObject object = new JSONObject();
+                RTMMessage tm = (RTMMessage)m;
+                try {
+                    object.put("type", "traffic");
+                    object.put("longitude", (double)tm.mLon);
+                    object.put("latitude", (double)tm.mLat);
+                    object.put("speed", (double)(tm.mSpeed));
+                    object.put("bearing", (double)tm.mDirection);
+                    object.put("altitude", (double)((double)tm.mAltitude));
+                    object.put("callsign", (String)"");
+                    object.put("address", (int)tm.mIcaoAddress);
+                    object.put("time", (long)tm.getTime());
+                } catch (JSONException e1) {
+                    continue;
+                }                
+                
+                objs.add(object.toString());
+
+            }
+
+            else if(nmeaOwnship.addMessage(m)) {
                     
                 /*
                  * Make a GPS locaiton message from ADSB ownship message.

@@ -104,6 +104,9 @@ public class MessageFactory {
         else if(type.equals(MessageType.EssentialFix)) {
             m = new GGAMessage();
         }
+        else if(type.equals(MessageType.Traffic)) {
+            m = new RTMMessage();
+        }
                 
         /*
          * Parse it.
