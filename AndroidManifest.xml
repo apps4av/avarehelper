@@ -11,8 +11,8 @@ Redistribution and use in source and binary forms, with or without modification,
 -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.apps4av.avarehelper"
-    android:versionCode="27"
-    android:versionName="2.0.7" >
+    android:versionCode="28"
+    android:versionName="2.0.8" >
 
     <uses-sdk
         android:minSdkVersion="12"
