@@ -115,10 +115,16 @@ public class OwnshipMessage extends Message {
 
         /*
          * VS
-         * XXX: Correct for -ve value
          */
-        mVerticalVelocity = (((int)msg[14] & 0x0F) << 4) + (int)(msg[15] & 0xFF);
-        mVerticalVelocity *= 64;
+        if (((int)msg[14] & 0x08) == 0) {
+            mVerticalVelocity = (int)(((int)msg[14] & 0x0F) << 14) + (((int)msg[15] & 0xFF) << 6);
+        }
+        else if (msg[15] == 0) {
+            mVerticalVelocity = Integer.MAX_VALUE;
+        }
+        else {
+            mVerticalVelocity = (int)(((int)msg[14] & 0x0F) << 14) + (((int)msg[15] & 0xFF) << 6) - 0x40000;
+        }
         
         /*
          * Track/heading
