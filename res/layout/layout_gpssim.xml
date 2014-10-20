@@ -34,14 +34,13 @@ Redistribution and use in source and binary forms, with or without modification,
     
     <LinearLayout
         android:id="@+id/lat_layout"
+        android:layout_marginLeft="10dp"
 		android:layout_below="@+id/main_image_gpssim"
 		android:orientation="horizontal"
 		android:layout_width="fill_parent"
 		android:layout_height="wrap_content">
 
 	    <TextView
-	        android:layout_margin="10dp"
-	        
 	        android:id="@+id/main_gpssim_heading_lat"
 	        android:layout_width="wrap_content"
 	        android:layout_height="wrap_content"
@@ -49,45 +48,34 @@ Redistribution and use in source and binary forms, with or without modification,
 	        />    
 	    <EditText
 	        android:id="@+id/main_gpssim_lat"
-	        android:layout_margin="10dp"
-	        android:inputType="number"
+	        android:inputType="numberDecimal|numberSigned"
 	        android:layout_width="wrap_content"
 	        android:layout_height="wrap_content"/>
+	    
+	    <TextView
+            android:id="@+id/main_gpssim_heading_lon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text ="@string/Lon"
+            />    
+        <EditText
+            android:id="@+id/main_gpssim_lon"
+            android:inputType="numberDecimal|numberSigned"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+	    
     </LinearLayout>    
     
-    <LinearLayout
-        android:id="@+id/lon_layout"
-		android:layout_below="@+id/lat_layout"
-		android:orientation="horizontal"
-		android:layout_width="fill_parent"
-		android:layout_height="wrap_content">
-
-	    <TextView
-	        android:layout_margin="10dp"
-	        
-	        android:id="@+id/main_gpssim_heading_lon"
-	        android:layout_width="wrap_content"
-	        android:layout_height="wrap_content"
-	        android:text ="@string/Lon"
-	        />    
-	    <EditText
-	        android:id="@+id/main_gpssim_lon"
-	        android:layout_margin="10dp"
-	        android:inputType="number"
-	        android:layout_width="wrap_content"
-	        android:layout_height="wrap_content"/>
-    </LinearLayout>     
     
     <LinearLayout
         android:id="@+id/heading_layout"
-		android:layout_below="@+id/lon_layout"
+		android:layout_below="@+id/lat_layout"
+        android:layout_marginLeft="10dp"
 		android:orientation="horizontal"
 		android:layout_width="fill_parent"
 		android:layout_height="wrap_content">
 
 	    <TextView
-	        android:layout_margin="10dp"
-	        
 	        android:id="@+id/main_gpssim_heading_label"
 	        android:layout_width="wrap_content"
 	        android:layout_height="wrap_content"
@@ -95,37 +83,27 @@ Redistribution and use in source and binary forms, with or without modification,
 	        />    
 	    <EditText
 	        android:id="@+id/main_gpssim_heading"
-	        android:layout_margin="10dp"
 	        android:inputType="number"
 	        android:layout_width="wrap_content"
 	        android:layout_height="wrap_content"/>
-    </LinearLayout>
-    
-    <LinearLayout
-        android:id="@+id/speed_layout"
-		android:layout_below="@+id/heading_layout"
-		android:orientation="horizontal"
-		android:layout_width="fill_parent"
-		android:layout_height="wrap_content">    
-		
+	    
 	    <TextView
-	        android:layout_margin="10dp"
-	        android:id="@+id/main_gpssim_speed_label"
-	        android:layout_width="wrap_content"
-	        android:layout_height="wrap_content"
-	        android:text ="@string/Speed"
-	        />     
-	    <EditText
-	        android:id="@+id/main_gpssim_speed"
-	        android:layout_margin="10dp"
-	        android:inputType="number"
-	        android:layout_width="wrap_content"
-	        android:layout_height="wrap_content"/>   
+            android:id="@+id/main_gpssim_speed_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text ="@string/Speed"
+            />     
+        <EditText
+            android:id="@+id/main_gpssim_speed"
+            android:inputType="number"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>   
+	    
     </LinearLayout>
     
     <LinearLayout
         android:id="@+id/altitude_layout"
-		android:layout_below="@+id/speed_layout"
+		android:layout_below="@+id/heading_layout"
 		android:orientation="horizontal"
 		android:layout_width="fill_parent"
 		android:layout_height="wrap_content">    
@@ -139,7 +117,6 @@ Redistribution and use in source and binary forms, with or without modification,
 	        />     
 	    <EditText
 	        android:id="@+id/main_gpssim_altitude"
-	        android:layout_margin="10dp"
 	        android:inputType="number"
 	        android:layout_width="wrap_content"
 	        android:layout_height="wrap_content"/>   
@@ -148,7 +125,6 @@ Redistribution and use in source and binary forms, with or without modification,
 	<CheckBox
 		android:id="@+id/main_button_gpssim_fly_to"
 		android:layout_width="wrap_content"
-		android:layout_margin="10dp"
 		android:layout_height="wrap_content"
 		android:layout_below="@+id/altitude_layout"
 		android:text="@string/FlyTo"/>	
@@ -156,7 +132,6 @@ Redistribution and use in source and binary forms, with or without modification,
 	<CheckBox
 		android:id="@+id/main_button_gpssim_land_at"
 		android:layout_width="wrap_content"
-		android:layout_margin="10dp"
 		android:layout_height="wrap_content"
 		android:layout_below="@+id/main_button_gpssim_fly_to"
 		android:text="@string/LandAt"/>	

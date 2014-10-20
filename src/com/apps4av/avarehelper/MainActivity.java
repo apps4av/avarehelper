@@ -1,5 +1,6 @@
 package com.apps4av.avarehelper;
 
+
 import android.app.AlertDialog;
 import android.content.ComponentName;
 import android.content.Context;
@@ -8,12 +9,17 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.support.v4.app.*;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
+import android.support.v7.app.*;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
-public class MainActivity extends FragmentActivity implements ListFragment.OnItemSelectedListener {
+public class MainActivity extends ActionBarActivity implements
+    ActionBar.OnNavigationListener {
 
     private boolean mBound;
     
@@ -26,6 +32,10 @@ public class MainActivity extends FragmentActivity implements ListFragment.OnIte
      */
     private AlertDialog mAlertDialogExit;
 
+
+    private Fragment[] mFragments = new Fragment[9];
+
+    private static final String STATE_SELECTED_NAVIGATION_ITEM = "selected_navigation_item";
 
     /*
      * (non-Javadoc)
@@ -80,6 +90,43 @@ public class MainActivity extends FragmentActivity implements ListFragment.OnIte
         Logger.setTextView(mTextLog);
         setContentView(view);
         mBound = false;
+        
+        // Set up the action bar to show a dropdown list.
+        final ActionBar actionBar = getSupportActionBar();
+        actionBar.setDisplayShowTitleEnabled(false);
+        actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
+        Bundle args = new Bundle();
+        mFragments[0] = new StatusFragment();
+        mFragments[1] = new BlueToothInFragment();
+        mFragments[2] = new WiFiInFragment();
+        mFragments[3] = new XplaneFragment();
+        mFragments[4] = new MsfsFragment();
+        mFragments[5] = new BlueToothOutFragment();
+        mFragments[6] = new FileFragment();
+        mFragments[7] = new GPSSimulatorFragment();
+        mFragments[8] = new USBInFragment();
+
+        for(int i = 0; i < 9; i++) {
+            mFragments[i].setArguments(args);
+        }
+
+        // Set up the dropdown list navigation in the action bar.
+        actionBar.setListNavigationCallbacks(
+        // Specify a SpinnerAdapter to populate the dropdown list.
+        new ArrayAdapter<String>(actionBar.getThemedContext(),
+                android.R.layout.simple_list_item_1,
+                android.R.id.text1, new String[] {
+                getString(R.string.Status),
+                getString(R.string.Bluetooth), 
+                getString(R.string.WIFI), 
+                getString(R.string.XPlane), 
+                getString(R.string.MSFS), 
+                getString(R.string.AP), 
+                getString(R.string.Play), 
+                getString(R.string.GPSSIM), 
+                getString(R.string.USBIN)
+                }), this);
+
     }
     
     @Override
@@ -127,79 +174,7 @@ public class MainActivity extends FragmentActivity implements ListFragment.OnIte
         }
     };
 
-    @Override
-    public void onRssItemSelected(String link) {
-        // TODO Auto-generated method stub
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
 
-        BlueToothInFragment btin;
-        StatusFragment status;
-        WiFiInFragment wfin;
-        XplaneFragment xp;
-        MsfsFragment msfs;
-        BlueToothOutFragment btout;
-        FileFragment file;
-        GPSSimulatorFragment gpsSim;
-        USBInFragment usbin;
-
-        Bundle args = new Bundle();
-        args.putBoolean("bound", mBound);
-        if(link.equals("layoutStatus")) {
-            status = new StatusFragment();
-            status.setArguments(args);
-            fragmentTransaction.replace(R.id.detailFragment, status);
-            fragmentTransaction.commit();
-        }
-        else if(link.equals("layoutBtin")) {
-            BlueToothInFragment.init(mService);
-            btin = new BlueToothInFragment();
-            fragmentTransaction.replace(R.id.detailFragment, btin);
-            fragmentTransaction.commit();
-        }
-        else if(link.equals("layoutWifiin")) {
-            WiFiInFragment.init(mService);
-            wfin = new WiFiInFragment();
-            fragmentTransaction.replace(R.id.detailFragment, wfin);
-            fragmentTransaction.commit();
-        }
-        else if(link.equals("layoutXplane")) {
-            XplaneFragment.init(mService);
-            xp = new XplaneFragment();
-            fragmentTransaction.replace(R.id.detailFragment, xp);
-            fragmentTransaction.commit();
-        }
-        else if(link.equals("layoutMsfs")) {
-            MsfsFragment.init(mService);
-            msfs = new MsfsFragment();
-            fragmentTransaction.replace(R.id.detailFragment, msfs);
-            fragmentTransaction.commit();
-        }
-        else if(link.equals("layoutAp")) {
-            BlueToothOutFragment.init(mService);
-            btout = new BlueToothOutFragment();
-            fragmentTransaction.replace(R.id.detailFragment, btout);
-            fragmentTransaction.commit();
-        }
-        else if(link.equals("layoutPlay")) {
-            FileFragment.init(mService);
-            file = new FileFragment();
-            fragmentTransaction.replace(R.id.detailFragment, file);
-            fragmentTransaction.commit();
-        }
-        else if(link.equals("layoutGPSSim")) {
-            GPSSimulatorFragment.init(mService);
-            gpsSim = new GPSSimulatorFragment();
-            fragmentTransaction.replace(R.id.detailFragment, gpsSim);
-            fragmentTransaction.commit();
-        }  
-        else if(link.equals("layoutUSBIn")) {
-            USBInFragment.init(mService);
-            usbin = new USBInFragment();
-            fragmentTransaction.replace(R.id.detailFragment, usbin);
-            fragmentTransaction.commit();
-        }      
-    }
     
     @Override
     protected void onResume() {
@@ -212,5 +187,86 @@ public class MainActivity extends FragmentActivity implements ListFragment.OnIte
         bindService(i, mConnection, Context.BIND_AUTO_CREATE);
 
     }
+
+    @Override
+    public boolean onNavigationItemSelected(int itemPosition, long itemId) {
+
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        mFragments[itemPosition].getArguments().putBoolean("bound", mBound);
+        
+        
+        switch(itemPosition) {
+        
+            case 0:
+                StatusFragment status = (StatusFragment) mFragments[0];
+                fragmentTransaction.replace(R.id.detailFragment, status);
+                break;
+                
+            case 1:
+                BlueToothInFragment btin = (BlueToothInFragment) mFragments[1];
+                BlueToothInFragment.init(mService);
+                btin = new BlueToothInFragment();
+                fragmentTransaction.replace(R.id.detailFragment, btin);
+                break;
+                
+            case 2:
+                WiFiInFragment wfin = (WiFiInFragment) mFragments[2];
+                WiFiInFragment.init(mService);
+                fragmentTransaction.replace(R.id.detailFragment, wfin);
+                break;
+           
+            case 3:
+                XplaneFragment xp = (XplaneFragment) mFragments[3];
+                XplaneFragment.init(mService);
+                fragmentTransaction.replace(R.id.detailFragment, xp);
+                break;
+            case 4:
+                MsfsFragment msfs = (MsfsFragment) mFragments[4];
+                MsfsFragment.init(mService);
+                fragmentTransaction.replace(R.id.detailFragment, msfs);
+                break;
+            case 5:
+                BlueToothOutFragment btout  = (BlueToothOutFragment) mFragments[5];
+                BlueToothOutFragment.init(mService);
+                fragmentTransaction.replace(R.id.detailFragment, btout);
+                break;
+            case 6:
+                FileFragment file = (FileFragment) mFragments[6];
+                FileFragment.init(mService);
+                fragmentTransaction.replace(R.id.detailFragment, file);
+                break;
+            case 7:
+                GPSSimulatorFragment gpsSim = (GPSSimulatorFragment) mFragments[7];
+                GPSSimulatorFragment.init(mService);
+                fragmentTransaction.replace(R.id.detailFragment, gpsSim);
+                break;
+            case 8:
+                USBInFragment usbin = (USBInFragment) mFragments[8];
+                USBInFragment.init(mService);
+                fragmentTransaction.replace(R.id.detailFragment, usbin);
+                break;
+        }
+
+        fragmentTransaction.commit();
+        return true;
+    }
+    
+    @Override
+    public void onRestoreInstanceState(Bundle savedInstanceState) {
+        // Restore the previously serialized current dropdown position.
+        if (savedInstanceState.containsKey(STATE_SELECTED_NAVIGATION_ITEM)) {
+            getActionBar().setSelectedNavigationItem(
+                    savedInstanceState.getInt(STATE_SELECTED_NAVIGATION_ITEM));
+        }
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        // Serialize the current dropdown position.
+        outState.putInt(STATE_SELECTED_NAVIGATION_ITEM, getActionBar()
+                .getSelectedNavigationIndex());
+    }
+
 
 }

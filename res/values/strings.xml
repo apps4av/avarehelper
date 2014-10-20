@@ -33,11 +33,11 @@ Redistribution and use in source and binary forms, with or without modification,
     <string name="Apply">Apply</string>
     <string name="FlyTo">Fly To Destination (if available)</string>
     <string name="LandAt">Land at Destination (if available)</string>
-    <string name="Lat">Latitude\u00b0</string>
-    <string name="Lon">Longitude\u00b0</string>
-    <string name="Heading">Heading\u00b0</string>
-    <string name="Altitude">Altitude ft</string>
-    <string name="Speed">Speed kt</string>
+    <string name="Lat">Lat.\u00b0</string>
+    <string name="Lon">Lon.\u00b0</string>
+    <string name="Heading">Hdg.\u00b0</string>
+    <string name="Altitude">Alt. ft</string>
+    <string name="Speed">Spd. kt</string>
     <string name="File">/mnt/sdcard/input.bin</string>
     <string name="FileSave">/mnt/sdcard/out.bin</string>
     <string name="Output">---- Output ----\n</string>

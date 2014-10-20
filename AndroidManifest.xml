@@ -11,8 +11,8 @@ Redistribution and use in source and binary forms, with or without modification,
 -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.apps4av.avarehelper"
-    android:versionCode="28"
-    android:versionName="2.0.8" >
+    android:versionCode="29"
+    android:versionName="2.0.9" >
 
     <uses-sdk
         android:minSdkVersion="12"
@@ -27,6 +27,7 @@ Redistribution and use in source and binary forms, with or without modification,
     <application
         android:allowBackup="true"
         android:icon="@drawable/link"
+        android:theme="@style/Theme.AppCompat"
         android:label="@string/app_name">
         
         <activity

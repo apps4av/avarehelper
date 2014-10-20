@@ -39,7 +39,12 @@ public class GPSSimulatorFragment extends Fragment {
 	private double getValidValue(String val) {
 		double ret = 0;
 		if(val.length() > 0) {
-			ret = Double.parseDouble(val);
+		    try {
+		        ret = Double.parseDouble(val);
+		    }
+		    catch (Exception e) {
+		        ret = 0;
+		    }
 		}
 
 		return ret;
