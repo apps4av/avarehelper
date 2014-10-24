@@ -46,7 +46,7 @@ Redistribution and use in source and binary forms, with or without modification,
 	        android:layout_height="wrap_content"
 	        android:text ="@string/Lat"
 	        />    
-	    <EditText
+	    <com.apps4av.avarehelper.SavedEditText
 	        android:id="@+id/main_gpssim_lat"
 	        android:inputType="numberDecimal|numberSigned"
 	        android:layout_width="wrap_content"
@@ -58,7 +58,7 @@ Redistribution and use in source and binary forms, with or without modification,
             android:layout_height="wrap_content"
             android:text ="@string/Lon"
             />    
-        <EditText
+        <com.apps4av.avarehelper.SavedEditText
             android:id="@+id/main_gpssim_lon"
             android:inputType="numberDecimal|numberSigned"
             android:layout_width="wrap_content"
@@ -81,7 +81,7 @@ Redistribution and use in source and binary forms, with or without modification,
 	        android:layout_height="wrap_content"
 	        android:text ="@string/Heading"
 	        />    
-	    <EditText
+	    <com.apps4av.avarehelper.SavedEditText
 	        android:id="@+id/main_gpssim_heading"
 	        android:inputType="number"
 	        android:layout_width="wrap_content"
@@ -93,7 +93,7 @@ Redistribution and use in source and binary forms, with or without modification,
             android:layout_height="wrap_content"
             android:text ="@string/Speed"
             />     
-        <EditText
+        <com.apps4av.avarehelper.SavedEditText
             android:id="@+id/main_gpssim_speed"
             android:inputType="number"
             android:layout_width="wrap_content"
@@ -115,7 +115,7 @@ Redistribution and use in source and binary forms, with or without modification,
 	        android:layout_height="wrap_content"
 	        android:text ="@string/Altitude"
 	        />     
-	    <EditText
+	    <com.apps4av.avarehelper.SavedEditText
 	        android:id="@+id/main_gpssim_altitude"
 	        android:inputType="number"
 	        android:layout_width="wrap_content"

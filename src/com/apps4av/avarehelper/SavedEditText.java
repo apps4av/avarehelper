@@ -11,34 +11,62 @@ Redistribution and use in source and binary forms, with or without modification,
 */
 package com.apps4av.avarehelper;
 
-import android.os.Bundle;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.TextView;
-import android.support.v4.app.*;
+import android.content.Context;
+import android.util.AttributeSet;
+import android.widget.EditText;
 
 /**
- * 
+ * Sticky edit text, value stored in Preferences
  * @author zkhan
  *
  */
-public class StatusFragment extends Fragment {
-    
-    private TextView mTv;
-    private boolean mBound;
-    
-    @Override  
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {  
-        mBound = getArguments().getBoolean("bound");
-        View view = inflater.inflate(R.layout.layout_status, container, false);
-        mTv = (TextView)view.findViewById(R.id.main_text);
-        if(mBound) {
-            mTv.setText(getString(R.string.Connected));            
-        }
-        else {
-            mTv.setText(getString(R.string.NotConnected));            
-        }
-        return view;
-    }
-} 
+public class SavedEditText extends EditText {
+
+	Preferences mPref = null;
+	
+	/**
+	 * Get value from saved
+	 */
+	private void setup(Context ctx) {
+		
+		/*
+		 * Get value from stored prefs
+		 */
+		mPref = new Preferences(ctx);
+		String val  = mPref.getEditTextValue(getId());
+		if(val != null) {
+			setText(val);
+		}
+	}
+	
+	public SavedEditText(Context context) {
+		super(context);
+		setup(context);
+		// TODO Auto-generated constructor stub
+	}
+
+	public SavedEditText(Context context, AttributeSet attrs) {
+		super(context, attrs);
+		// TODO Auto-generated constructor stub
+		setup(context);
+	}
+
+	public SavedEditText(Context context, AttributeSet attrs, int defStyleAttr) {
+		super(context, attrs, defStyleAttr);
+		// TODO Auto-generated constructor stub
+		setup(context);
+	}
+
+
+	/**
+	 * Override the text changed callback to save the text
+	 */
+	@Override
+	public void onTextChanged(CharSequence s, int start, int before, int count){
+		super.onTextChanged(s, start, before, count);
+		if(null != mPref) {
+			String val = getText().toString();
+			mPref.setEditTextValue(getId(), val);
+		}
+	} 
+}
