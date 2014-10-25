@@ -22,7 +22,6 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
-import android.widget.EditText;
 import android.widget.TextView;
 import android.support.v4.app.*;
 
@@ -34,7 +33,7 @@ import android.support.v4.app.*;
 public class MsfsFragment extends Fragment {
     
     private MsfsConnection mMsfs;
-    private EditText mTextMsfsPort;
+    private SavedEditText mTextMsfsPort;
     private TextView mTextMsfsIp;
     private CheckBox mMsfsCb;
 
@@ -49,7 +48,7 @@ public class MsfsFragment extends Fragment {
         View view = inflater.inflate(R.layout.layout_msfs, container, false);
         
         mTextMsfsIp = (TextView)view.findViewById(R.id.main_msfs_ip);
-        mTextMsfsPort = (EditText)view.findViewById(R.id.main_msfs_port);
+        mTextMsfsPort = (SavedEditText)view.findViewById(R.id.main_msfs_port);
         mMsfsCb = (CheckBox)view.findViewById(R.id.main_button_msfs_connect);
         mTextMsfsIp.setText(mTextMsfsIp.getText() + "(" + Util.getIpAddr(mContext) + ")");
         mMsfsCb.setOnClickListener(new OnClickListener() {

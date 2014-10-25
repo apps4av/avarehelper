@@ -12,7 +12,6 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CheckBox;
-import android.widget.EditText;
 import android.support.v4.app.*;
 
 /**
@@ -25,11 +24,11 @@ public class GPSSimulatorFragment extends Fragment {
 	private GPSSimulatorConnection mGPSSim;
 	private CheckBox mLandAtCb;
 	private CheckBox mFlyToCb;
-	private EditText mTextLat;
-	private EditText mTextLon;
-	private EditText mTextHeading;
-	private EditText mTextSpeed;
-	private EditText mTextAltitude;
+	private SavedEditText mTextLat;
+	private SavedEditText mTextLon;
+	private SavedEditText mTextHeading;
+	private SavedEditText mTextSpeed;
+	private SavedEditText mTextAltitude;
 	private Button mButtonStart;
 	private Button mButtonApply;
 
@@ -67,11 +66,11 @@ public class GPSSimulatorFragment extends Fragment {
 
 		mLandAtCb = (CheckBox)view.findViewById(R.id.main_button_gpssim_land_at);
 		mFlyToCb = (CheckBox)view.findViewById(R.id.main_button_gpssim_fly_to);
-		mTextLon = (EditText)view.findViewById(R.id.main_gpssim_lon);
-		mTextLat = (EditText)view.findViewById(R.id.main_gpssim_lat);
-		mTextAltitude = (EditText)view.findViewById(R.id.main_gpssim_altitude);
-		mTextSpeed = (EditText)view.findViewById(R.id.main_gpssim_speed);
-		mTextHeading = (EditText)view.findViewById(R.id.main_gpssim_heading);
+		mTextLon = (SavedEditText)view.findViewById(R.id.main_gpssim_lon);
+		mTextLat = (SavedEditText)view.findViewById(R.id.main_gpssim_lat);
+		mTextAltitude = (SavedEditText)view.findViewById(R.id.main_gpssim_altitude);
+		mTextSpeed = (SavedEditText)view.findViewById(R.id.main_gpssim_speed);
+		mTextHeading = (SavedEditText)view.findViewById(R.id.main_gpssim_heading);
 		mButtonApply =(Button)view.findViewById(R.id.main_button_gpssim_apply);
 		mButtonStart = (Button)view.findViewById(R.id.main_button_gpssim_start);
 

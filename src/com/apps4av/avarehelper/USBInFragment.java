@@ -22,7 +22,6 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.EditText;
 import android.support.v4.app.*;
 
 /**
@@ -37,8 +36,8 @@ public class USBInFragment extends Fragment {
     private Button mConnectButton;
     private static IBinder mService;
     private Button mConnectFileSaveButton;
-    private EditText mTextFileSave;
-    private EditText mParamsText;
+    private SavedEditText mTextFileSave;
+    private SavedEditText mParamsText;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -49,12 +48,12 @@ public class USBInFragment extends Fragment {
         
         View view = inflater.inflate(R.layout.layout_usbin, container, false);
 
-        mParamsText = (EditText)view.findViewById(R.id.usbin_params_text);
+        mParamsText = (SavedEditText)view.findViewById(R.id.usbin_params_text);
         
         /*
          * BT connection
          */
-        mTextFileSave = (EditText)view.findViewById(R.id.usbin_file_name_save);
+        mTextFileSave = (SavedEditText)view.findViewById(R.id.usbin_file_name_save);
 
         /*
          * List of BT devices is same

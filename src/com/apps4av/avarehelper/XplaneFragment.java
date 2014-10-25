@@ -22,7 +22,6 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
-import android.widget.EditText;
 import android.widget.TextView;
 import android.support.v4.app.*;
 
@@ -34,7 +33,7 @@ import android.support.v4.app.*;
 public class XplaneFragment extends Fragment {
     
     private XplaneConnection mXp;
-    private EditText mTextXplanePort;
+    private SavedEditText mTextXplanePort;
     private TextView mTextXplaneIp;
     private CheckBox mXplaneCb;
 
@@ -49,7 +48,7 @@ public class XplaneFragment extends Fragment {
         View view = inflater.inflate(R.layout.layout_xplane, container, false);
         
         mTextXplaneIp = (TextView)view.findViewById(R.id.main_xplane_ip);
-        mTextXplanePort = (EditText)view.findViewById(R.id.main_xplane_port);
+        mTextXplanePort = (SavedEditText)view.findViewById(R.id.main_xplane_port);
         mXplaneCb = (CheckBox)view.findViewById(R.id.main_button_xplane_connect);
         mTextXplaneIp.setText(mTextXplaneIp.getText() + "(" + Util.getIpAddr(mContext) + ")");
         mXplaneCb.setOnClickListener(new OnClickListener() {

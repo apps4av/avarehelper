@@ -22,7 +22,6 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.EditText;
 import android.support.v4.app.*;
 
 /**
@@ -36,7 +35,7 @@ public class FileFragment extends Fragment {
     private Context mContext;
     private static IBinder mService;
     private Button mConnectButton;
-    private EditText mTextFile;
+    private SavedEditText mTextFile;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -47,7 +46,7 @@ public class FileFragment extends Fragment {
 
         View view = inflater.inflate(R.layout.layout_play, container, false);
 
-        mTextFile = (EditText)view.findViewById(R.id.main_file_name);
+        mTextFile = (SavedEditText)view.findViewById(R.id.main_file_name);
         mConnectButton = (Button)view.findViewById(R.id.main_button_connect_file);
         mConnectButton.setOnClickListener(new OnClickListener() {
             

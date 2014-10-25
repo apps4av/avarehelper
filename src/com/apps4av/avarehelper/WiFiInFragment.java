@@ -23,7 +23,6 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CheckBox;
-import android.widget.EditText;
 import android.support.v4.app.*;
 
 /**
@@ -34,12 +33,12 @@ import android.support.v4.app.*;
 public class WiFiInFragment extends Fragment {
     
     private WifiConnection mWifi;
-    private EditText mTextWifiPort;
+    private SavedEditText mTextWifiPort;
     private CheckBox mWifiCb;
     private static IBinder mService;
     private Context mContext;
     private Button mConnectFileSaveButton;
-    private EditText mTextFileSave;
+    private SavedEditText mTextFileSave;
 
     @Override  
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {  
@@ -58,9 +57,9 @@ public class WiFiInFragment extends Fragment {
         }
         
         
-        mTextFileSave = (EditText)view.findViewById(R.id.main_file_name_save);
+        mTextFileSave = (SavedEditText)view.findViewById(R.id.main_file_name_save);
         mWifiCb = (CheckBox)view.findViewById(R.id.main_button_connectwifi);
-        mTextWifiPort = (EditText)view.findViewById(R.id.main_wifi_port);
+        mTextWifiPort = (SavedEditText)view.findViewById(R.id.main_wifi_port);
         mWifiCb.setOnClickListener(new OnClickListener() {
             
             

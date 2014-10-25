@@ -25,7 +25,6 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
-import android.widget.EditText;
 import android.widget.Spinner;
 import android.support.v4.app.*;
 
@@ -43,7 +42,7 @@ public class BlueToothInFragment extends Fragment {
     private Button mConnectButton;
     private static IBinder mService;
     private Button mConnectFileSaveButton;
-    private EditText mTextFileSave;
+    private SavedEditText mTextFileSave;
     private CheckBox mSecureCb;
 
     @Override
@@ -59,7 +58,7 @@ public class BlueToothInFragment extends Fragment {
          * BT connection
          */
         mSpinner = (Spinner) view.findViewById(R.id.main_spinner);
-        mTextFileSave = (EditText)view.findViewById(R.id.main_file_name_save);
+        mTextFileSave = (SavedEditText)view.findViewById(R.id.main_file_name_save);
 
         /*
          * List of BT devices is same
