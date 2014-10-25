@@ -46,8 +46,6 @@ public class MainActivity extends ActionBarActivity implements
 
     private Fragment[] mFragments = new Fragment[9];
 
-    private static final String STATE_SELECTED_NAVIGATION_ITEM = "selected_navigation_item";
-
     /*
      * (non-Javadoc)
      * @see android.app.Activity#onBackPressed()
@@ -263,21 +261,4 @@ public class MainActivity extends ActionBarActivity implements
         return true;
     }
     
-    @Override
-    public void onRestoreInstanceState(Bundle savedInstanceState) {
-        // Restore the previously serialized current dropdown position.
-        if (savedInstanceState.containsKey(STATE_SELECTED_NAVIGATION_ITEM)) {
-            getActionBar().setSelectedNavigationItem(
-                    savedInstanceState.getInt(STATE_SELECTED_NAVIGATION_ITEM));
-        }
-    }
-
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
-        // Serialize the current dropdown position.
-        outState.putInt(STATE_SELECTED_NAVIGATION_ITEM, getActionBar()
-                .getSelectedNavigationIndex());
-    }
-
-
 }
