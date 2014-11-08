@@ -61,8 +61,7 @@ public class MessageFactory {
         /*
          * Starts with $GP, ends with checksum *DD
          */
-        if(bufin[0] == 36 && bufin[1] == 71 && bufin[2] == 80 &&
-                bufin[len - 5] == 42) {
+        if(bufin[0] == 36 && bufin[1] == 71) {
             int xor = checkSum(bufin);
            
             /*

@@ -54,9 +54,9 @@ public class DataBuffer {
         mIndexes.clear();
         for(int i = 0; i < mElem - 2; i++) {
             /*
-             * Look for $GP
+             * Look for $G
              */
-            if(mBuffer[i] == (byte)36 && mBuffer[i + 1] == (byte)71 && mBuffer[i + 2] == (byte)80) {
+            if(mBuffer[i] == (byte)36 && mBuffer[i + 1] == (byte)71) {
                 mIndexes.add(i);
             }
         }        
