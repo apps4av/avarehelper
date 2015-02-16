@@ -9,68 +9,64 @@ Redistribution and use in source and binary forms, with or without modification,
     *
     *     THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-
-package com.apps4av.avarehelper;
-
-
+package com.apps4av.avarehelper.storage;
 
 import android.content.Context;
-import android.content.SharedPreferences;
-import android.preference.PreferenceManager;
+import android.util.AttributeSet;
+import android.widget.EditText;
 
 /**
- * Preferences for main activity
+ * Sticky edit text, value stored in Preferences
+ * @author zkhan
+ *
  */
-public class Preferences {
+public class SavedEditText extends EditText {
 
-    
-    /**
-     * Preferences
-     */
-    private SharedPreferences mPref;
+	Preferences mPref = null;
+	
+	/**
+	 * Get value from saved
+	 */
+	private void setup(Context ctx) {
+		
+		/*
+		 * Get value from stored prefs
+		 */
+		mPref = new Preferences(ctx);
+		String val  = mPref.getEditTextValue(getId());
+		if(val != null) {
+			setText(val);
+		}
+	}
+	
+	public SavedEditText(Context context) {
+		super(context);
+		setup(context);
+		// TODO Auto-generated constructor stub
+	}
 
-    /**
-     * 
-     * @param ctx
-     */
-    public Preferences(Context ctx) {
-        /*
-         * Get prefs
-         */
-        mPref = PreferenceManager.getDefaultSharedPreferences(ctx);
-    }
+	public SavedEditText(Context context, AttributeSet attrs) {
+		super(context, attrs);
+		// TODO Auto-generated constructor stub
+		setup(context);
+	}
+
+	public SavedEditText(Context context, AttributeSet attrs, int defStyleAttr) {
+		super(context, attrs, defStyleAttr);
+		// TODO Auto-generated constructor stub
+		setup(context);
+	}
 
 
-    /**
-     * 
-     * @return
-     */
-    public String getEditTextValue(int id) {
-        return mPref.getString("EditText" + id, null);
-    }
-
-    /**
-     * 
-     * @param tags
-     */
-    public void setEditTextValue(int id, String val) {
-        mPref.edit().putString("EditText" + id, val).commit();
-    }
-
-    /**
-     * 
-     * @return
-     */
-    public boolean getCheckboxValue(int id) {
-        return mPref.getBoolean("Checkbox" + id, false);
-    }
-
-    /**
-     * 
-     * @param tags
-     */
-    public void setCheckboxValue(int id, boolean val) {
-        mPref.edit().putBoolean("Checkbox" + id, val).commit();
-    }
-
+	/**
+	 * Override the text changed callback to save the text
+	 */
+	@Override
+	public void onTextChanged(CharSequence s, int start, int before, int count){
+		super.onTextChanged(s, start, before, count);
+		if(null != mPref) {
+			String val = getText().toString();
+			mPref.setEditTextValue(getId(), val);
+		}
+	} 
 }

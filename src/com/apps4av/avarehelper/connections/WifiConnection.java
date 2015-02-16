@@ -10,46 +10,43 @@ Redistribution and use in source and binary forms, with or without modification,
     *     THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-package com.apps4av.avarehelper;
+package com.apps4av.avarehelper.connections;
 
 import java.io.FileOutputStream;
-import java.util.ArrayList;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
 import java.util.LinkedList;
-import java.util.List;
 
-import android.content.Context;
-import android.hardware.usb.UsbManager;
-
+import com.apps4av.avarehelper.utils.Logger;
 import com.ds.avare.IHelper;
-import com.hoho.android.usbserial.driver.UsbSerialDriver;
-import com.hoho.android.usbserial.driver.UsbSerialProber;
-
 
 /**
  * 
  * @author zkhan
  *
  */
-public class USBConnectionIn {
+public class WifiConnection {
 
-    private static UsbSerialDriver mDriver = null;
-    private static boolean mRunning = false;
-    private static String mFileSave = null;
-    private static String mParams = "230400,8,n,1";
     
-    private static USBConnectionIn mConnection;
+    private static WifiConnection mConnection;
     
-    private static ConnectionStatus mConnectionStatus;
     private static IHelper mHelper;
     
     private Thread mThread;
-    private static UsbManager mUsbManager;
-
-
+    private static String mFileSave = null;
+    
+    private static boolean mRunning;
+    
+    DatagramSocket mSocket;
+    
+    private int mPort = 0;
+    
+    private boolean mConnected = false;
+    
     /**
      * 
      */
-    private USBConnectionIn() {
+    private WifiConnection() {
     }
 
     /**
@@ -61,18 +58,17 @@ public class USBConnectionIn {
             mFileSave = file;
         }
     }
+
     
     /**
      * 
      * @return
      */
-    public static USBConnectionIn getInstance(Context ctx) {
+    public static WifiConnection getInstance() {
 
         if(null == mConnection) {
-            mConnection = new USBConnectionIn();
-            mConnectionStatus = new ConnectionStatus();
-            mConnectionStatus.setState(ConnectionStatus.DISCONNECTED);
-            mUsbManager = (UsbManager) ctx.getSystemService(Context.USB_SERVICE);
+            mConnection = new WifiConnection();
+            mRunning = false;
         }
         return mConnection;
     }
@@ -81,11 +77,7 @@ public class USBConnectionIn {
      * 
      */
     public void stop() {
-        Logger.Logit("Stopping USB");
-        if(mConnectionStatus.getState() != ConnectionStatus.CONNECTED) {
-            Logger.Logit("Stopping USB failed because already stopped");
-            return;
-        }
+        Logger.Logit("Stopping WIFI");
         mRunning = false;
         if(null != mThread) {
             mThread.interrupt();
@@ -96,25 +88,21 @@ public class USBConnectionIn {
      * 
      */
     public void start() {
-        Logger.Logit("Starting USB");
-        if(mConnectionStatus.getState() != ConnectionStatus.CONNECTED) {
-            Logger.Logit("Starting USB failed because already started");
-            return;
-        }
         
+        Logger.Logit("Starting WiFi Listener");
+
         mRunning = true;
         
         /*
-         * Thread that reads BT
+         * Thread that reads WIFI
          */
         mThread = new Thread() {
             @Override
             public void run() {
         
-                Logger.Logit("USB reading data");
+                Logger.Logit("WiFi reading data");
 
                 BufferProcessor bp = new BufferProcessor();
-                Logger.Logit("BT reading data");
 
                 byte[] buffer = new byte[8192];
                 
@@ -135,23 +123,18 @@ public class USBConnectionIn {
                             break;
                         }
                         try {
-                            Thread.sleep(10);
+                            Thread.sleep(1000);
                         } catch (Exception e) {
                             
-                        }
-                        
-                        // serial driver sends 0 when no data
-                        if(red == 0) {
-                            continue;
                         }
                         
                         /*
                          * Try to reconnect
                          */
-                        Logger.Logit("Disconnected from USB device, retrying to connect");
+                        Logger.Logit("Listener error, re-starting listener");
 
                         disconnect();
-                        connect(mParams);
+                        connect(mPort);
                         continue;
                     }
 
@@ -174,86 +157,34 @@ public class USBConnectionIn {
         mThread.start();
     }
     
-    /**
-     * 
-     * @param state
-     */
-    private void setState(int state) {
-        mConnectionStatus.setState(state);
-    }
-    
-    /**
-     * 
-     * @return
-     */
-    public List<String> getDevices() {
-        List<String> list = new ArrayList<String>();
         
-
-
-        /*
-         * Find devices
-         */
-        
-        return list;
-    }
-    
     /**
      * 
      * A device name devNameMatch, will connect to first device whose
      * name matched this string.
      * @return
      */
-    public boolean connect(String params) {
+    public boolean connect(int port) {
         
-        mParams = params;
-        Logger.Logit("Connecting to serial device");
-        mDriver = UsbSerialProber.findFirstDevice(mUsbManager);
+        Logger.Logit("Listening on port " + port);
 
-        if(mDriver == null) {
-            Logger.Logit("No USB serial device available");
-            return false;
-        }
-        
+        mPort = port;
         
         /*
-         * Only when not connected, connect
+         * Make socket
          */
-        if(mConnectionStatus.getState() != ConnectionStatus.DISCONNECTED) {
-            Logger.Logit("Failed! Already connected?");
-
-            return false;
-        }
-        setState(ConnectionStatus.CONNECTING);
+        Logger.Logit("Making socket to listen");
 
         try {
-            mDriver.open();
-            
-            String tokens[] = mParams.split(",");
-            // 115200, 8, n, 1
-            // rate, data, parity, stop
-            int rate = Integer.parseInt(tokens[0]);
-            int data = Integer.parseInt(tokens[1]);
-            int parity;
-            if(tokens[2].equals("n")) {
-                parity = UsbSerialDriver.PARITY_NONE;
-            }
-            else if (tokens[2].equals("o")) {
-                parity = UsbSerialDriver.PARITY_ODD;
-            }
-            else {
-                parity = UsbSerialDriver.PARITY_EVEN;
-            }
-            int stop = Integer.parseInt(tokens[3]);
-            mDriver.setParameters(rate, data, stop, parity);
-        } 
-        catch (Exception e) {
-            setState(ConnectionStatus.DISCONNECTED);
-            Logger.Logit("Failed!");
+            mSocket = new DatagramSocket(mPort);
+            mSocket.setBroadcast(true);
+        }
+        catch(Exception e) {
+            Logger.Logit("Failed! Connecting socket " + e.getMessage());
             return false;
-        } 
-        setState(ConnectionStatus.CONNECTED);
+        }
 
+        mConnected = true;
         Logger.Logit("Success!");
 
         return true;
@@ -266,18 +197,18 @@ public class USBConnectionIn {
         
         Logger.Logit("Disconnecting from device");
 
-        try {
-            mDriver.close();
-        }
-        catch (Exception e) {
-            
-        }
-        mDriver = null;
         /*
          * Exit
          */
-        setState(ConnectionStatus.DISCONNECTED);
-        Logger.Logit("Disconnected");
+        try {
+            mSocket.close();
+        } 
+        catch(Exception e2) {
+            Logger.Logit("Error stream close");
+        }
+        
+        mConnected = false;
+        Logger.Logit("Listener stopped");
     }
     
     /**
@@ -285,15 +216,15 @@ public class USBConnectionIn {
      * @return
      */
     private int read(byte[] buffer) {
-        int red = -1;
+        DatagramPacket pkt = new DatagramPacket(buffer, buffer.length); 
         try {
-            red = mDriver.read(buffer, 1000);
+            mSocket.receive(pkt);
         } 
         catch(Exception e) {
-            red = -1;
+            return -1;
         }
         
-        if(red > 0) {
+        if(pkt.getLength() > 0) {
             String file = null;
             synchronized(this) {
                 file = mFileSave;
@@ -301,31 +232,17 @@ public class USBConnectionIn {
             if(file != null) {
                 try {
                     FileOutputStream output = new FileOutputStream(file, true);
-                    output.write(buffer, 0, red);
+                    output.write(buffer, 0, pkt.getLength());
                     output.close();
                 } catch(Exception e) {
                 }
             }
         }
-        return red;
+
+        
+        return pkt.getLength();
     }
 
-    /**
-     * 
-     * @return
-     */
-    public boolean isConnected() {
-        return mConnectionStatus.getState() == ConnectionStatus.CONNECTED;
-    }
-
-    /**
-     * 
-     * @return
-     */
-    public boolean isConnectedOrConnecting() {
-        return mConnectionStatus.getState() == ConnectionStatus.CONNECTED ||
-                mConnectionStatus.getState() == ConnectionStatus.CONNECTING;
-    }
 
     /**
      * 
@@ -334,7 +251,7 @@ public class USBConnectionIn {
     public void setHelper(IHelper helper) {
         mHelper = helper;
     }
-    
+
     /**
      * 
      * @return
@@ -342,13 +259,20 @@ public class USBConnectionIn {
     public String getFileSave() {
         return mFileSave;
     }
-
+    
+    /**
+     * 
+     */
+    public boolean isConnected() {
+        return mConnected;
+    }
+    
     /**
      * 
      * @return
      */
-    public String getParams() {
-        return mParams;
+    public int getPort() {
+        return mPort;
     }
-    
+
 }

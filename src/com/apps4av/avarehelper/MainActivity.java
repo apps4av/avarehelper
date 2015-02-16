@@ -11,15 +11,17 @@ Redistribution and use in source and binary forms, with or without modification,
 */
 package com.apps4av.avarehelper;
 
+import com.apps4av.avarehelper.utils.GenericCallback;
+import com.apps4av.avarehelper.utils.Logger;
 
-import android.app.AlertDialog;
 import android.content.ComponentName;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.IBinder;
+import android.os.Message;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -31,63 +33,14 @@ import android.widget.TextView;
 
 public class MainActivity extends ActionBarActivity implements
     ActionBar.OnNavigationListener {
-
-    private boolean mBound;
     
     private TextView mTextLog;
+    private TextView mTextStatus;
     
-    private IBinder mService;
+    private BackgroundService mService;
 
-    /**
-     * Shows exit dialog
-     */
-    private AlertDialog mAlertDialogExit;
+    private Fragment[] mFragments = new Fragment[8];
 
-
-    private Fragment[] mFragments = new Fragment[9];
-
-    /*
-     * (non-Javadoc)
-     * @see android.app.Activity#onBackPressed()
-     */
-    @Override
-    public void onBackPressed() {
-        
-        
-        /*
-         * And may exit
-         */
-        mAlertDialogExit = new AlertDialog.Builder(MainActivity.this).create();
-        mAlertDialogExit.setTitle(getString(R.string.Exit));
-        mAlertDialogExit.setCanceledOnTouchOutside(true);
-        mAlertDialogExit.setCancelable(true);
-        mAlertDialogExit.setButton(AlertDialog.BUTTON_POSITIVE, getString(R.string.Yes), new DialogInterface.OnClickListener() {
-            /* (non-Javadoc)
-             * @see android.content.DialogInterface.OnClickListener#onClick(android.content.DialogInterface, int)
-             */
-            public void onClick(DialogInterface dialog, int which) {
-                /*
-                 * Go to background
-                 */
-                System.runFinalizersOnExit(true);
-                System.exit(0);
-            }
-        });
-        mAlertDialogExit.setButton(AlertDialog.BUTTON_NEGATIVE, getString(R.string.No), new DialogInterface.OnClickListener() {
-            /* (non-Javadoc)
-             * @see android.content.DialogInterface.OnClickListener#onClick(android.content.DialogInterface, int)
-             */
-            public void onClick(DialogInterface dialog, int which) {
-                /*
-                 * Go to background
-                 */
-                dialog.dismiss();
-            }            
-        });
-
-        mAlertDialogExit.show();
-
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -96,26 +49,32 @@ public class MainActivity extends ActionBarActivity implements
         LayoutInflater layoutInflater = (LayoutInflater)getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View view = layoutInflater.inflate(R.layout.activity_main, null);
         mTextLog = (TextView)view.findViewById(R.id.main_text_log);
+        mTextStatus = (TextView)view.findViewById(R.id.main_text_status);
         Logger.setTextView(mTextLog);
         setContentView(view);
-        mBound = false;
         
+        /*
+         * Start service now, bind later. This will be no-op if service is already running
+         */
+        Intent intent = new Intent(this, BackgroundService.class);
+        startService(intent);
+
         // Set up the action bar to show a dropdown list.
         final ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayShowTitleEnabled(false);
         actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
         Bundle args = new Bundle();
-        mFragments[0] = new StatusFragment();
-        mFragments[1] = new BlueToothInFragment();
-        mFragments[2] = new WiFiInFragment();
-        mFragments[3] = new XplaneFragment();
-        mFragments[4] = new MsfsFragment();
-        mFragments[5] = new BlueToothOutFragment();
-        mFragments[6] = new FileFragment();
-        mFragments[7] = new GPSSimulatorFragment();
-        mFragments[8] = new USBInFragment();
+        int pos = 0;
+        mFragments[pos++] = new BlueToothInFragment();
+        mFragments[pos++] = new WiFiInFragment();
+        mFragments[pos++] = new XplaneFragment();
+        mFragments[pos++] = new MsfsFragment();
+        mFragments[pos++] = new BlueToothOutFragment();
+        mFragments[pos++] = new FileFragment();
+        mFragments[pos++] = new GPSSimulatorFragment();
+        mFragments[pos++] = new USBInFragment();
 
-        for(int i = 0; i < 9; i++) {
+        for(int i = 0; i < pos; i++) {
             mFragments[i].setArguments(args);
         }
 
@@ -125,7 +84,6 @@ public class MainActivity extends ActionBarActivity implements
         new ArrayAdapter<String>(actionBar.getThemedContext(),
                 android.R.layout.simple_list_item_1,
                 android.R.id.text1, new String[] {
-                getString(R.string.Status),
                 getString(R.string.Bluetooth), 
                 getString(R.string.WIFI), 
                 getString(R.string.XPlane), 
@@ -144,19 +102,7 @@ public class MainActivity extends ActionBarActivity implements
         /*
          * Clean up stuff on exit
          */
-        if(mBound) {
-            unbindService(mConnection);
-            mBound = false;
-        }
-        
-        if(null != mAlertDialogExit) {
-            try {
-                mAlertDialogExit.dismiss();
-            }
-            catch (Exception e) {
-            }
-        }
-
+        getApplicationContext().unbindService(mConnection);        
     }
    
     /**
@@ -170,8 +116,20 @@ public class MainActivity extends ActionBarActivity implements
         @Override
         public void onServiceConnected(ComponentName className,
                 IBinder service) {
-            mBound = true;
-            mService = service;
+            BackgroundService.LocalBinder binder = (BackgroundService.LocalBinder)service;
+            mService = binder.getService();
+            mService.setStatusCallback(new GenericCallback() {
+            	@Override
+            	public Object callback(Object o1, Object o2) {
+            		/*
+            		 * Update status from timer in service
+            		 */
+            		Message m = mHandler.obtainMessage();
+            		m.obj = o1;
+            		mHandler.sendMessage(m);
+            		return null;
+            	}
+            });
         }
 
         /* (non-Javadoc)
@@ -179,80 +137,59 @@ public class MainActivity extends ActionBarActivity implements
          */
         @Override
         public void onServiceDisconnected(ComponentName arg0) {
-            mBound = false;
         }
     };
 
-
-    
     @Override
     protected void onResume() {
         super.onResume();
         /*
          * Start the helper service in Avare.
          */
-        Intent i = new Intent("com.ds.avare.START_SERVICE");
-        i.setClassName("com.ds.avare", "com.ds.avare.IHelperService");
-        bindService(i, mConnection, Context.BIND_AUTO_CREATE);
-
+        Intent intent = new Intent(getApplicationContext(), BackgroundService.class);
+        getApplicationContext().bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
     }
 
     @Override
     public boolean onNavigationItemSelected(int itemPosition, long itemId) {
 
-        FragmentManager fragmentManager = getSupportFragmentManager();
+    	FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-        mFragments[itemPosition].getArguments().putBoolean("bound", mBound);
-        
         
         switch(itemPosition) {
         
             case 0:
-                StatusFragment status = (StatusFragment) mFragments[0];
-                fragmentTransaction.replace(R.id.detailFragment, status);
-                break;
-                
-            case 1:
-                BlueToothInFragment btin = (BlueToothInFragment) mFragments[1];
-                BlueToothInFragment.init(mService);
-                btin = new BlueToothInFragment();
+                BlueToothInFragment btin = (BlueToothInFragment) mFragments[itemPosition];
                 fragmentTransaction.replace(R.id.detailFragment, btin);
                 break;
                 
-            case 2:
-                WiFiInFragment wfin = (WiFiInFragment) mFragments[2];
-                WiFiInFragment.init(mService);
+            case 1:
+                WiFiInFragment wfin = (WiFiInFragment) mFragments[itemPosition];
                 fragmentTransaction.replace(R.id.detailFragment, wfin);
                 break;
            
-            case 3:
-                XplaneFragment xp = (XplaneFragment) mFragments[3];
-                XplaneFragment.init(mService);
+            case 2:
+                XplaneFragment xp = (XplaneFragment) mFragments[itemPosition];
                 fragmentTransaction.replace(R.id.detailFragment, xp);
                 break;
-            case 4:
-                MsfsFragment msfs = (MsfsFragment) mFragments[4];
-                MsfsFragment.init(mService);
+            case 3:
+                MsfsFragment msfs = (MsfsFragment) mFragments[itemPosition];
                 fragmentTransaction.replace(R.id.detailFragment, msfs);
                 break;
-            case 5:
-                BlueToothOutFragment btout  = (BlueToothOutFragment) mFragments[5];
-                BlueToothOutFragment.init(mService);
+            case 4:
+                BlueToothOutFragment btout  = (BlueToothOutFragment) mFragments[itemPosition];
                 fragmentTransaction.replace(R.id.detailFragment, btout);
                 break;
-            case 6:
-                FileFragment file = (FileFragment) mFragments[6];
-                FileFragment.init(mService);
+            case 5:
+                FileFragment file = (FileFragment) mFragments[itemPosition];
                 fragmentTransaction.replace(R.id.detailFragment, file);
                 break;
-            case 7:
-                GPSSimulatorFragment gpsSim = (GPSSimulatorFragment) mFragments[7];
-                GPSSimulatorFragment.init(mService);
+            case 6:
+                GPSSimulatorFragment gpsSim = (GPSSimulatorFragment) mFragments[itemPosition];
                 fragmentTransaction.replace(R.id.detailFragment, gpsSim);
                 break;
-            case 8:
-                USBInFragment usbin = (USBInFragment) mFragments[8];
-                USBInFragment.init(mService);
+            case 7:
+                USBInFragment usbin = (USBInFragment) mFragments[itemPosition];
                 fragmentTransaction.replace(R.id.detailFragment, usbin);
                 break;
         }
@@ -260,5 +197,20 @@ public class MainActivity extends ActionBarActivity implements
         fragmentTransaction.commit();
         return true;
     }
-    
+ 
+    /**
+     * This leak warning is not an issue if we do not post delayed messages, which is true here.
+     */
+    private Handler mHandler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            if((Boolean)msg.obj) {
+            	mTextStatus.setText(getString(R.string.Connected));
+            }
+            else {
+            	mTextStatus.setText(getString(R.string.NotConnected));        	
+            }
+        }
+    };
+
 }

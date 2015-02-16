@@ -9,36 +9,41 @@ Redistribution and use in source and binary forms, with or without modification,
     *
     *     THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-package com.apps4av.avarehelper;
-
-import android.os.Bundle;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.TextView;
-import android.support.v4.app.*;
+package com.apps4av.avarehelper.connections;
 
 /**
  * 
  * @author zkhan
  *
  */
-public class StatusFragment extends Fragment {
+public class ConnectionStatus {
+
+    public static final int CONNECTED = 1;
+    public static final int CONNECTING = 2;
+    public static final int DISCONNECTED = 0;
     
-    private TextView mTv;
-    private boolean mBound;
-    
-    @Override  
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {  
-        mBound = getArguments().getBoolean("bound");
-        View view = inflater.inflate(R.layout.layout_status, container, false);
-        mTv = (TextView)view.findViewById(R.id.main_text);
-        if(mBound) {
-            mTv.setText(getString(R.string.Connected));            
-        }
-        else {
-            mTv.setText(getString(R.string.NotConnected));            
-        }
-        return view;
+    private int mState;
+   
+    /**
+     * 
+     */
+    public ConnectionStatus() {
+        mState = DISCONNECTED;
     }
-} 
+    
+    /**
+     * 
+     * @return
+     */
+    public int getState() {
+        return mState;
+    }
+    
+    /**
+     * 
+     * @param state
+     */
+    public void setState(int state) {
+        mState = state;
+    }
+}

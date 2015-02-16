@@ -10,50 +10,70 @@ Redistribution and use in source and binary forms, with or without modification,
     *     THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-package com.apps4av.avarehelper;
+package com.apps4av.avarehelper.connections;
 
-import java.io.BufferedInputStream;
-import java.io.FileInputStream;
-import java.io.InputStream;
+import java.io.FileOutputStream;
+import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.List;
 
+import android.content.Context;
+import android.hardware.usb.UsbManager;
+
+import com.apps4av.avarehelper.utils.Logger;
 import com.ds.avare.IHelper;
+import com.hoho.android.usbserial.driver.UsbSerialDriver;
+import com.hoho.android.usbserial.driver.UsbSerialProber;
+
 
 /**
  * 
  * @author zkhan
  *
  */
-public class FileConnectionIn {
+public class USBConnectionIn {
 
-    private static InputStream mStream = null;
+    private static UsbSerialDriver mDriver = null;
     private static boolean mRunning = false;
+    private static String mFileSave = null;
+    private static String mParams = "230400,8,n,1";
     
-    private static FileConnectionIn mConnection;
+    private static USBConnectionIn mConnection;
     
     private static ConnectionStatus mConnectionStatus;
     private static IHelper mHelper;
-
+    
     private Thread mThread;
-    private String mFileName = null;
+    private static UsbManager mUsbManager;
+
 
     /**
      * 
      */
-    private FileConnectionIn() {
+    private USBConnectionIn() {
     }
 
+    /**
+     * 
+     * @param file
+     */
+    public void setFileSave(String file) {
+        synchronized(this) {
+            mFileSave = file;
+        }
+    }
     
     /**
      * 
      * @return
      */
-    public static FileConnectionIn getInstance() {
+    public static USBConnectionIn getInstance(Context ctx) {
 
         if(null == mConnection) {
-            mConnection = new FileConnectionIn();
+            mConnection = new USBConnectionIn();
             mConnectionStatus = new ConnectionStatus();
             mConnectionStatus.setState(ConnectionStatus.DISCONNECTED);
+            mUsbManager = (UsbManager) ctx.getSystemService(Context.USB_SERVICE);
         }
         return mConnection;
     }
@@ -62,9 +82,9 @@ public class FileConnectionIn {
      * 
      */
     public void stop() {
-        Logger.Logit("Stopping File Reader");
+        Logger.Logit("Stopping USB");
         if(mConnectionStatus.getState() != ConnectionStatus.CONNECTED) {
-            Logger.Logit("Stop failed because already stopped");
+            Logger.Logit("Stopping USB failed because already stopped");
             return;
         }
         mRunning = false;
@@ -77,26 +97,26 @@ public class FileConnectionIn {
      * 
      */
     public void start() {
-        Logger.Logit("Starting File Reader");
+        Logger.Logit("Starting USB");
         if(mConnectionStatus.getState() != ConnectionStatus.CONNECTED) {
-            Logger.Logit("Starting failed because already started");
+            Logger.Logit("Starting USB failed because already started");
             return;
         }
         
         mRunning = true;
         
         /*
-         * Thread that reads File
+         * Thread that reads BT
          */
         mThread = new Thread() {
             @Override
             public void run() {
         
-                Logger.Logit("File reading data");
+                Logger.Logit("USB reading data");
 
                 BufferProcessor bp = new BufferProcessor();
+                Logger.Logit("BT reading data");
 
-                
                 byte[] buffer = new byte[8192];
                 
                 /*
@@ -116,11 +136,23 @@ public class FileConnectionIn {
                             break;
                         }
                         try {
-                            Thread.sleep(1000);
+                            Thread.sleep(10);
                         } catch (Exception e) {
                             
                         }
                         
+                        // serial driver sends 0 when no data
+                        if(red == 0) {
+                            continue;
+                        }
+                        
+                        /*
+                         * Try to reconnect
+                         */
+                        Logger.Logit("Disconnected from USB device, retrying to connect");
+
+                        disconnect();
+                        connect(mParams);
                         continue;
                     }
 
@@ -151,6 +183,21 @@ public class FileConnectionIn {
         mConnectionStatus.setState(state);
     }
     
+    /**
+     * 
+     * @return
+     */
+    public List<String> getDevices() {
+        List<String> list = new ArrayList<String>();
+        
+
+
+        /*
+         * Find devices
+         */
+        
+        return list;
+    }
     
     /**
      * 
@@ -158,37 +205,54 @@ public class FileConnectionIn {
      * name matched this string.
      * @return
      */
-    public boolean connect(String fileName) {
+    public boolean connect(String params) {
         
-        Logger.Logit("Opening file " + fileName);
+        mParams = params;
+        Logger.Logit("Connecting to serial device");
+        mDriver = UsbSerialProber.findFirstDevice(mUsbManager);
 
-        if(fileName == null) {
+        if(mDriver == null) {
+            Logger.Logit("No USB serial device available");
             return false;
         }
         
-        mFileName = fileName;
         
         /*
          * Only when not connected, connect
          */
         if(mConnectionStatus.getState() != ConnectionStatus.DISCONNECTED) {
-            Logger.Logit("Failed! Already reading?");
+            Logger.Logit("Failed! Already connected?");
 
             return false;
         }
         setState(ConnectionStatus.CONNECTING);
 
-        Logger.Logit("Getting input stream");
-
         try {
-            mStream = new BufferedInputStream(new FileInputStream(mFileName));
+            mDriver.open();
+            
+            String tokens[] = mParams.split(",");
+            // 115200, 8, n, 1
+            // rate, data, parity, stop
+            int rate = Integer.parseInt(tokens[0]);
+            int data = Integer.parseInt(tokens[1]);
+            int parity;
+            if(tokens[2].equals("n")) {
+                parity = UsbSerialDriver.PARITY_NONE;
+            }
+            else if (tokens[2].equals("o")) {
+                parity = UsbSerialDriver.PARITY_ODD;
+            }
+            else {
+                parity = UsbSerialDriver.PARITY_EVEN;
+            }
+            int stop = Integer.parseInt(tokens[3]);
+            mDriver.setParameters(rate, data, stop, parity);
         } 
         catch (Exception e) {
-            Logger.Logit("Failed! Input stream error");
-
             setState(ConnectionStatus.DISCONNECTED);
+            Logger.Logit("Failed!");
+            return false;
         } 
-
         setState(ConnectionStatus.CONNECTED);
 
         Logger.Logit("Success!");
@@ -201,18 +265,18 @@ public class FileConnectionIn {
      */
     public void disconnect() {
         
-        Logger.Logit("Closing file");
+        Logger.Logit("Disconnecting from device");
 
+        try {
+            mDriver.close();
+        }
+        catch (Exception e) {
+            
+        }
+        mDriver = null;
         /*
          * Exit
          */
-        try {
-            mStream.close();
-        } 
-        catch(Exception e2) {
-            Logger.Logit("Error stream close");
-        }
-        
         setState(ConnectionStatus.DISCONNECTED);
         Logger.Logit("Disconnected");
     }
@@ -224,10 +288,25 @@ public class FileConnectionIn {
     private int read(byte[] buffer) {
         int red = -1;
         try {
-            red = mStream.read(buffer, 0, buffer.length);
+            red = mDriver.read(buffer, 1000);
         } 
         catch(Exception e) {
             red = -1;
+        }
+        
+        if(red > 0) {
+            String file = null;
+            synchronized(this) {
+                file = mFileSave;
+            }
+            if(file != null) {
+                try {
+                    FileOutputStream output = new FileOutputStream(file, true);
+                    output.write(buffer, 0, red);
+                    output.close();
+                } catch(Exception e) {
+                }
+            }
         }
         return red;
     }
@@ -256,13 +335,21 @@ public class FileConnectionIn {
     public void setHelper(IHelper helper) {
         mHelper = helper;
     }
+    
+    /**
+     * 
+     * @return
+     */
+    public String getFileSave() {
+        return mFileSave;
+    }
 
     /**
      * 
      * @return
      */
-    public String getFileName() {
-        return mFileName;
+    public String getParams() {
+        return mParams;
     }
-
+    
 }

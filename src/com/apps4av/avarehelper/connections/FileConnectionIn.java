@@ -10,11 +10,14 @@ Redistribution and use in source and binary forms, with or without modification,
     *     THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-package com.apps4av.avarehelper;
+package com.apps4av.avarehelper.connections;
 
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
-import org.json.JSONObject;
+import java.io.BufferedInputStream;
+import java.io.FileInputStream;
+import java.io.InputStream;
+import java.util.LinkedList;
+
+import com.apps4av.avarehelper.utils.Logger;
 import com.ds.avare.IHelper;
 
 /**
@@ -22,27 +25,23 @@ import com.ds.avare.IHelper;
  * @author zkhan
  *
  */
-public class XplaneConnection {
+public class FileConnectionIn {
 
+    private static InputStream mStream = null;
+    private static boolean mRunning = false;
     
-    private static XplaneConnection mConnection;
+    private static FileConnectionIn mConnection;
     
+    private static ConnectionStatus mConnectionStatus;
     private static IHelper mHelper;
-    
+
     private Thread mThread;
-    
-    private static boolean mRunning;
-    
-    DatagramSocket mSocket;
-    
-    private int mPort = 0;
-    
-    private boolean mConnected = false;
-    
+    private String mFileName = null;
+
     /**
      * 
      */
-    private XplaneConnection() {
+    private FileConnectionIn() {
     }
 
     
@@ -50,11 +49,12 @@ public class XplaneConnection {
      * 
      * @return
      */
-    public static XplaneConnection getInstance() {
+    public static FileConnectionIn getInstance() {
 
         if(null == mConnection) {
-            mConnection = new XplaneConnection();
-            mRunning = false;
+            mConnection = new FileConnectionIn();
+            mConnectionStatus = new ConnectionStatus();
+            mConnectionStatus.setState(ConnectionStatus.DISCONNECTED);
         }
         return mConnection;
     }
@@ -63,7 +63,11 @@ public class XplaneConnection {
      * 
      */
     public void stop() {
-        Logger.Logit("Stopping XPlane Listener");
+        Logger.Logit("Stopping File Reader");
+        if(mConnectionStatus.getState() != ConnectionStatus.CONNECTED) {
+            Logger.Logit("Stop failed because already stopped");
+            return;
+        }
         mRunning = false;
         if(null != mThread) {
             mThread.interrupt();
@@ -74,22 +78,27 @@ public class XplaneConnection {
      * 
      */
     public void start() {
+        Logger.Logit("Starting File Reader");
+        if(mConnectionStatus.getState() != ConnectionStatus.CONNECTED) {
+            Logger.Logit("Starting failed because already started");
+            return;
+        }
         
-        Logger.Logit("Starting XPlane Listener");
-               
         mRunning = true;
         
         /*
-         * Thread that reads Xplane
+         * Thread that reads File
          */
         mThread = new Thread() {
             @Override
             public void run() {
         
-                Logger.Logit("Xplane reading data");
+                Logger.Logit("File reading data");
 
-                byte[] buffer = new byte[1024];
+                BufferProcessor bp = new BufferProcessor();
+
                 
+                byte[] buffer = new byte[8192];
                 
                 /*
                  * This state machine will keep trying to connect to 
@@ -113,44 +122,20 @@ public class XplaneConnection {
                             
                         }
                         
-                        /*
-                         * Try to reconnect
-                         */
-                        Logger.Logit("Listener error, re-starting listener");
-
-                        disconnect();
-                        connect(mPort);
                         continue;
                     }
 
-                    String input = new String(buffer);
-                    if(input.startsWith("XGPS")) {
-                        String tokens[] = input.split(",");
-                        if(tokens.length >= 6) {
-                            /*
-                             * Make a GPS location message from ownship message.
-                             */
-                            JSONObject object = new JSONObject();
+                    /*
+                     * Put both in Decode and ADBS buffers
+                     */
+                    bp.put(buffer, red);
+                    LinkedList<String> objs = bp.decode();
+                    for(String s : objs) {
+                        if(mHelper != null) {
                             try {
-                                object.put("type", "ownship");
-                                object.put("longitude", Double.parseDouble(tokens[1]));
-                                object.put("latitude", Double.parseDouble(tokens[2]));
-                                object.put("speed", Double.parseDouble(tokens[5]));
-                                object.put("bearing", Double.parseDouble(tokens[4]));
-                                object.put("altitude", Double.parseDouble(tokens[3]));
-                                object.put("time", System.currentTimeMillis());
-                            } catch (Exception e1) {
-                                continue;
+                                mHelper.sendDataText(s);
+                            } catch (Exception e) {
                             }
-                            
-                            if(mHelper != null) {
-                                try {
-                                    mHelper.sendDataText(object.toString());
-                                    Logger.Logit(object.toString());
-                                } catch (Exception e) {
-                                }
-                            }
-                     
                         }
                     }
                 }
@@ -159,36 +144,56 @@ public class XplaneConnection {
         mThread.start();
     }
     
-        
+    /**
+     * 
+     * @param state
+     */
+    private void setState(int state) {
+        mConnectionStatus.setState(state);
+    }
+    
+    
     /**
      * 
      * A device name devNameMatch, will connect to first device whose
      * name matched this string.
      * @return
      */
-    public boolean connect(int port) {
+    public boolean connect(String fileName) {
         
-        Logger.Logit("Listening on port " + port);
+        Logger.Logit("Opening file " + fileName);
 
-        mPort = port;
-        
-        /*
-         * Make socket
-         */
-        Logger.Logit("Making socket to listen");
-
-        try {
-            mSocket = new DatagramSocket(mPort);
-        }
-        catch(Exception e) {
-            Logger.Logit("Failed! Connecting socket " + e.getMessage());
+        if(fileName == null) {
             return false;
         }
+        
+        mFileName = fileName;
+        
+        /*
+         * Only when not connected, connect
+         */
+        if(mConnectionStatus.getState() != ConnectionStatus.DISCONNECTED) {
+            Logger.Logit("Failed! Already reading?");
+
+            return false;
+        }
+        setState(ConnectionStatus.CONNECTING);
+
+        Logger.Logit("Getting input stream");
+
+        try {
+            mStream = new BufferedInputStream(new FileInputStream(mFileName));
+        } 
+        catch (Exception e) {
+            Logger.Logit("Failed! Input stream error");
+
+            setState(ConnectionStatus.DISCONNECTED);
+        } 
+
+        setState(ConnectionStatus.CONNECTED);
 
         Logger.Logit("Success!");
 
-        mConnected = true;
-        
         return true;
     }
     
@@ -197,21 +202,20 @@ public class XplaneConnection {
      */
     public void disconnect() {
         
-        Logger.Logit("Disconnecting from device");
+        Logger.Logit("Closing file");
 
         /*
          * Exit
          */
         try {
-            mSocket.close();
+            mStream.close();
         } 
         catch(Exception e2) {
             Logger.Logit("Error stream close");
         }
-
-        mConnected = false;
-
-        Logger.Logit("Listener stopped");
+        
+        setState(ConnectionStatus.DISCONNECTED);
+        Logger.Logit("Disconnected");
     }
     
     /**
@@ -219,16 +223,32 @@ public class XplaneConnection {
      * @return
      */
     private int read(byte[] buffer) {
-        DatagramPacket pkt = new DatagramPacket(buffer, buffer.length); 
+        int red = -1;
         try {
-            mSocket.receive(pkt);
+            red = mStream.read(buffer, 0, buffer.length);
         } 
         catch(Exception e) {
-            return -1;
+            red = -1;
         }
-        return pkt.getLength();
+        return red;
     }
 
+    /**
+     * 
+     * @return
+     */
+    public boolean isConnected() {
+        return mConnectionStatus.getState() == ConnectionStatus.CONNECTED;
+    }
+
+    /**
+     * 
+     * @return
+     */
+    public boolean isConnectedOrConnecting() {
+        return mConnectionStatus.getState() == ConnectionStatus.CONNECTED ||
+                mConnectionStatus.getState() == ConnectionStatus.CONNECTING;
+    }
 
     /**
      * 
@@ -240,18 +260,10 @@ public class XplaneConnection {
 
     /**
      * 
-     */
-    public boolean isConnected() {
-        return mConnected;
-    }
-    
-    /**
-     * 
      * @return
      */
-    public int getPort() {
-        return mPort;
+    public String getFileName() {
+        return mFileName;
     }
-
 
 }

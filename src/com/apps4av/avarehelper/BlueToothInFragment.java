@@ -13,11 +13,11 @@ package com.apps4av.avarehelper;
 
 import java.util.List;
 
-import com.ds.avare.IHelper;
+import com.apps4av.avarehelper.connections.BlueToothConnectionIn;
+import com.apps4av.avarehelper.storage.SavedEditText;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.os.IBinder;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -40,7 +40,6 @@ public class BlueToothInFragment extends Fragment {
     private Spinner mSpinner;
     private Context mContext;
     private Button mConnectButton;
-    private static IBinder mService;
     private Button mConnectFileSaveButton;
     private SavedEditText mTextFileSave;
     private CheckBox mSecureCb;
@@ -65,9 +64,6 @@ public class BlueToothInFragment extends Fragment {
          */
         mBt = BlueToothConnectionIn.getInstance();
         
-        if (null != mService) {
-            mBt.setHelper(IHelper.Stub.asInterface(mService));
-        }
         mList = mBt.getDevices();
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(mContext,
                 android.R.layout.simple_spinner_item, mList);
@@ -159,12 +155,4 @@ public class BlueToothInFragment extends Fragment {
     public void onDestroyView() {
         super.onDestroyView();
     }
-
-    /**
-     * 
-     */
-    public static void init(IBinder service) {
-        mService = service;
-    }
-
 }

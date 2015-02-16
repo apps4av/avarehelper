@@ -10,13 +10,14 @@ Redistribution and use in source and binary forms, with or without modification,
     *     THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-package com.apps4av.avarehelper;
+package com.apps4av.avarehelper.connections;
 
-import java.io.FileOutputStream;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
-import java.util.LinkedList;
 
+import org.json.JSONObject;
+
+import com.apps4av.avarehelper.utils.Logger;
 import com.ds.avare.IHelper;
 
 /**
@@ -24,15 +25,14 @@ import com.ds.avare.IHelper;
  * @author zkhan
  *
  */
-public class WifiConnection {
+public class XplaneConnection {
 
     
-    private static WifiConnection mConnection;
+    private static XplaneConnection mConnection;
     
     private static IHelper mHelper;
     
     private Thread mThread;
-    private static String mFileSave = null;
     
     private static boolean mRunning;
     
@@ -45,17 +45,7 @@ public class WifiConnection {
     /**
      * 
      */
-    private WifiConnection() {
-    }
-
-    /**
-     * 
-     * @param file
-     */
-    public void setFileSave(String file) {
-        synchronized(this) {
-            mFileSave = file;
-        }
+    private XplaneConnection() {
     }
 
     
@@ -63,10 +53,10 @@ public class WifiConnection {
      * 
      * @return
      */
-    public static WifiConnection getInstance() {
+    public static XplaneConnection getInstance() {
 
         if(null == mConnection) {
-            mConnection = new WifiConnection();
+            mConnection = new XplaneConnection();
             mRunning = false;
         }
         return mConnection;
@@ -76,7 +66,7 @@ public class WifiConnection {
      * 
      */
     public void stop() {
-        Logger.Logit("Stopping WIFI");
+        Logger.Logit("Stopping XPlane Listener");
         mRunning = false;
         if(null != mThread) {
             mThread.interrupt();
@@ -88,22 +78,21 @@ public class WifiConnection {
      */
     public void start() {
         
-        Logger.Logit("Starting WiFi Listener");
-
+        Logger.Logit("Starting XPlane Listener");
+               
         mRunning = true;
         
         /*
-         * Thread that reads WIFI
+         * Thread that reads Xplane
          */
         mThread = new Thread() {
             @Override
             public void run() {
         
-                Logger.Logit("WiFi reading data");
+                Logger.Logit("Xplane reading data");
 
-                BufferProcessor bp = new BufferProcessor();
-
-                byte[] buffer = new byte[8192];
+                byte[] buffer = new byte[1024];
+                
                 
                 /*
                  * This state machine will keep trying to connect to 
@@ -137,17 +126,34 @@ public class WifiConnection {
                         continue;
                     }
 
-                    /*
-                     * Put both in Decode and ADBS buffers
-                     */
-                    bp.put(buffer, red);
-                    LinkedList<String> objs = bp.decode();
-                    for(String s : objs) {
-                        if(mHelper != null) {
+                    String input = new String(buffer);
+                    if(input.startsWith("XGPS")) {
+                        String tokens[] = input.split(",");
+                        if(tokens.length >= 6) {
+                            /*
+                             * Make a GPS location message from ownship message.
+                             */
+                            JSONObject object = new JSONObject();
                             try {
-                                mHelper.sendDataText(s);
-                            } catch (Exception e) {
+                                object.put("type", "ownship");
+                                object.put("longitude", Double.parseDouble(tokens[1]));
+                                object.put("latitude", Double.parseDouble(tokens[2]));
+                                object.put("speed", Double.parseDouble(tokens[5]));
+                                object.put("bearing", Double.parseDouble(tokens[4]));
+                                object.put("altitude", Double.parseDouble(tokens[3]));
+                                object.put("time", System.currentTimeMillis());
+                            } catch (Exception e1) {
+                                continue;
                             }
+                            
+                            if(mHelper != null) {
+                                try {
+                                    mHelper.sendDataText(object.toString());
+                                    Logger.Logit(object.toString());
+                                } catch (Exception e) {
+                                }
+                            }
+                     
                         }
                     }
                 }
@@ -176,16 +182,16 @@ public class WifiConnection {
 
         try {
             mSocket = new DatagramSocket(mPort);
-            mSocket.setBroadcast(true);
         }
         catch(Exception e) {
             Logger.Logit("Failed! Connecting socket " + e.getMessage());
             return false;
         }
 
-        mConnected = true;
         Logger.Logit("Success!");
 
+        mConnected = true;
+        
         return true;
     }
     
@@ -205,8 +211,9 @@ public class WifiConnection {
         catch(Exception e2) {
             Logger.Logit("Error stream close");
         }
-        
+
         mConnected = false;
+
         Logger.Logit("Listener stopped");
     }
     
@@ -222,23 +229,6 @@ public class WifiConnection {
         catch(Exception e) {
             return -1;
         }
-        
-        if(pkt.getLength() > 0) {
-            String file = null;
-            synchronized(this) {
-                file = mFileSave;
-            }
-            if(file != null) {
-                try {
-                    FileOutputStream output = new FileOutputStream(file, true);
-                    output.write(buffer, 0, pkt.getLength());
-                    output.close();
-                } catch(Exception e) {
-                }
-            }
-        }
-
-        
         return pkt.getLength();
     }
 
@@ -253,14 +243,6 @@ public class WifiConnection {
 
     /**
      * 
-     * @return
-     */
-    public String getFileSave() {
-        return mFileSave;
-    }
-    
-    /**
-     * 
      */
     public boolean isConnected() {
         return mConnected;
@@ -273,5 +255,6 @@ public class WifiConnection {
     public int getPort() {
         return mPort;
     }
+
 
 }

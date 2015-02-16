@@ -30,6 +30,8 @@ Redistribution and use in source and binary forms, with or without modification,
         android:theme="@style/Theme.AppCompat"
         android:label="@string/app_name">
         
+        <service android:name=".BackgroundService"/>
+    	
         <activity
             android:windowSoftInputMode="stateHidden"
             android:name="com.apps4av.avarehelper.MainActivity"

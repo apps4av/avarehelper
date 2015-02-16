@@ -19,8 +19,8 @@ Redistribution and use in source and binary forms, with or without modification,
     <string name="Saving">Saving</string>
     <string name="Stop">Stop</string>
     <string name="Avare">Avare</string>
-    <string name="Connected">Avare Connected and Linked. Make sure the phone/tablet internal GPS is disabled.</string>
-    <string name="NotConnected">Avare Not Connected</string>
+    <string name="Connected">Avare Connected!</string>
+    <string name="NotConnected">Avare Not Connected!</string>
     <string name="ADSB">ADSB</string>
     <string name="ADSBWifi">ADSB WiFi</string>
     <string name="XPlane">XPlane</string>

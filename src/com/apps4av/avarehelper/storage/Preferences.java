@@ -9,52 +9,68 @@ Redistribution and use in source and binary forms, with or without modification,
     *
     *     THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-package com.apps4av.avarehelper;
 
-import android.os.Handler;
-import android.os.Message;
-import android.widget.TextView;
+package com.apps4av.avarehelper.storage;
+
+
+
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 
 /**
- * 
- * @author zkhan
- *
+ * Preferences for main activity
  */
-public class Logger {
+public class Preferences {
 
-    private static TextView mTv;
     
-    public static void Logit(String msg) {
-        Message m = mHandler.obtainMessage();
-        m.obj = (Object)msg;
-        mHandler.sendMessage(m);
-    }
-    
+    /**
+     * Preferences
+     */
+    private SharedPreferences mPref;
+
     /**
      * 
-     * @param tv
+     * @param ctx
      */
-    public static void setTextView(TextView tv) {
-        mTv = tv;
+    public Preferences(Context ctx) {
+        /*
+         * Get prefs
+         */
+        mPref = PreferenceManager.getDefaultSharedPreferences(ctx);
     }
-    
+
+
     /**
-     * This leak warning is not an issue if we do not post delayed messages, which is true here.
+     * 
+     * @return
      */
-    private static Handler mHandler = new Handler() {
-        @Override
-        public void handleMessage(Message msg) {
-            if(null != msg && null != mTv) {
-                String txt = mTv.getText().toString();
-                /*
-                 * Limit buffer size
-                 */
-                if(txt.length() > 1023) {
-                    txt = txt.substring(0, 1023);
-                }
-                mTv.setText((String)msg.obj + "\n" + txt);
-            }
-        }
-    };
-    
+    public String getEditTextValue(int id) {
+        return mPref.getString("EditText" + id, null);
+    }
+
+    /**
+     * 
+     * @param tags
+     */
+    public void setEditTextValue(int id, String val) {
+        mPref.edit().putString("EditText" + id, val).commit();
+    }
+
+    /**
+     * 
+     * @return
+     */
+    public boolean getCheckboxValue(int id) {
+        return mPref.getBoolean("Checkbox" + id, false);
+    }
+
+    /**
+     * 
+     * @param tags
+     */
+    public void setCheckboxValue(int id, boolean val) {
+        mPref.edit().putBoolean("Checkbox" + id, val).commit();
+    }
+
 }

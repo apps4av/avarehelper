@@ -13,11 +13,10 @@ package com.apps4av.avarehelper;
 
 import java.util.List;
 
-import com.ds.avare.IHelper;
+import com.apps4av.avarehelper.connections.BlueToothConnectionOut;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.os.IBinder;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -40,7 +39,6 @@ public class BlueToothOutFragment extends Fragment {
     private Spinner mSpinner;
     private Context mContext;
     private Button mConnectButton;
-    private static IBinder mService;
     private CheckBox mSecureCb;
 
     @Override
@@ -56,9 +54,6 @@ public class BlueToothOutFragment extends Fragment {
          * List of BT devices is same
          */
         mBt = BlueToothConnectionOut.getInstance();
-        if (null != mService) {
-            mBt.setHelper(IHelper.Stub.asInterface(mService));
-        }
 
         mList = mBt.getDevices();
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(mContext,
@@ -125,13 +120,6 @@ public class BlueToothOutFragment extends Fragment {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-    }
-
-    /**
-     * 
-     */
-    public static void init(IBinder service) {
-        mService = service;
     }
 
 }

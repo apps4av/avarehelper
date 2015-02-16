@@ -3,8 +3,16 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_height="fill_parent"  
     android:background="#000000">  
-    
-    <FrameLayout  
+
+	<TextView
+        android:id="@+id/main_text_status"
+        android:layout_margin="10dp"
+        android:text="@string/NotConnected"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"/>
+	
+    <FrameLayout
+        android:layout_below="@+id/main_text_status"
         android:id="@+id/detailFragment"  
         android:layout_width="match_parent"  
         tools:context="com.apps4av.avarehelper.MainActivity"

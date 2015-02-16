@@ -12,11 +12,13 @@ Redistribution and use in source and binary forms, with or without modification,
 package com.apps4av.avarehelper;
 
 
-import com.ds.avare.IHelper;
+import com.apps4av.avarehelper.connections.XplaneConnection;
+import com.apps4av.avarehelper.storage.SavedEditText;
+import com.apps4av.avarehelper.utils.Logger;
+import com.apps4av.avarehelper.utils.Util;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.os.IBinder;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -37,7 +39,6 @@ public class XplaneFragment extends Fragment {
     private TextView mTextXplaneIp;
     private CheckBox mXplaneCb;
 
-    private static IBinder mService;
     private Context mContext;
 
     @Override  
@@ -80,9 +81,6 @@ public class XplaneFragment extends Fragment {
          * List of BT devices is same
          */
         mXp = XplaneConnection.getInstance();
-        if(null != mService) {
-            mXp.setHelper(IHelper.Stub.asInterface(mService));
-        }
         
         setStates();
         
@@ -107,12 +105,4 @@ public class XplaneFragment extends Fragment {
         super.onDestroyView();
     }
 
-    
-    /**
-     * 
-     */
-    public static void init(IBinder service) {
-        mService = service;
-    }
-    
 } 

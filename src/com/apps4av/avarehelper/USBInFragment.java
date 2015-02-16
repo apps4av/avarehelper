@@ -12,11 +12,11 @@ Redistribution and use in source and binary forms, with or without modification,
 package com.apps4av.avarehelper;
 
 
-import com.ds.avare.IHelper;
+import com.apps4av.avarehelper.connections.USBConnectionIn;
+import com.apps4av.avarehelper.storage.SavedEditText;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.os.IBinder;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -34,7 +34,6 @@ public class USBInFragment extends Fragment {
     private USBConnectionIn mUSB;
     private Context mContext;
     private Button mConnectButton;
-    private static IBinder mService;
     private Button mConnectFileSaveButton;
     private SavedEditText mTextFileSave;
     private SavedEditText mParamsText;
@@ -60,10 +59,6 @@ public class USBInFragment extends Fragment {
          */
         mUSB = USBConnectionIn.getInstance(mContext);
         
-        if (null != mService) {
-            mUSB.setHelper(IHelper.Stub.asInterface(mService));
-        }
-
         mConnectButton = (Button) view.findViewById(R.id.usbin_button_connect);
         mConnectButton.setOnClickListener(new OnClickListener() {
 
@@ -142,13 +137,6 @@ public class USBInFragment extends Fragment {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-    }
-
-    /**
-     * 
-     */
-    public static void init(IBinder service) {
-        mService = service;
     }
 
 }

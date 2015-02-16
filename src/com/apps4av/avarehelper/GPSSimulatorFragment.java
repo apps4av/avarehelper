@@ -1,11 +1,11 @@
 package com.apps4av.avarehelper;
 
 
-import com.ds.avare.IHelper;
+import com.apps4av.avarehelper.connections.GPSSimulatorConnection;
+import com.apps4av.avarehelper.storage.SavedEditText;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.os.IBinder;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -32,7 +32,6 @@ public class GPSSimulatorFragment extends Fragment {
 	private Button mButtonStart;
 	private Button mButtonApply;
 
-	private static IBinder mService;
 	private Context mContext;
 
 	private double getValidValue(String val) {
@@ -101,10 +100,7 @@ public class GPSSimulatorFragment extends Fragment {
 		/*
 		 * Get Connection
 		 */
-		 mGPSSim = GPSSimulatorConnection.getInstance();
-		if(null != mService) {
-			mGPSSim.setHelper(IHelper.Stub.asInterface(mService));
-		}
+		mGPSSim = GPSSimulatorConnection.getInstance();
 
 		setStates();
 
@@ -114,13 +110,6 @@ public class GPSSimulatorFragment extends Fragment {
 	@Override  
 	public void onDestroyView() {  
 		super.onDestroyView();
-	}
-
-	/**
-	 * 
-	 */
-	public static void init(IBinder service) {
-		mService = service;
 	}
 
 	private void setStates() {
