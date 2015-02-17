@@ -11,6 +11,7 @@ Redistribution and use in source and binary forms, with or without modification,
 */
 package com.apps4av.avarehelper;
 
+import com.apps4av.avarehelper.connections.ConnectionStatus;
 import com.apps4av.avarehelper.utils.GenericCallback;
 import com.apps4av.avarehelper.utils.Logger;
 
@@ -205,7 +206,7 @@ public class MainActivity extends ActionBarActivity implements
         @Override
         public void handleMessage(Message msg) {
             if((Boolean)msg.obj) {
-            	mTextStatus.setText(getString(R.string.Connected));
+            	mTextStatus.setText(getString(R.string.Connected) + " " + ConnectionStatus.getConnections(getApplicationContext()));
             }
             else {
             	mTextStatus.setText(getString(R.string.NotConnected));        	

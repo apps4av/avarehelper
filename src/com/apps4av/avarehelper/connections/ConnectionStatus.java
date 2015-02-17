@@ -11,6 +11,10 @@ Redistribution and use in source and binary forms, with or without modification,
 */
 package com.apps4av.avarehelper.connections;
 
+import com.apps4av.avarehelper.R;
+
+import android.content.Context;
+
 /**
  * 
  * @author zkhan
@@ -45,5 +49,24 @@ public class ConnectionStatus {
      */
     public void setState(int state) {
         mState = state;
+    }
+    
+    /*
+     * Find names of all running connections.
+     */
+    public static String getConnections(Context ctx) {
+    	String s = "";
+    	s += BlueToothConnectionIn.getInstance().isConnected() ? "," + ctx.getString(R.string.Bluetooth) : "";
+    	s += WifiConnection.getInstance().isConnected() ?  "," + ctx.getString(R.string.WIFI) : "";
+    	s += XplaneConnection.getInstance().isConnected() ? "," + ctx.getString(R.string.XPlane) : "";
+    	s += MsfsConnection.getInstance().isConnected() ? "," + ctx.getString(R.string.MSFS) : "";
+    	s += BlueToothConnectionOut.getInstance().isConnected() ? "," + ctx.getString(R.string.AP) : "";
+    	s += FileConnectionIn.getInstance().isConnected() ? "," + ctx.getString(R.string.Play) : "";
+    	s += GPSSimulatorConnection.getInstance().isRunning() ? "," + ctx.getString(R.string.GPSSIM) : "";
+    	s += USBConnectionIn.getInstance(ctx).isConnected() ? "," + ctx.getString(R.string.USBIN) : "";
+    	if(s.startsWith(",")) {
+    		s = s.substring(1);
+    	}
+    	return "(" + s + ")";
     }
 }
