@@ -40,7 +40,7 @@ public class MainActivity extends ActionBarActivity implements
     
     private BackgroundService mService;
 
-    private Fragment[] mFragments = new Fragment[8];
+    private Fragment[] mFragments = new Fragment[9];
 
 
     @Override
@@ -74,6 +74,7 @@ public class MainActivity extends ActionBarActivity implements
         mFragments[pos++] = new FileFragment();
         mFragments[pos++] = new GPSSimulatorFragment();
         mFragments[pos++] = new USBInFragment();
+        mFragments[pos++] = new HelpFragment();
 
         for(int i = 0; i < pos; i++) {
             mFragments[i].setArguments(args);
@@ -92,7 +93,8 @@ public class MainActivity extends ActionBarActivity implements
                 getString(R.string.AP), 
                 getString(R.string.Play), 
                 getString(R.string.GPSSIM), 
-                getString(R.string.USBIN)
+                getString(R.string.USBIN),
+                getString(R.string.Help)
                 }), this);
 
     }
@@ -192,6 +194,10 @@ public class MainActivity extends ActionBarActivity implements
             case 7:
                 USBInFragment usbin = (USBInFragment) mFragments[itemPosition];
                 fragmentTransaction.replace(R.id.detailFragment, usbin);
+                break;
+            case 8:
+                HelpFragment help = (HelpFragment) mFragments[itemPosition];
+                fragmentTransaction.replace(R.id.detailFragment, help);
                 break;
         }
 
