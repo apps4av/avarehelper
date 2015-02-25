@@ -59,6 +59,13 @@ public class Id413Product extends Product {
             mText = mText.split("\u001E")[0];
             mText = mText.replaceAll("\n\t[A-Z]{1}", "\n"); /* remove invalid chars after newline */
             mParts = mText.split(" ", 3);
+            if(mParts.length < 3) {
+            	// Errors in stream could cause this
+            	mParts = new String[3];
+            	mParts[0] = "";
+            	mParts[1] = "";
+            	mParts[2] = "";
+            }
             Logger.Logit(mText);
         }
         
