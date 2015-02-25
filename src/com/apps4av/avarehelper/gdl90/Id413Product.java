@@ -59,13 +59,6 @@ public class Id413Product extends Product {
             mText = mText.split("\u001E")[0];
             mText = mText.replaceAll("\n\t[A-Z]{1}", "\n"); /* remove invalid chars after newline */
             mParts = mText.split(" ", 3);
-            if(mParts.length < 3) {
-            	// Errors in stream could cause this
-            	mParts = new String[3];
-            	mParts[0] = "";
-            	mParts[1] = "";
-            	mParts[2] = "";
-            }
             Logger.Logit(mText);
         }
         
@@ -75,6 +68,9 @@ public class Id413Product extends Product {
      * Parse what type of text it is
      */
     public String getHeader() {
+    	if(mParts.length < 1) {
+    		return "";
+    	}
         return mParts[0];
     }
 
@@ -82,6 +78,9 @@ public class Id413Product extends Product {
      * Return location for which it applies
      */
     public String getLocation() {
+    	if(mParts.length < 2) {
+    		return "";
+    	}
         return mParts[1];
     }
 
@@ -89,6 +88,9 @@ public class Id413Product extends Product {
      * Return data
      */
     public String getData() {
+    	if(mParts.length < 3) {
+    		return "";
+    	}
         return mParts[2];
     }
 
