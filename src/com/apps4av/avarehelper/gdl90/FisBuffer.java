@@ -13,6 +13,8 @@ package com.apps4av.avarehelper.gdl90;
 
 import java.util.LinkedList;
 
+import com.apps4av.avarehelper.utils.Logger;
+
 /**
  * 
  * @author zkhan
@@ -67,8 +69,14 @@ public class FisBuffer {
             
             Fis f = new Fis(frameType, mBuffer, i + 2, iFrameLength);
             
-            Product p = ProductFactory.buildProduct(f.mBuffer);
-            mProducts.add(p);
+            try {
+	            Product p = ProductFactory.buildProduct(f.mBuffer);
+	            mProducts.add(p);
+            }
+            catch (ArrayIndexOutOfBoundsException e) {
+            	//XXX: Skip for now buffer parsing overflow errors
+            	Logger.Logit("Error parsing FIS product, buffer overflow! Please report this issue (specify ADSB unit type)");
+            }
             
             i += iFrameLength + 2;
         }
