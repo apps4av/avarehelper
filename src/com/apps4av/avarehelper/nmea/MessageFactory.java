@@ -74,6 +74,9 @@ public class MessageFactory {
                 return null;
             }
         }
+        else {
+        	return null;
+        }
 
         
         /*
