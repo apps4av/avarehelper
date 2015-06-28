@@ -72,7 +72,6 @@ public class BackgroundService extends Service {
                 IBinder service) {
             mHelperService = service;
             mBtInCon.setHelper(IHelper.Stub.asInterface(service));
-            mBtInCon.setHelper(IHelper.Stub.asInterface(service));
             mBtOutCon.setHelper(IHelper.Stub.asInterface(service));
             mFileInCon.setHelper(IHelper.Stub.asInterface(service));
             mGpsSimCon.setHelper(IHelper.Stub.asInterface(service));
