@@ -1,4 +1,4 @@
-package apps4av.com.avarehelper;
+package com.apps4av.avarehelper;
 
 import android.app.Application;
 import android.test.ApplicationTestCase;
