@@ -22,7 +22,9 @@ local.properties
 
 #Android Studio files
 .idea/
-avare.iml
+*.iml
 out/
+/build/
+build/
 /app/build/
 /.gradle/
