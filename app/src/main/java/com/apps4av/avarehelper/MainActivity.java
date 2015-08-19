@@ -42,6 +42,7 @@ public class MainActivity extends ActionBarActivity implements
 
     private Fragment[] mFragments = new Fragment[9];
 
+    private WifiManager.MulticastLock multicastLock
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -97,6 +98,11 @@ public class MainActivity extends ActionBarActivity implements
                 getString(R.string.Help)
                 }), this);
 
+
+        // Acquire Multicast Lock to receive multicast packets over Wifi.
+        WifiManager wm = (WifiManager)getSystemService(Context.WIFI_SERVICE);
+        multicastLock = wm.createMulticastLock("avarehelper");
+        multicastLock.acquire();
     }
     
     @Override
@@ -106,6 +112,9 @@ public class MainActivity extends ActionBarActivity implements
          * Clean up stuff on exit
          */
         getApplicationContext().unbindService(mConnection);        
+
+        // Release multicast lock.
+        multicastLock.release();
     }
    
     /**
