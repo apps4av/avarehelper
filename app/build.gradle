@@ -5,7 +5,7 @@ android {
     buildToolsVersion "22.0.1"
 
     defaultConfig {
-        applicationId "apps4av.com.avarehelper"
+        applicationId "com.apps4av.avarehelper"
         minSdkVersion 12
         targetSdkVersion 22
     }
