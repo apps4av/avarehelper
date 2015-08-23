@@ -8,8 +8,6 @@ android {
         applicationId "apps4av.com.avarehelper"
         minSdkVersion 12
         targetSdkVersion 22
-        versionCode 1
-        versionName "1.0"
     }
     buildTypes {
         release {
