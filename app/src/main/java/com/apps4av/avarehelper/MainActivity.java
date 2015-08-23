@@ -11,14 +11,11 @@ Redistribution and use in source and binary forms, with or without modification,
 */
 package com.apps4av.avarehelper;
 
-import com.apps4av.avarehelper.connections.ConnectionStatus;
-import com.apps4av.avarehelper.utils.GenericCallback;
-import com.apps4av.avarehelper.utils.Logger;
-
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
@@ -26,11 +23,16 @@ import android.os.Message;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v7.app.*;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.ActionBarActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
+
+import com.apps4av.avarehelper.connections.ConnectionStatus;
+import com.apps4av.avarehelper.utils.GenericCallback;
+import com.apps4av.avarehelper.utils.Logger;
 
 public class MainActivity extends ActionBarActivity implements
     ActionBar.OnNavigationListener {
@@ -42,7 +44,7 @@ public class MainActivity extends ActionBarActivity implements
 
     private Fragment[] mFragments = new Fragment[9];
 
-    private WifiManager.MulticastLock multicastLock
+    private WifiManager.MulticastLock multicastLock;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
