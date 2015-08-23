@@ -12,17 +12,18 @@ Redistribution and use in source and binary forms, with or without modification,
 package com.apps4av.avarehelper;
 
 
-import com.apps4av.avarehelper.connections.USBConnectionIn;
-import com.apps4av.avarehelper.storage.SavedEditText;
-
 import android.content.Context;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.support.v4.app.*;
+
+import com.apps4av.avarehelper.connections.USBConnectionIn;
+import com.apps4av.avarehelper.storage.Preferences;
+import com.apps4av.avarehelper.storage.SavedEditText;
 
 /**
  * 
@@ -80,7 +81,7 @@ public class USBInFragment extends Fragment {
                     mConnectButton.setText(getString(R.string.Connect));
                     mUSB.connect(mParamsText.getText().toString());
                     if (mUSB.isConnected()) {
-                        mUSB.start();
+                        mUSB.start(new Preferences(getActivity()));
                     }
                     setStates();
                 }

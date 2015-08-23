@@ -42,9 +42,11 @@ public class MainActivity extends ActionBarActivity implements
     
     private BackgroundService mService;
 
-    private Fragment[] mFragments = new Fragment[9];
+    private Fragment[] mFragments = new Fragment[10];
 
-    private WifiManager.MulticastLock multicastLock;
+
+
+        private WifiManager.MulticastLock multicastLock;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -78,6 +80,7 @@ public class MainActivity extends ActionBarActivity implements
         mFragments[pos++] = new GPSSimulatorFragment();
         mFragments[pos++] = new USBInFragment();
         mFragments[pos++] = new HelpFragment();
+        mFragments[pos++] = new PreferencesFragment();
 
         for(int i = 0; i < pos; i++) {
             mFragments[i].setArguments(args);
@@ -97,7 +100,8 @@ public class MainActivity extends ActionBarActivity implements
                 getString(R.string.Play), 
                 getString(R.string.GPSSIM), 
                 getString(R.string.USBIN),
-                getString(R.string.Help)
+                getString(R.string.Help),
+                getString(R.string.Preferences)
                 }), this);
 
 
@@ -209,6 +213,10 @@ public class MainActivity extends ActionBarActivity implements
             case 8:
                 HelpFragment help = (HelpFragment) mFragments[itemPosition];
                 fragmentTransaction.replace(R.id.detailFragment, help);
+                break;
+            case 9:
+                PreferencesFragment pref = (PreferencesFragment) mFragments[itemPosition];
+                fragmentTransaction.replace(R.id.detailFragment, pref);
                 break;
         }
 

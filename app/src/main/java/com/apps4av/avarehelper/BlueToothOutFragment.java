@@ -11,12 +11,9 @@ Redistribution and use in source and binary forms, with or without modification,
 */
 package com.apps4av.avarehelper;
 
-import java.util.List;
-
-import com.apps4av.avarehelper.connections.BlueToothConnectionOut;
-
 import android.content.Context;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -25,7 +22,11 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.Spinner;
-import android.support.v4.app.*;
+
+import com.apps4av.avarehelper.connections.BlueToothConnectionOut;
+import com.apps4av.avarehelper.storage.Preferences;
+
+import java.util.List;
 
 /**
  * 
@@ -88,7 +89,7 @@ public class BlueToothOutFragment extends Fragment {
                     mConnectButton.setText(getString(R.string.Connect));
                     mBt.connect(val, mSecureCb.isChecked());
                     if (mBt.isConnected()) {
-                        mBt.start();
+                        mBt.start(new Preferences(getActivity()));
                     }
                     setStates();
                 }

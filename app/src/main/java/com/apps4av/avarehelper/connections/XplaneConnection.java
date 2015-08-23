@@ -12,13 +12,14 @@ Redistribution and use in source and binary forms, with or without modification,
 
 package com.apps4av.avarehelper.connections;
 
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
+import com.apps4av.avarehelper.storage.Preferences;
+import com.apps4av.avarehelper.utils.Logger;
+import com.ds.avare.IHelper;
 
 import org.json.JSONObject;
 
-import com.apps4av.avarehelper.utils.Logger;
-import com.ds.avare.IHelper;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
 
 /**
  * 
@@ -76,8 +77,8 @@ public class XplaneConnection {
     /**
      * 
      */
-    public void start() {
-        
+    public void start(final Preferences pref) {
+
         Logger.Logit("Starting XPlane Listener");
                
         mRunning = true;

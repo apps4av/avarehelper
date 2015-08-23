@@ -12,6 +12,14 @@ Redistribution and use in source and binary forms, with or without modification,
 
 package com.apps4av.avarehelper.connections;
 
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
+import android.bluetooth.BluetoothSocket;
+
+import com.apps4av.avarehelper.storage.Preferences;
+import com.apps4av.avarehelper.utils.Logger;
+import com.ds.avare.IHelper;
+
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -19,13 +27,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
-
-import com.apps4av.avarehelper.utils.Logger;
-import com.ds.avare.IHelper;
-
-import android.bluetooth.BluetoothAdapter;
-import android.bluetooth.BluetoothDevice;
-import android.bluetooth.BluetoothSocket;
 
 /**
  * 
@@ -104,7 +105,7 @@ public class BlueToothConnectionIn {
     /**
      * 
      */
-    public void start() {
+    public void start(final Preferences pref) {
         Logger.Logit("Starting BT");
         if(mConnectionStatus.getState() != ConnectionStatus.CONNECTED) {
             Logger.Logit("Starting BT failed because already started");
@@ -163,7 +164,7 @@ public class BlueToothConnectionIn {
                      * Put both in Decode and ADBS buffers
                      */
                     bp.put(buffer, red);
-                    LinkedList<String> objs = bp.decode();
+                    LinkedList<String> objs = bp.decode(pref);
                     for(String s : objs) {
                         if(mHelper != null) {
                             try {

@@ -12,19 +12,20 @@ Redistribution and use in source and binary forms, with or without modification,
 package com.apps4av.avarehelper;
 
 
-import com.apps4av.avarehelper.connections.WifiConnection;
-import com.apps4av.avarehelper.storage.SavedEditText;
-import com.apps4av.avarehelper.utils.Logger;
-
 import android.content.Context;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CheckBox;
-import android.support.v4.app.*;
+
+import com.apps4av.avarehelper.connections.WifiConnection;
+import com.apps4av.avarehelper.storage.Preferences;
+import com.apps4av.avarehelper.storage.SavedEditText;
+import com.apps4av.avarehelper.utils.Logger;
 
 /**
  * 
@@ -71,7 +72,7 @@ public class WiFiInFragment extends Fragment {
                          */
                         Logger.Logit("Invalid port");
                     }
-                    mWifi.start();
+                    mWifi.start(new Preferences(getActivity()));
                 }
                 else {
                     mWifi.stop();

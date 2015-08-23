@@ -12,23 +12,24 @@ Redistribution and use in source and binary forms, with or without modification,
 
 package com.apps4av.avarehelper.connections;
 
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
+import android.bluetooth.BluetoothSocket;
+
+import com.apps4av.avarehelper.nmea.GGAPacket;
+import com.apps4av.avarehelper.nmea.RMBPacket;
+import com.apps4av.avarehelper.nmea.RMCPacket;
+import com.apps4av.avarehelper.storage.Preferences;
+import com.apps4av.avarehelper.utils.Logger;
+import com.ds.avare.IHelper;
+
+import org.json.JSONObject;
+
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
-
-import org.json.JSONObject;
-
-import com.apps4av.avarehelper.nmea.GGAPacket;
-import com.apps4av.avarehelper.nmea.RMBPacket;
-import com.apps4av.avarehelper.nmea.RMCPacket;
-import com.apps4av.avarehelper.utils.Logger;
-import com.ds.avare.IHelper;
-
-import android.bluetooth.BluetoothAdapter;
-import android.bluetooth.BluetoothDevice;
-import android.bluetooth.BluetoothSocket;
 
 /**
  * 
@@ -97,7 +98,7 @@ public class BlueToothConnectionOut {
     /**
      * 
      */
-    public void start() {
+    public void start(final Preferences pref) {
         
         Logger.Logit("Starting BT");
         if(mConnectionStatus.getState() != ConnectionStatus.CONNECTED) {

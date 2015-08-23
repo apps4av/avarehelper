@@ -12,18 +12,19 @@ Redistribution and use in source and binary forms, with or without modification,
 
 package com.apps4av.avarehelper.connections;
 
-import java.io.FileOutputStream;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-
 import android.content.Context;
 import android.hardware.usb.UsbManager;
 
+import com.apps4av.avarehelper.storage.Preferences;
 import com.apps4av.avarehelper.utils.Logger;
 import com.ds.avare.IHelper;
 import com.hoho.android.usbserial.driver.UsbSerialDriver;
 import com.hoho.android.usbserial.driver.UsbSerialProber;
+
+import java.io.FileOutputStream;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
 
 
 /**
@@ -96,7 +97,7 @@ public class USBConnectionIn {
     /**
      * 
      */
-    public void start() {
+    public void start(final Preferences pref) {
         Logger.Logit("Starting USB");
         if(mConnectionStatus.getState() != ConnectionStatus.CONNECTED) {
             Logger.Logit("Starting USB failed because already started");
@@ -160,7 +161,7 @@ public class USBConnectionIn {
                      * Put both in Decode and ADBS buffers
                      */
                     bp.put(buffer, red);
-                    LinkedList<String> objs = bp.decode();
+                    LinkedList<String> objs = bp.decode(pref);
                     for(String s : objs) {
                         if(mHelper != null) {
                             try {

@@ -12,13 +12,14 @@ Redistribution and use in source and binary forms, with or without modification,
 
 package com.apps4av.avarehelper.connections;
 
+import com.apps4av.avarehelper.storage.Preferences;
+import com.apps4av.avarehelper.utils.Logger;
+import com.ds.avare.IHelper;
+
 import java.io.BufferedInputStream;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.LinkedList;
-
-import com.apps4av.avarehelper.utils.Logger;
-import com.ds.avare.IHelper;
 
 /**
  * 
@@ -77,7 +78,7 @@ public class FileConnectionIn {
     /**
      * 
      */
-    public void start() {
+    public void start(final Preferences pref) {
         Logger.Logit("Starting File Reader");
         if(mConnectionStatus.getState() != ConnectionStatus.CONNECTED) {
             Logger.Logit("Starting failed because already started");
@@ -129,7 +130,7 @@ public class FileConnectionIn {
                      * Put both in Decode and ADBS buffers
                      */
                     bp.put(buffer, red);
-                    LinkedList<String> objs = bp.decode();
+                    LinkedList<String> objs = bp.decode(pref);
                     for(String s : objs) {
                         if(mHelper != null) {
                             try {

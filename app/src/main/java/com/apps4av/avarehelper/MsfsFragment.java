@@ -12,20 +12,21 @@ Redistribution and use in source and binary forms, with or without modification,
 package com.apps4av.avarehelper;
 
 
-import com.apps4av.avarehelper.connections.MsfsConnection;
-import com.apps4av.avarehelper.storage.SavedEditText;
-import com.apps4av.avarehelper.utils.Logger;
-import com.apps4av.avarehelper.utils.Util;
-
 import android.content.Context;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.TextView;
-import android.support.v4.app.*;
+
+import com.apps4av.avarehelper.connections.MsfsConnection;
+import com.apps4av.avarehelper.storage.Preferences;
+import com.apps4av.avarehelper.storage.SavedEditText;
+import com.apps4av.avarehelper.utils.Logger;
+import com.apps4av.avarehelper.utils.Util;
 
 /**
  * 
@@ -66,7 +67,7 @@ public class MsfsFragment extends Fragment {
                        */
                       Logger.Logit("Invalid port");
                   }
-                  mMsfs.start();
+                  mMsfs.start(new Preferences(getActivity()));
               }
               else {
                   mMsfs.stop();

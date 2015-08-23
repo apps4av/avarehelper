@@ -60,4 +60,8 @@ Redistribution and use in source and binary forms, with or without modification,
     <string name="Play">Play</string>
     <string name="Secure">Secure</string>
     <string name="Help">Help</string>
+    <string name="Preferences">Preferences</string>
+    <string name="GeoAltitude">GeoAltitude</string>
+    <string name="GeoAltitudeLabel">Use Geometric Altitude</string>
+    <string name="GeoAltitudeSummary">Check to use geometric altitude for position, otherwise use ownship altitude.</string>
 </resources>

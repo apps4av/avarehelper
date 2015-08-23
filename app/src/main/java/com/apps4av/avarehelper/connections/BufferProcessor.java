@@ -12,12 +12,6 @@ Redistribution and use in source and binary forms, with or without modification,
 
 package com.apps4av.avarehelper.connections;
 
-import java.util.LinkedList;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import com.apps4av.avarehelper.gdl90.BasicReportMessage;
 import com.apps4av.avarehelper.gdl90.Constants;
 import com.apps4av.avarehelper.gdl90.FisBuffer;
@@ -31,6 +25,13 @@ import com.apps4av.avarehelper.gdl90.TrafficReportMessage;
 import com.apps4av.avarehelper.gdl90.UplinkMessage;
 import com.apps4av.avarehelper.nmea.Ownship;
 import com.apps4av.avarehelper.nmea.RTMMessage;
+import com.apps4av.avarehelper.storage.Preferences;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.LinkedList;
 
 /**
  * 
@@ -65,7 +66,7 @@ public class BufferProcessor {
      * 
      * @return
      */
-    public LinkedList<String> decode() {
+    public LinkedList<String> decode(Preferences pref) {
 
         LinkedList<String> objs = new LinkedList<String>();
         
@@ -415,10 +416,7 @@ public class BufferProcessor {
                     object.put("bearing", (double)om.mDirection);
                     object.put("time", (long)om.getTime());
                     int altitude = -1000;
-                    if(om.mAltitude == Integer.MIN_VALUE && mGeoAltitude != Integer.MIN_VALUE) {
-                        /*
-                         * Hack for iLevil
-                         */
+                    if(pref.getGeoAltitude()) {
                         altitude = mGeoAltitude;
                     }
                     else {
@@ -427,7 +425,7 @@ public class BufferProcessor {
                     if(altitude < -1000) {
                         altitude = -1000;
                     }
-                    object.put("altitude", (double)altitude);
+                    object.put("altitude", (double) altitude);
                 } catch (JSONException e1) {
                     continue;
                 }

@@ -12,13 +12,14 @@ Redistribution and use in source and binary forms, with or without modification,
 
 package com.apps4av.avarehelper.connections;
 
+import com.apps4av.avarehelper.storage.Preferences;
+import com.apps4av.avarehelper.utils.Logger;
+import com.ds.avare.IHelper;
+
 import java.io.FileOutputStream;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.util.LinkedList;
-
-import com.apps4av.avarehelper.utils.Logger;
-import com.ds.avare.IHelper;
 
 /**
  * 
@@ -87,7 +88,7 @@ public class WifiConnection {
     /**
      * 
      */
-    public void start() {
+    public void start(final Preferences pref) {
         
         Logger.Logit("Starting WiFi Listener");
 
@@ -142,7 +143,7 @@ public class WifiConnection {
                      * Put both in Decode and ADBS buffers
                      */
                     bp.put(buffer, red);
-                    LinkedList<String> objs = bp.decode();
+                    LinkedList<String> objs = bp.decode(pref);
                     for(String s : objs) {
                         if(mHelper != null) {
                             try {
