@@ -37,13 +37,37 @@ Redistribution and use in source and binary forms, with or without modification,
         android:layout_below="@+id/main_image_file"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/File"/>        
+        android:text="@string/File"
+        />
+
+    <CheckBox
+        android:id="@+id/main_cb_file_delay"
+        android:layout_below="@+id/main_file_name"
+        android:layout_margin="10dp"
+        android:layout_width="wrap_content"
+        android:text="@string/File_Delay"
+        android:checked="true"
+        android:layout_height="wrap_content"
+        />
+
+    <CheckBox
+        android:id="@+id/main_cb_file_throttle"
+        android:layout_below="@+id/main_file_name"
+        android:layout_toRightOf="@+id/main_cb_file_delay"
+        android:layout_margin="10dp"
+        android:layout_width="wrap_content"
+        android:text="@string/File_Throttle"
+        android:checked="true"
+        android:layout_height="wrap_content"
+        />
+
     <Button
         android:id="@+id/main_button_connect_file"
         android:layout_width="wrap_content"
-        android:layout_below="@+id/main_file_name"
+        android:layout_below="@+id/main_cb_file_delay"
         android:layout_margin="10dp"
         android:layout_height="wrap_content"
-        android:text="@string/Start"/>
+        android:text="@string/Start"
+        />
     
 </RelativeLayout>

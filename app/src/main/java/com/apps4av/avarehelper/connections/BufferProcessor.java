@@ -12,6 +12,8 @@ Redistribution and use in source and binary forms, with or without modification,
 
 package com.apps4av.avarehelper.connections;
 
+import android.widget.CheckBox;
+
 import com.apps4av.avarehelper.gdl90.BasicReportMessage;
 import com.apps4av.avarehelper.gdl90.Constants;
 import com.apps4av.avarehelper.gdl90.FisBuffer;
@@ -41,6 +43,7 @@ import java.util.LinkedList;
 public class BufferProcessor {
 
     private int mGeoAltitude = Integer.MIN_VALUE;
+    private long mLastTime = Long.MIN_VALUE; //   Cache for last msg time to allow pacing.  Should be instance variable, but no constructor.
 
     com.apps4av.avarehelper.gdl90.DataBuffer dbuffer = 
             new com.apps4av.avarehelper.gdl90.DataBuffer(16384);
@@ -51,7 +54,23 @@ public class BufferProcessor {
     com.apps4av.avarehelper.nmea.Decode ndecode = 
             new com.apps4av.avarehelper.nmea.Decode();
     Ownship nmeaOwnship = new Ownship();
+    CheckBox paceOutput;
 
+    private void pace(long mTime) {  // method to pace messages when used with fileplayback
+
+        int deltaT;
+
+            // Compute time since last message.  If negative, assume 0.
+            //  If set a maximum time, since this will delay updates.
+            deltaT = (int) java.lang.Math.min((int) java.lang.Math.max(0, (mTime - mLastTime)/2 ), 2000);
+            mLastTime = java.lang.Math.max(mTime, mLastTime); // Update if later.
+            //  Wait deltaT milliseconds.
+            try {
+                Thread.sleep(deltaT);
+            } catch (InterruptedException e) {
+                return;  // Not sure this is correct. REVIEW
+            }
+    }
     /**
      * 
      * @param buffer
@@ -69,14 +88,16 @@ public class BufferProcessor {
     public LinkedList<String> decode(Preferences pref) {
 
         LinkedList<String> objs = new LinkedList<String>();
-        
+
+        long mTime = 0;
+
         byte[] buf;
-        
+
         while(null != (buf = nbuffer.get())) {
             com.apps4av.avarehelper.nmea.Message m = ndecode.decode(buf);
             
             if(m instanceof RTMMessage) {
-                
+
                 /*
                  * Make a GPS locaiton message from ADSB ownship message.
                  */
@@ -91,11 +112,13 @@ public class BufferProcessor {
                     object.put("altitude", (double)((double)tm.mAltitude));
                     object.put("callsign", (String)"");
                     object.put("address", (int)tm.mIcaoAddress);
-                    object.put("time", (long)tm.getTime());
+                    mTime=(long) tm.getTime();
+                    object.put("time", mTime);
+
                 } catch (JSONException e1) {
                     continue;
-                }                
-                
+                }
+
                 objs.add(object.toString());
 
             }
@@ -114,7 +137,8 @@ public class BufferProcessor {
                     object.put("speed", (double)(om.mHorizontalVelocity));
                     object.put("bearing", (double)om.mDirection);
                     object.put("altitude", (double)((double)om.mAltitude));
-                    object.put("time", (long)om.getTime());
+                    mTime=(long) om.getTime();
+                    object.put("time", mTime);
                 } catch (JSONException e1) {
                     continue;
                 }
@@ -149,7 +173,8 @@ public class BufferProcessor {
                     object.put("altitude", (double)((double)tm.mAltitude));
                     object.put("callsign", (String)tm.mCallSign);
                     object.put("address", (int)tm.mIcaoAddress);
-                    object.put("time", (long)tm.getTime());
+                    mTime=(long) tm.getTime();
+                    object.put("time", mTime);
                 } catch (JSONException e1) {
                     continue;
                 }                
@@ -159,7 +184,7 @@ public class BufferProcessor {
             }
 
             else if(m instanceof BasicReportMessage) {
-                
+
                 /*
                  * Make a GPS locaiton message from ADSB ownship message.
                  */
@@ -174,16 +199,17 @@ public class BufferProcessor {
                     object.put("altitude", (double)((double)tm.mAltitude));
                     object.put("callsign", (String)tm.mCallSign);
                     object.put("address", (int)tm.mIcaoAddress);
-                    object.put("time", (long)tm.getTime());
+                    mTime=(long) tm.getTime();
+                    object.put("time", mTime);
                 } catch (JSONException e1) {
                     continue;
                 }
-                
+
                 objs.add(object.toString());
             }
 
             else if(m instanceof LongReportMessage) {
-                
+
                 /*
                  * Make a GPS locaiton message from ADSB ownship message.
                  */
@@ -198,11 +224,12 @@ public class BufferProcessor {
                     object.put("altitude", (double)((double)tm.mAltitude));
                     object.put("callsign", (String)tm.mCallSign);
                     object.put("address", (int)tm.mIcaoAddress);
-                    object.put("time", (long)tm.getTime());
+                    mTime=(long) tm.getTime();
+                    object.put("time", mTime);
                 } catch (JSONException e1) {
                     continue;
                 }
-                
+
                 objs.add(object.toString());
             }
 
@@ -223,10 +250,10 @@ public class BufferProcessor {
                     if(p instanceof Id6364Product) {
                         Id6364Product pn = (Id6364Product)p;
                         JSONObject object = new JSONObject();
-                        
+
                         JSONArray arrayEmpty = new JSONArray();
                         JSONArray arrayData = new JSONArray();
-                        
+
                         int[] data = pn.getData();
                         if(null != data) {
                             for(int i = 0; i < data.length; i++) {
@@ -239,10 +266,11 @@ public class BufferProcessor {
                                 arrayEmpty.put(e);
                             }
                         }
-                    
+
                         try {
                             object.put("type", "nexrad");
-                            object.put("time", (long)pn.getTime().getTimeInMillis());
+                            mTime= (long) pn.getTime().getTimeInMillis();
+                            object.put("time", mTime);
                             object.put("conus", pn.isConus());
                             object.put("blocknumber", (long)pn.getBlockNumber());
                             object.put("x", Constants.COLS_PER_BIN);
@@ -252,7 +280,7 @@ public class BufferProcessor {
                         } catch (JSONException e1) {
                             continue;
                         }
-                        
+
                         objs.add(object.toString());
                     }
                     /*
@@ -261,33 +289,33 @@ public class BufferProcessor {
                     else if(p instanceof Id413Product) {
                         Id413Product pn = (Id413Product)p;
                         JSONObject object = new JSONObject();
-                        
+
                         String data = pn.getData();
                         String type = pn.getHeader();
                         long time = (long)pn.getTime().getTimeInMillis();
-                        
+
                         /*
                          * Clear garbage spaces etc. Convert to Avare format
                          */
                         try {
                             if(type.equals("WINDS")) {
-                                
+
                                 String tokens[] = data.split("\n");
                                 if(tokens.length < 2) {
                                     /*
                                      * Must have line like
-                                     * MSY 230000Z  FT 3000 6000    F9000   C12000  G18000  C24000  C30000  D34000  39000   Y 
+                                     * MSY 230000Z  FT 3000 6000    F9000   C12000  G18000  C24000  C30000  D34000  39000   Y
                                      * and second line like
                                      * 1410 2508+10 2521+07 2620+01 3037-12 3041-26 304843 295251 29765
                                      */
                                     continue;
                                 }
-                                
+
                                 tokens[0] = tokens[0].replaceAll("\\s+", " ");
                                 tokens[1] = tokens[1].replaceAll("\\s+", " ");
                                 String winds[] = tokens[1].split(" ");
                                 String alts[] = tokens[0].split(" ");
-                                                                        
+
                                 /*
                                  * Start from 3rd entry - alts
                                  */
@@ -387,22 +415,23 @@ public class BufferProcessor {
                         catch (Exception e) {
                             continue;
                         }
-                        
+
                         try {
                             object.put("type", pn.getHeader());
+                            mTime=time;
                             object.put("time", time);
                             object.put("location", pn.getLocation());
                             object.put("data", data);
                         } catch (JSONException e1) {
                             continue;
                         }
-                        
+
                         objs.add(object.toString());
                     }
                 }
             }
             else if(m instanceof OwnshipMessage) {
-                
+
                 /*
                  * Make a GPS locaiton message from ADSB ownship message.
                  */
@@ -414,7 +443,8 @@ public class BufferProcessor {
                     object.put("latitude", (double)om.mLat);
                     object.put("speed", (double)(om.mHorizontalVelocity));
                     object.put("bearing", (double)om.mDirection);
-                    object.put("time", (long)om.getTime());
+                    mTime=(long) om.getTime();
+                    object.put("time", mTime);
                     int altitude = -1000;
                     if(pref.getGeoAltitude()) {
                         altitude = mGeoAltitude;
@@ -429,11 +459,11 @@ public class BufferProcessor {
                 } catch (JSONException e1) {
                     continue;
                 }
-                
+
                 objs.add(object.toString());
             }
         }
-
+        if (paceOutput != null && paceOutput.isChecked()) pace(mTime);
         return objs;
     }
 }

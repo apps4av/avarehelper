@@ -121,8 +121,6 @@ public class BlueToothConnectionIn {
             @Override
             public void run() {
         
-                Logger.Logit("WiFi reading data");
-
                 BufferProcessor bp = new BufferProcessor();
                 Logger.Logit("BT reading data");
 

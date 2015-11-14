@@ -12,6 +12,8 @@ Redistribution and use in source and binary forms, with or without modification,
 
 package com.apps4av.avarehelper.connections;
 
+import android.widget.CheckBox;
+
 import com.apps4av.avarehelper.storage.Preferences;
 import com.apps4av.avarehelper.utils.Logger;
 import com.ds.avare.IHelper;
@@ -38,6 +40,9 @@ public class FileConnectionIn {
 
     private Thread mThread;
     private String mFileName = null;
+    public CheckBox mFileDelayCb;
+    public CheckBox mFileThrottleCb;
+
 
     /**
      * 
@@ -86,7 +91,17 @@ public class FileConnectionIn {
         }
         
         mRunning = true;
-        
+        // When reading from file, wait for 5 seconds to allow user to switch to Avare.
+        if(mFileDelayCb.isChecked()) {
+            Logger.Logit("Delaying 5 seconds");
+            try {
+                Thread.sleep(5000);
+            } catch (InterruptedException e) {
+                return;
+            }
+        }
+
+
         /*
          * Thread that reads File
          */
@@ -98,7 +113,8 @@ public class FileConnectionIn {
 
                 BufferProcessor bp = new BufferProcessor();
 
-                
+                bp.paceOutput= mFileThrottleCb;
+
                 byte[] buffer = new byte[8192];
                 
                 /*

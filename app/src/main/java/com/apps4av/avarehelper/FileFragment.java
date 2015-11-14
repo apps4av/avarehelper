@@ -21,6 +21,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.CheckBox;
 
 import com.apps4av.avarehelper.connections.FileConnectionIn;
 import com.apps4av.avarehelper.storage.Preferences;
@@ -37,6 +38,8 @@ public class FileFragment extends Fragment {
     private Context mContext;
     private Button mConnectButton;
     private SavedEditText mTextFile;
+    private CheckBox mFileDelayCb;
+    private CheckBox mFileThrottleCb;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -81,7 +84,13 @@ public class FileFragment extends Fragment {
         /*
          * List of BT devices is same
          */
+
+
         mFile = FileConnectionIn.getInstance();
+
+        mFile.mFileDelayCb = (CheckBox)view.findViewById(R.id.main_cb_file_delay);
+        mFile.mFileThrottleCb = (CheckBox)view.findViewById(R.id.main_cb_file_throttle);
+
 
         setStates();
         return view;
