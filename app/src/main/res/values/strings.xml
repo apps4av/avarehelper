@@ -40,6 +40,8 @@ Redistribution and use in source and binary forms, with or without modification,
     <string name="Speed">Spd. kt</string>
     <string name="File">/mnt/sdcard/input.bin</string>
     <string name="FileSave">/mnt/sdcard/out.bin</string>
+    <string name="File_Delay">Delay Start 5 s?</string>
+    <string name="File_Throttle">Pace playback?</string>
     <string name="Output">---- Output ----\n</string>
     <string name="Yes">Yes</string>
     <string name="No">No</string>
