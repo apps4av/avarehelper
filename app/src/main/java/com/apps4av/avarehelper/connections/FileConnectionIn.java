@@ -91,15 +91,6 @@ public class FileConnectionIn {
         }
         
         mRunning = true;
-        // When reading from file, wait for 5 seconds to allow user to switch to Avare.
-        if(mFileDelayCb.isChecked()) {
-            Logger.Logit("Delaying 5 seconds");
-            try {
-                Thread.sleep(5000);
-            } catch (InterruptedException e) {
-                return;
-            }
-        }
 
 
         /*
@@ -121,6 +112,17 @@ public class FileConnectionIn {
                  * This state machine will keep trying to connect to 
                  * ADBS/GPS receiver
                  */
+                // When reading from file, wait for 5 seconds to allow user to switch to Avare.
+                if(mFileDelayCb.isChecked()) {
+                    Logger.Logit("Delaying 5 seconds");
+                    try {
+                        Thread.sleep(5000);
+                    } catch (InterruptedException e) {
+                        return;
+                    }
+                }
+
+
                 while(mRunning) {
                     
                     int red = 0;
