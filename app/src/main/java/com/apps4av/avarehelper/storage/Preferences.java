@@ -73,12 +73,4 @@ public class Preferences {
         mPref.edit().putBoolean("Checkbox" + id, val).commit();
     }
 
-    public void setGeoAltitude(boolean geoAltitude) {
-        mPref.edit().putBoolean("GeoAltitude", geoAltitude).commit();
-    }
-
-    public boolean getGeoAltitude() {
-        return mPref.getBoolean("GeoAltitude", true);
-    }
-
 }

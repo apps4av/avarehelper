@@ -16,9 +16,6 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.CheckBox;
-
-import com.apps4av.avarehelper.storage.Preferences;
 
 /**
  * 
@@ -33,16 +30,6 @@ public class PreferencesFragment extends Fragment {
             Bundle savedInstanceState) {
 
         View view = inflater.inflate(R.layout.layout_preferences, container, false);
-
-        final CheckBox check = (CheckBox) view.findViewById(R.id.preferences_geoalt_checkbox);
-        check.setChecked(new Preferences(getActivity()).getGeoAltitude());
-        check.setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View v) {
-                new Preferences(getActivity()).setGeoAltitude(check.isChecked());
-            }
-        });
 
         return view;
     }

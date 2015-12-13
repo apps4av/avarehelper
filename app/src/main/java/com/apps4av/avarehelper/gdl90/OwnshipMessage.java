@@ -66,20 +66,21 @@ public class OwnshipMessage extends Message {
         int lower = ((int)(msg[11] & 0xF0)) >> 4;
         int alt = upper + lower;
         if(alt == 0xFFF) {
-            /*
-             * Will check this and augment with geometric altitude.
-             */
-            mAltitude = Integer.MIN_VALUE;
+            mAltitude = -1000;
         }
         else {
             alt *= 25;
             alt -= 1000;
-            /*
-             * In meters
-             */
-            mAltitude = (int)((double)alt / 3.28084);
+
+            if(alt < -1000) {
+                alt = -1000;
+            }
         }
-        
+        /*
+         * In meters
+         */
+        mAltitude = (int)((double)alt / 3.28084);
+
         /*
          * Misc.
          */

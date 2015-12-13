@@ -40,9 +40,7 @@ import java.util.LinkedList;
  */
 public class BufferProcessor {
 
-    private int mGeoAltitude = Integer.MIN_VALUE;
-
-    com.apps4av.avarehelper.gdl90.DataBuffer dbuffer = 
+    com.apps4av.avarehelper.gdl90.DataBuffer dbuffer =
             new com.apps4av.avarehelper.gdl90.DataBuffer(16384);
     com.apps4av.avarehelper.nmea.DataBuffer nbuffer = 
             new com.apps4av.avarehelper.nmea.DataBuffer(16384);
@@ -207,7 +205,21 @@ public class BufferProcessor {
             }
 
             else if(m instanceof OwnshipGeometricAltitudeMessage) {
-                mGeoAltitude = ((OwnshipGeometricAltitudeMessage)m).mAltitudeWGS84;
+                JSONObject object = new JSONObject();
+                try {
+                    object.put("type", "geoaltitude");
+
+                    int altitude = (int)((OwnshipGeometricAltitudeMessage)m).mAltitudeWGS84;
+                    if(altitude == Integer.MIN_VALUE) {
+                        // invalid
+                        continue;
+                    }
+                    object.put("altitude", (double) altitude);
+                    object.put("time", (long) m.getTime());
+                } catch (JSONException e1) {
+                    continue;
+                }
+                objs.add(object.toString());
             }
 
             else if(m instanceof UplinkMessage) {
@@ -415,17 +427,7 @@ public class BufferProcessor {
                     object.put("speed", (double)(om.mHorizontalVelocity));
                     object.put("bearing", (double)om.mDirection);
                     object.put("time", (long)om.getTime());
-                    int altitude = -1000;
-                    if(pref.getGeoAltitude()) {
-                        altitude = mGeoAltitude;
-                    }
-                    else {
-                        altitude = om.mAltitude;
-                    }
-                    if(altitude < -1000) {
-                        altitude = -1000;
-                    }
-                    object.put("altitude", (double) altitude);
+                    object.put("altitude", (double) om.mAltitude);
                 } catch (JSONException e1) {
                     continue;
                 }
