@@ -26,6 +26,7 @@ import com.apps4av.avarehelper.gdl90.UplinkMessage;
 import com.apps4av.avarehelper.nmea.Ownship;
 import com.apps4av.avarehelper.nmea.RTMMessage;
 import com.apps4av.avarehelper.storage.Preferences;
+import com.apps4av.avarehelper.utils.MetarFlightCategory;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -270,6 +271,7 @@ public class BufferProcessor {
                     /*
                      * Text product
                      */
+
                     else if(p instanceof Id413Product) {
                         Id413Product pn = (Id413Product)p;
                         JSONObject object = new JSONObject();
@@ -281,7 +283,11 @@ public class BufferProcessor {
                         /*
                          * Clear garbage spaces etc. Convert to Avare format
                          */
+
                         try {
+                            if(type.equals("METAR") || type.equals("SPECI")) {
+                                object.put("flight_category", MetarFlightCategory.getFlightCategory(pn.getLocation(), pn.getData()));
+                            }
                             if(type.equals("WINDS")) {
                                 
                                 String tokens[] = data.split("\n");
