@@ -66,7 +66,7 @@ public class OwnshipMessage extends Message {
         int lower = ((int)(msg[11] & 0xF0)) >> 4;
         int alt = upper + lower;
         if(alt == 0xFFF) {
-            mAltitude = -1000;
+            mAltitude = -305; // -1000 ft
         }
         else {
             alt *= 25;
@@ -75,11 +75,11 @@ public class OwnshipMessage extends Message {
             if(alt < -1000) {
                 alt = -1000;
             }
+            /*
+             * In meters
+             */
+            mAltitude = (int)((double)alt / 3.28084);
         }
-        /*
-         * In meters
-         */
-        mAltitude = (int)((double)alt / 3.28084);
 
         /*
          * Misc.

@@ -41,7 +41,7 @@ public class OwnshipGeometricAltitudeMessage extends Message {
             /*
              * Invalid
              */
-            mAltitudeWGS84 = Integer.MIN_VALUE;
+            mAltitudeWGS84 = -305; // 1000 ft
         }
         else {
             double alt = upper + lower;
