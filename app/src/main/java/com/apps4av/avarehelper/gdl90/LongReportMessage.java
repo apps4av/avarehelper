@@ -196,7 +196,7 @@ public class LongReportMessage extends Message {
         int codedAltitude = 0;
         codedAltitude  = ((int)msg[13] & 0xFF) << 4;
         codedAltitude += ((int)msg[14] & 0xF0) >> 4;
-        mAltitude = (codedAltitude * 25) - 1025;
+        mAltitude = (codedAltitude * 25) - 1000;
 
         mNic = (int)msg[14] & 0x04;
         
