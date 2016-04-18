@@ -31,6 +31,7 @@ public class Id413Product extends Product {
     protected void parse(byte[] msg) {
 
         mText = "";
+        mParts = null;
         int len = msg.length;
         int holder = 0;
         int i = 0;
@@ -54,7 +55,7 @@ public class Id413Product extends Product {
             
             mText += String.format("%c%c%c%c", firstChar, secondChar, thirdChar, fourthChar);
         }
-        
+
         if(!mText.equals("")) {
             mText = mText.split("\u001E")[0];
             mText = mText.replaceAll("\n\t[A-Z]{1}", "\n"); /* remove invalid chars after newline */
@@ -68,6 +69,9 @@ public class Id413Product extends Product {
      * Parse what type of text it is
      */
     public String getHeader() {
+        if(null == mParts) {
+            return "";
+        }
     	if(mParts.length < 1) {
     		return "";
     	}
@@ -78,6 +82,9 @@ public class Id413Product extends Product {
      * Return location for which it applies
      */
     public String getLocation() {
+        if(null == mParts) {
+            return "";
+        }
     	if(mParts.length < 2) {
     		return "";
     	}
@@ -88,6 +95,9 @@ public class Id413Product extends Product {
      * Return data
      */
     public String getData() {
+        if(null == mParts) {
+            return "";
+        }
     	if(mParts.length < 3) {
     		return "";
     	}
