@@ -16,6 +16,7 @@ import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 
+import com.apps4av.avarehelper.nmea.BODPacket;
 import com.apps4av.avarehelper.nmea.GGAPacket;
 import com.apps4av.avarehelper.nmea.RMBPacket;
 import com.apps4av.avarehelper.nmea.RMCPacket;
@@ -148,6 +149,7 @@ public class BlueToothConnectionOut {
                     byte buffer[] = null;
                     byte buffer2[] = null;
                     byte buffer3[] = null;
+                    byte buffer4[] = null;
                     try {
                         JSONObject object;
                         object = new JSONObject(recvd);
@@ -180,6 +182,11 @@ public class BlueToothConnectionOut {
                                     object.getDouble("destDeviation"),
                                     object.getDouble("speed"));
                             buffer3 = pkt3.getPacket().getBytes();
+                            BODPacket pkt4 = new BODPacket(object.getDouble("idDest"),
+                                    object.getDouble("idStart"),
+                                    object.getDouble("bearingTrue"),
+                                    object.getDouble("bearingMag"));
+                            buffer4 = pkt4.getPacket().getBytes();
                         }
                     } catch (Exception e) {
                         continue;
@@ -265,6 +272,35 @@ public class BlueToothConnectionOut {
                         connect(mDevName, mSecure);
                         continue;
                     }
+
+                    // BOD
+                    if(buffer4 == null) {
+                        continue;
+                    }
+                    if(buffer4.length <= 0) {
+                        continue;
+                    }
+                    wrote = write(buffer4);
+                    if(wrote <= 0) {
+                        if(!mRunning) {
+                            break;
+                        }
+                        try {
+                            Thread.sleep(1000);
+                        } catch (Exception e) {
+                            
+                        }
+                        
+                        /*
+                         * Try to reconnect
+                         */
+                        Logger.Logit("Disconnected from BT device, retrying to connect");
+
+                        disconnect();
+                        connect(mDevName, mSecure);
+                        continue;
+                    }
+
 
                 }
             }
