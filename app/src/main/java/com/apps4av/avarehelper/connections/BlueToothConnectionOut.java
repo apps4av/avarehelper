@@ -182,10 +182,10 @@ public class BlueToothConnectionOut {
                                     object.getDouble("destDeviation"),
                                     object.getDouble("speed"));
                             buffer3 = pkt3.getPacket().getBytes();
-                            BODPacket pkt4 = new BODPacket(object.getDouble("idDest"),
-                                    object.getDouble("idStart"),
+                            BODPacket pkt4 = new BODPacket(object.getDouble("destId"),
+                                    object.getDouble("destOriginId"),
                                     object.getDouble("bearingTrue"),
-                                    object.getDouble("bearingMag"));
+                                    object.getDouble("bearingMagnetic"));
                             buffer4 = pkt4.getPacket().getBytes();
                         }
                     } catch (Exception e) {
