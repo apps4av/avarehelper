@@ -102,8 +102,8 @@ public class TrafficReportMessage extends Message {
          * next three bytes are the traffic's ICAO address
          */
         mIcaoAddress = 0;
-        mIcaoAddress = (((int)msg[1] << 16) & 0xFF) + ((int)(msg[2] << 8) & 0xFF) + ((int)msg[3] & 0xFF);
-        
+        mIcaoAddress = ((((int)msg[1]) & 0xFF) << 16) + ((((int)(msg[2]) & 0xFF) << 8)) + ((((int)msg[3]) & 0xFF));
+
         /*
          * next 3 bytes are lat value with resolution = 180 / (2^23) degrees
          */

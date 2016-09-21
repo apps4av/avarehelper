@@ -11,8 +11,13 @@ Redistribution and use in source and binary forms, with or without modification,
 */
 package com.apps4av.avarehelper;
 
-import java.util.Timer;
-import java.util.TimerTask;
+import android.app.Service;
+import android.content.ComponentName;
+import android.content.Context;
+import android.content.Intent;
+import android.content.ServiceConnection;
+import android.os.Binder;
+import android.os.IBinder;
 
 import com.apps4av.avarehelper.connections.BlueToothConnectionIn;
 import com.apps4av.avarehelper.connections.BlueToothConnectionOut;
@@ -25,13 +30,8 @@ import com.apps4av.avarehelper.connections.XplaneConnection;
 import com.apps4av.avarehelper.utils.GenericCallback;
 import com.ds.avare.IHelper;
 
-import android.app.Service;
-import android.content.ComponentName;
-import android.content.Context;
-import android.content.Intent;
-import android.content.ServiceConnection;
-import android.os.Binder;
-import android.os.IBinder;
+import java.util.Timer;
+import java.util.TimerTask;
 
 /**
  * @author zkhan
@@ -197,6 +197,11 @@ public class BackgroundService extends Service {
 
     public void setStatusCallback(GenericCallback cb) {
     	mCb = cb;
+    }
+
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        return Service.START_STICKY;
     }
 
     /**
