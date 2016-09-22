@@ -13,8 +13,8 @@ Redistribution and use in source and binary forms, with or without modification,
 package com.apps4av.avarehelper.connections;
 
 import com.apps4av.avarehelper.storage.Preferences;
+import com.apps4av.avarehelper.utils.GenericCallback;
 import com.apps4av.avarehelper.utils.Logger;
-import com.ds.avare.IHelper;
 
 import java.io.BufferedInputStream;
 import java.io.FileInputStream;
@@ -26,23 +26,17 @@ import java.util.LinkedList;
  * @author zkhan
  *
  */
-public class FileConnectionIn {
-
-    private static InputStream mStream = null;
-    private static boolean mRunning = false;
-    
+public class FileConnectionIn extends Connection {
     private static FileConnectionIn mConnection;
-    
-    private static ConnectionStatus mConnectionStatus;
-    private static IHelper mHelper;
 
-    private Thread mThread;
+    private InputStream mStream = null;
     private String mFileName = null;
 
     /**
      * 
      */
     private FileConnectionIn() {
+        super("File Input");
     }
 
     
@@ -54,8 +48,6 @@ public class FileConnectionIn {
 
         if(null == mConnection) {
             mConnection = new FileConnectionIn();
-            mConnectionStatus = new ConnectionStatus();
-            mConnectionStatus.setState(ConnectionStatus.DISCONNECTED);
         }
         return mConnection;
     }
@@ -63,66 +55,41 @@ public class FileConnectionIn {
     /**
      * 
      */
-    public void stop() {
-        Logger.Logit("Stopping File Reader");
-        if(mConnectionStatus.getState() != ConnectionStatus.CONNECTED) {
-            Logger.Logit("Stop failed because already stopped");
-            return;
-        }
-        mRunning = false;
-        if(null != mThread) {
-            mThread.interrupt();
-        }
-    }
-
-    /**
-     * 
-     */
     public void start(final Preferences pref) {
-        Logger.Logit("Starting File Reader");
-        if(mConnectionStatus.getState() != ConnectionStatus.CONNECTED) {
-            Logger.Logit("Starting failed because already started");
-            return;
-        }
-        
-        mRunning = true;
-        
+
         /*
          * Thread that reads File
          */
-        mThread = new Thread() {
+        super.start(new GenericCallback() {
             @Override
-            public void run() {
-        
-                Logger.Logit("File reading data");
-
+            public Object callback(Object o, Object o1) {
                 BufferProcessor bp = new BufferProcessor();
 
-                
+
                 byte[] buffer = new byte[8192];
-                
+
                 /*
-                 * This state machine will keep trying to connect to 
+                 * This state machine will keep trying to connect to
                  * ADBS/GPS receiver
                  */
-                while(mRunning) {
-                    
+                while(isRunning()) {
+
                     int red = 0;
-                    
+
                     /*
                      * Read.
                      */
                     red = read(buffer);
                     if(red <= 0) {
-                        if(!mRunning) {
+                        if(isStopped()) {
                             break;
                         }
                         try {
                             Thread.sleep(1000);
                         } catch (Exception e) {
-                            
+
                         }
-                        
+
                         continue;
                     }
 
@@ -132,28 +99,15 @@ public class FileConnectionIn {
                     bp.put(buffer, red);
                     LinkedList<String> objs = bp.decode(pref);
                     for(String s : objs) {
-                        if(mHelper != null) {
-                            try {
-                                mHelper.sendDataText(s);
-                            } catch (Exception e) {
-                            }
-                        }
+                        sendDataToHelper(s);
                     }
                 }
+                return null;
             }
-        };
-        mThread.start();
+        });
     }
     
-    /**
-     * 
-     * @param state
-     */
-    private void setState(int state) {
-        mConnectionStatus.setState(state);
-    }
-    
-    
+
     /**
      * 
      * A device name devNameMatch, will connect to first device whose
@@ -162,8 +116,6 @@ public class FileConnectionIn {
      */
     public boolean connect(String fileName) {
         
-        Logger.Logit("Opening file " + fileName);
-
         if(fileName == null) {
             return false;
         }
@@ -173,12 +125,12 @@ public class FileConnectionIn {
         /*
          * Only when not connected, connect
          */
-        if(mConnectionStatus.getState() != ConnectionStatus.DISCONNECTED) {
+        if(getState() != Connection.DISCONNECTED) {
             Logger.Logit("Failed! Already reading?");
 
             return false;
         }
-        setState(ConnectionStatus.CONNECTING);
+        setState(Connection.CONNECTING);
 
         Logger.Logit("Getting input stream");
 
@@ -188,12 +140,10 @@ public class FileConnectionIn {
         catch (Exception e) {
             Logger.Logit("Failed! Input stream error");
 
-            setState(ConnectionStatus.DISCONNECTED);
+            setState(Connection.DISCONNECTED);
         } 
 
-        setState(ConnectionStatus.CONNECTED);
-
-        Logger.Logit("Success!");
+        super.connect();
 
         return true;
     }
@@ -202,8 +152,6 @@ public class FileConnectionIn {
      * 
      */
     public void disconnect() {
-        
-        Logger.Logit("Closing file");
 
         /*
          * Exit
@@ -214,9 +162,8 @@ public class FileConnectionIn {
         catch(Exception e2) {
             Logger.Logit("Error stream close");
         }
-        
-        setState(ConnectionStatus.DISCONNECTED);
-        Logger.Logit("Disconnected");
+
+        super.disconnect();
     }
     
     /**
@@ -232,31 +179,6 @@ public class FileConnectionIn {
             red = -1;
         }
         return red;
-    }
-
-    /**
-     * 
-     * @return
-     */
-    public boolean isConnected() {
-        return mConnectionStatus.getState() == ConnectionStatus.CONNECTED;
-    }
-
-    /**
-     * 
-     * @return
-     */
-    public boolean isConnectedOrConnecting() {
-        return mConnectionStatus.getState() == ConnectionStatus.CONNECTED ||
-                mConnectionStatus.getState() == ConnectionStatus.CONNECTING;
-    }
-
-    /**
-     * 
-     * @param helper
-     */
-    public void setHelper(IHelper helper) {
-        mHelper = helper;
     }
 
     /**

@@ -16,15 +16,12 @@ import android.content.Context;
 import android.hardware.usb.UsbManager;
 
 import com.apps4av.avarehelper.storage.Preferences;
+import com.apps4av.avarehelper.utils.GenericCallback;
 import com.apps4av.avarehelper.utils.Logger;
-import com.ds.avare.IHelper;
 import com.hoho.android.usbserial.driver.UsbSerialDriver;
 import com.hoho.android.usbserial.driver.UsbSerialProber;
 
-import java.io.FileOutputStream;
-import java.util.ArrayList;
 import java.util.LinkedList;
-import java.util.List;
 
 
 /**
@@ -32,48 +29,28 @@ import java.util.List;
  * @author zkhan
  *
  */
-public class USBConnectionIn {
+public class USBConnectionIn extends Connection {
 
-    private static UsbSerialDriver mDriver = null;
-    private static boolean mRunning = false;
-    private static String mFileSave = null;
-    private static String mParams = "230400,8,n,1";
-    
     private static USBConnectionIn mConnection;
-    
-    private static ConnectionStatus mConnectionStatus;
-    private static IHelper mHelper;
-    
-    private Thread mThread;
     private static UsbManager mUsbManager;
+    private String mParams = "230400,8,n,1";
+    private UsbSerialDriver mDriver = null;
 
 
     /**
      * 
      */
     private USBConnectionIn() {
+        super("USB Input");
     }
 
-    /**
-     * 
-     * @param file
-     */
-    public void setFileSave(String file) {
-        synchronized(this) {
-            mFileSave = file;
-        }
-    }
-    
     /**
      * 
      * @return
      */
     public static USBConnectionIn getInstance(Context ctx) {
-
         if(null == mConnection) {
             mConnection = new USBConnectionIn();
-            mConnectionStatus = new ConnectionStatus();
-            mConnectionStatus.setState(ConnectionStatus.DISCONNECTED);
             mUsbManager = (UsbManager) ctx.getSystemService(Context.USB_SERVICE);
         }
         return mConnection;
@@ -82,71 +59,42 @@ public class USBConnectionIn {
     /**
      * 
      */
-    public void stop() {
-        Logger.Logit("Stopping USB");
-        if(mConnectionStatus.getState() != ConnectionStatus.CONNECTED) {
-            Logger.Logit("Stopping USB failed because already stopped");
-            return;
-        }
-        mRunning = false;
-        if(null != mThread) {
-            mThread.interrupt();
-        }
-    }
-
-    /**
-     * 
-     */
     public void start(final Preferences pref) {
-        Logger.Logit("Starting USB");
-        if(mConnectionStatus.getState() != ConnectionStatus.CONNECTED) {
-            Logger.Logit("Starting USB failed because already started");
-            return;
-        }
-        
-        mRunning = true;
-        
-        /*
-         * Thread that reads BT
-         */
-        mThread = new Thread() {
-            @Override
-            public void run() {
-        
-                Logger.Logit("USB reading data");
 
+        super.start(new GenericCallback() {
+            @Override
+            public Object callback(Object o, Object o1) {
                 BufferProcessor bp = new BufferProcessor();
-                Logger.Logit("BT reading data");
 
                 byte[] buffer = new byte[8192];
-                
+
                 /*
-                 * This state machine will keep trying to connect to 
+                 * This state machine will keep trying to connect to
                  * ADBS/GPS receiver
                  */
-                while(mRunning) {
-                    
+                while(isRunning()) {
+
                     int red = 0;
-                    
+
                     /*
                      * Read.
                      */
                     red = read(buffer);
                     if(red <= 0) {
-                        if(!mRunning) {
+                        if(isStopped()) {
                             break;
                         }
                         try {
                             Thread.sleep(10);
                         } catch (Exception e) {
-                            
+
                         }
-                        
+
                         // serial driver sends 0 when no data
                         if(red == 0) {
                             continue;
                         }
-                        
+
                         /*
                          * Try to reconnect
                          */
@@ -163,43 +111,14 @@ public class USBConnectionIn {
                     bp.put(buffer, red);
                     LinkedList<String> objs = bp.decode(pref);
                     for(String s : objs) {
-                        if(mHelper != null) {
-                            try {
-                                mHelper.sendDataText(s);
-                            } catch (Exception e) {
-                            }
-                        }
+                        sendDataToHelper(s);
                     }
                 }
+                return null;
             }
-        };
-        mThread.start();
+        });
     }
-    
-    /**
-     * 
-     * @param state
-     */
-    private void setState(int state) {
-        mConnectionStatus.setState(state);
-    }
-    
-    /**
-     * 
-     * @return
-     */
-    public List<String> getDevices() {
-        List<String> list = new ArrayList<String>();
-        
 
-
-        /*
-         * Find devices
-         */
-        
-        return list;
-    }
-    
     /**
      * 
      * A device name devNameMatch, will connect to first device whose
@@ -209,7 +128,6 @@ public class USBConnectionIn {
     public boolean connect(String params) {
         
         mParams = params;
-        Logger.Logit("Connecting to serial device");
         mDriver = UsbSerialProber.findFirstDevice(mUsbManager);
 
         if(mDriver == null) {
@@ -221,12 +139,12 @@ public class USBConnectionIn {
         /*
          * Only when not connected, connect
          */
-        if(mConnectionStatus.getState() != ConnectionStatus.DISCONNECTED) {
+        if(getState() != Connection.DISCONNECTED) {
             Logger.Logit("Failed! Already connected?");
 
             return false;
         }
-        setState(ConnectionStatus.CONNECTING);
+        setState(Connection.CONNECTING);
 
         try {
             mDriver.open();
@@ -250,14 +168,12 @@ public class USBConnectionIn {
             mDriver.setParameters(rate, data, stop, parity);
         } 
         catch (Exception e) {
-            setState(ConnectionStatus.DISCONNECTED);
+            setState(Connection.DISCONNECTED);
             Logger.Logit("Failed!");
             return false;
         } 
-        setState(ConnectionStatus.CONNECTED);
 
-        Logger.Logit("Success!");
-
+        super.connect();
         return true;
     }
     
@@ -266,8 +182,6 @@ public class USBConnectionIn {
      */
     public void disconnect() {
         
-        Logger.Logit("Disconnecting from device");
-
         try {
             mDriver.close();
         }
@@ -278,8 +192,7 @@ public class USBConnectionIn {
         /*
          * Exit
          */
-        setState(ConnectionStatus.DISCONNECTED);
-        Logger.Logit("Disconnected");
+        super.disconnect();
     }
     
     /**
@@ -294,55 +207,9 @@ public class USBConnectionIn {
         catch(Exception e) {
             red = -1;
         }
-        
-        if(red > 0) {
-            String file = null;
-            synchronized(this) {
-                file = mFileSave;
-            }
-            if(file != null) {
-                try {
-                    FileOutputStream output = new FileOutputStream(file, true);
-                    output.write(buffer, 0, red);
-                    output.close();
-                } catch(Exception e) {
-                }
-            }
-        }
+
+        saveToFile(red, buffer);
         return red;
-    }
-
-    /**
-     * 
-     * @return
-     */
-    public boolean isConnected() {
-        return mConnectionStatus.getState() == ConnectionStatus.CONNECTED;
-    }
-
-    /**
-     * 
-     * @return
-     */
-    public boolean isConnectedOrConnecting() {
-        return mConnectionStatus.getState() == ConnectionStatus.CONNECTED ||
-                mConnectionStatus.getState() == ConnectionStatus.CONNECTING;
-    }
-
-    /**
-     * 
-     * @param helper
-     */
-    public void setHelper(IHelper helper) {
-        mHelper = helper;
-    }
-    
-    /**
-     * 
-     * @return
-     */
-    public String getFileSave() {
-        return mFileSave;
     }
 
     /**

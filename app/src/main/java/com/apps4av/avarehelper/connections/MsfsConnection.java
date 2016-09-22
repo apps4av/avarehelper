@@ -14,8 +14,8 @@ package com.apps4av.avarehelper.connections;
 
 import com.apps4av.avarehelper.nmea.Ownship;
 import com.apps4av.avarehelper.storage.Preferences;
+import com.apps4av.avarehelper.utils.GenericCallback;
 import com.apps4av.avarehelper.utils.Logger;
-import com.ds.avare.IHelper;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -28,27 +28,20 @@ import java.net.DatagramSocket;
  * @author zkhan
  *
  */
-public class MsfsConnection {
+public class MsfsConnection extends Connection {
 
     
     private static MsfsConnection mConnection;
     
-    private static IHelper mHelper;
-    
-    private Thread mThread;
-    
-    private static boolean mRunning;
-    
     DatagramSocket mSocket;
     
     private int mPort = 0;
-    
-    private boolean mConnected = false;
-    
+
     /**
      * 
      */
     private MsfsConnection() {
+        super("MSFS Input");
     }
 
     
@@ -60,7 +53,6 @@ public class MsfsConnection {
 
         if(null == mConnection) {
             mConnection = new MsfsConnection();
-            mRunning = false;
         }
         return mConnection;
     }
@@ -68,63 +60,41 @@ public class MsfsConnection {
     /**
      * 
      */
-    public void stop() {
-        Logger.Logit("Stopping MSFS Listener");
-        mRunning = false;
-        if(null != mThread) {
-            mThread.interrupt();
-        }
-    }
-
-    /**
-     * 
-     */
     public void start(final Preferences pref) {
-        
-        Logger.Logit("Starting MSFS Listener");
-               
-        mRunning = true;
-        
-        /*
-         * Thread that reads Xplane
-         */
-        mThread = new Thread() {
-            @Override
-            public void run() {
-        
-                Logger.Logit("MSFS reading data");
 
+        super.start(new GenericCallback() {
+            @Override
+            public Object callback(Object o, Object o1) {
                 byte[] buffer = new byte[16384];
 
-                com.apps4av.avarehelper.nmea.DataBuffer nbuffer = 
+                com.apps4av.avarehelper.nmea.DataBuffer nbuffer =
                         new com.apps4av.avarehelper.nmea.DataBuffer(16384);
-                com.apps4av.avarehelper.nmea.Decode ndecode = 
+                com.apps4av.avarehelper.nmea.Decode ndecode =
                         new com.apps4av.avarehelper.nmea.Decode();
                 Ownship nmeaOwnship = new Ownship();
-                
-                
+
+
                 /*
-                 * This state machine will keep trying to connect to 
+                 * This state machine will keep trying to connect to
                  * ADBS/GPS receiver
                  */
-                while(mRunning) {
-                    
+                while (isRunning()) {
+
                     int red = 0;
-                    
+
                     /*
                      * Read.
                      */
                     red = read(buffer);
-                    if(red <= 0) {
-                        if(!mRunning) {
+                    if (red <= 0) {
+                        if (isStopped()) {
                             break;
                         }
                         try {
                             Thread.sleep(1000);
                         } catch (Exception e) {
-                            
                         }
-                        
+
                         /*
                          * Try to reconnect
                          */
@@ -135,14 +105,14 @@ public class MsfsConnection {
                         continue;
                     }
 
-                    nbuffer.put(buffer, red);                     
+                    nbuffer.put(buffer, red);
 
                     byte[] buf;
-                    
-                    while(null != (buf = nbuffer.get())) {
+
+                    while (null != (buf = nbuffer.get())) {
                         com.apps4av.avarehelper.nmea.Message m = ndecode.decode(buf);
-                        if(nmeaOwnship.addMessage(m)) {
-                                
+                        if (nmeaOwnship.addMessage(m)) {
+
                             /*
                              * Make a GPS locaiton message from ADSB ownship message.
                              */
@@ -150,32 +120,26 @@ public class MsfsConnection {
                             Ownship om = nmeaOwnship;
                             try {
                                 object.put("type", "ownship");
-                                object.put("longitude", (double)om.mLon);
-                                object.put("latitude", (double)om.mLat);
-                                object.put("speed", (double)(om.mHorizontalVelocity));
-                                object.put("bearing", (double)om.mDirection);
-                                object.put("altitude", (double)((double)om.mAltitude));
-                                object.put("time", (long)om.getTime());
+                                object.put("longitude", (double) om.mLon);
+                                object.put("latitude", (double) om.mLat);
+                                object.put("speed", (double) (om.mHorizontalVelocity));
+                                object.put("bearing", (double) om.mDirection);
+                                object.put("altitude", (double) ((double) om.mAltitude));
+                                object.put("time", (long) om.getTime());
                             } catch (JSONException e1) {
-                                return;
-                            }
-                            
-                            if(mHelper != null) {
-                                try {
-                                    mHelper.sendDataText(object.toString());
-                                } catch (Exception e) {
-                                }
+                                continue;
                             }
 
+                            sendDataToHelper(object.toString());
                         }
-                        continue;
                     }
                 }
+
+                return null;
             }
-        };
-        mThread.start();
+        });
     }
-    
+
         
     /**
      * 
@@ -185,8 +149,6 @@ public class MsfsConnection {
      */
     public boolean connect(int port) {
         
-        Logger.Logit("Listening on port " + port);
-
         mPort = port;
         
         /*
@@ -202,9 +164,7 @@ public class MsfsConnection {
             return false;
         }
 
-        mConnected = true;
-        Logger.Logit("Success!");
-
+        super.connect();
         return true;
     }
     
@@ -213,8 +173,6 @@ public class MsfsConnection {
      */
     public void disconnect() {
         
-        Logger.Logit("Disconnecting from device");
-
         /*
          * Exit
          */
@@ -224,9 +182,8 @@ public class MsfsConnection {
         catch(Exception e2) {
             Logger.Logit("Error stream close");
         }
-        
-        mConnected = false;
-        Logger.Logit("Listener stopped");
+
+        super.disconnect();
     }
     
     /**
@@ -241,25 +198,12 @@ public class MsfsConnection {
         catch(Exception e) {
             return -1;
         }
+
+        saveToFile(pkt.getLength(), buffer);
         return pkt.getLength();
     }
 
 
-    /**
-     * 
-     * @param helper
-     */
-    public void setHelper(IHelper helper) {
-        mHelper = helper;
-    }
-
-    /**
-     * 
-     */
-    public boolean isConnected() {
-        return mConnected;
-    }
-    
     /**
      * 
      * @return

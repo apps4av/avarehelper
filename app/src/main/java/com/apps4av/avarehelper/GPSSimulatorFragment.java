@@ -1,18 +1,18 @@
 package com.apps4av.avarehelper;
 
 
-import com.apps4av.avarehelper.connections.GPSSimulatorConnection;
-import com.apps4av.avarehelper.storage.SavedEditText;
-
 import android.content.Context;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CheckBox;
-import android.support.v4.app.*;
+
+import com.apps4av.avarehelper.connections.GPSSimulatorConnection;
+import com.apps4av.avarehelper.storage.SavedEditText;
 
 /**
  * 
@@ -76,13 +76,15 @@ public class GPSSimulatorFragment extends Fragment {
 		mButtonStart.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				if (mGPSSim.isRunning()) {
-					mGPSSim.stop();
-				}
+				if (mGPSSim.isConnected()) {
+                    mGPSSim.stop();
+                    mGPSSim.disconnect();
+                }
 				else {
 					apply();
-					mGPSSim.start(getValidValue(mTextLat.getText().toString()),
-							getValidValue(mTextLon.getText().toString()));
+                    mGPSSim.connect();
+                    mGPSSim.start(getValidValue(mTextLat.getText().toString()),
+                            getValidValue(mTextLon.getText().toString()));
 				}
 
 				setStates();
@@ -92,7 +94,7 @@ public class GPSSimulatorFragment extends Fragment {
 		mButtonApply.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				if (mGPSSim.isRunning()) {
+				if (mGPSSim.isConnected()) {
 					apply();
 				}
 			}
@@ -113,7 +115,7 @@ public class GPSSimulatorFragment extends Fragment {
 	}
 
 	private void setStates() {
-		if(mGPSSim.isRunning()) {
+		if(mGPSSim.isConnected()) {
 			mButtonStart.setText(mContext.getString(R.string.Stop));
 			mButtonApply.setEnabled(true);
 		}

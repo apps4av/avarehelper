@@ -13,8 +13,8 @@ Redistribution and use in source and binary forms, with or without modification,
 package com.apps4av.avarehelper.connections;
 
 import com.apps4av.avarehelper.storage.Preferences;
+import com.apps4av.avarehelper.utils.GenericCallback;
 import com.apps4av.avarehelper.utils.Logger;
-import com.ds.avare.IHelper;
 
 import org.json.JSONObject;
 
@@ -26,27 +26,21 @@ import java.net.DatagramSocket;
  * @author zkhan
  *
  */
-public class XplaneConnection {
+public class XplaneConnection extends Connection {
 
     
     private static XplaneConnection mConnection;
-    
-    private static IHelper mHelper;
-    
-    private Thread mThread;
-    
-    private static boolean mRunning;
-    
+
     DatagramSocket mSocket;
     
     private int mPort = 0;
     
-    private boolean mConnected = false;
-    
+
     /**
      * 
      */
     private XplaneConnection() {
+        super("XPlane Input");
     }
 
     
@@ -58,65 +52,45 @@ public class XplaneConnection {
 
         if(null == mConnection) {
             mConnection = new XplaneConnection();
-            mRunning = false;
         }
         return mConnection;
     }
 
-    /**
-     * 
-     */
-    public void stop() {
-        Logger.Logit("Stopping XPlane Listener");
-        mRunning = false;
-        if(null != mThread) {
-            mThread.interrupt();
-        }
-    }
 
     /**
      * 
      */
     public void start(final Preferences pref) {
 
-        Logger.Logit("Starting XPlane Listener");
-               
-        mRunning = true;
-        
-        /*
-         * Thread that reads Xplane
-         */
-        mThread = new Thread() {
-            @Override
-            public void run() {
-        
-                Logger.Logit("Xplane reading data");
 
+        super.start(new GenericCallback() {
+            @Override
+            public Object callback(Object o, Object o1) {
                 byte[] buffer = new byte[1024];
-                
-                
+
+
                 /*
-                 * This state machine will keep trying to connect to 
+                 * This state machine will keep trying to connect to
                  * ADBS/GPS receiver
                  */
-                while(mRunning) {
-                    
+                while(isRunning()) {
+
                     int red = 0;
-                    
+
                     /*
                      * Read.
                      */
                     red = read(buffer);
                     if(red <= 0) {
-                        if(!mRunning) {
+                        if(isStopped()) {
                             break;
                         }
                         try {
                             Thread.sleep(1000);
                         } catch (Exception e) {
-                            
+
                         }
-                        
+
                         /*
                          * Try to reconnect
                          */
@@ -146,21 +120,14 @@ public class XplaneConnection {
                             } catch (Exception e1) {
                                 continue;
                             }
-                            
-                            if(mHelper != null) {
-                                try {
-                                    mHelper.sendDataText(object.toString());
-                                    Logger.Logit(object.toString());
-                                } catch (Exception e) {
-                                }
-                            }
-                     
+
+                            sendDataToHelper(object.toString());
                         }
                     }
                 }
+                return null;
             }
-        };
-        mThread.start();
+        });
     }
     
         
@@ -172,8 +139,6 @@ public class XplaneConnection {
      */
     public boolean connect(int port) {
         
-        Logger.Logit("Listening on port " + port);
-
         mPort = port;
         
         /*
@@ -189,10 +154,8 @@ public class XplaneConnection {
             return false;
         }
 
-        Logger.Logit("Success!");
+        super.connect();
 
-        mConnected = true;
-        
         return true;
     }
     
@@ -200,8 +163,6 @@ public class XplaneConnection {
      * 
      */
     public void disconnect() {
-        
-        Logger.Logit("Disconnecting from device");
 
         /*
          * Exit
@@ -213,9 +174,7 @@ public class XplaneConnection {
             Logger.Logit("Error stream close");
         }
 
-        mConnected = false;
-
-        Logger.Logit("Listener stopped");
+        super.disconnect();
     }
     
     /**
@@ -234,21 +193,6 @@ public class XplaneConnection {
     }
 
 
-    /**
-     * 
-     * @param helper
-     */
-    public void setHelper(IHelper helper) {
-        mHelper = helper;
-    }
-
-    /**
-     * 
-     */
-    public boolean isConnected() {
-        return mConnected;
-    }
-    
     /**
      * 
      * @return

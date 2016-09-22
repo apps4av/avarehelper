@@ -13,10 +13,9 @@ Redistribution and use in source and binary forms, with or without modification,
 package com.apps4av.avarehelper.connections;
 
 import com.apps4av.avarehelper.storage.Preferences;
+import com.apps4av.avarehelper.utils.GenericCallback;
 import com.apps4av.avarehelper.utils.Logger;
-import com.ds.avare.IHelper;
 
-import java.io.FileOutputStream;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.util.LinkedList;
@@ -26,41 +25,24 @@ import java.util.LinkedList;
  * @author zkhan
  *
  */
-public class WifiConnection {
+public class WifiConnection extends Connection {
 
     
     private static WifiConnection mConnection;
-    
-    private static IHelper mHelper;
-    
-    private Thread mThread;
-    private static String mFileSave = null;
-    
-    private static boolean mRunning;
-    
+
     DatagramSocket mSocket;
     
     private int mPort = 0;
     
-    private boolean mConnected = false;
-    
+
     /**
      * 
      */
     private WifiConnection() {
+        super("WIFI Input");
     }
 
-    /**
-     * 
-     * @param file
-     */
-    public void setFileSave(String file) {
-        synchronized(this) {
-            mFileSave = file;
-        }
-    }
 
-    
     /**
      * 
      * @return
@@ -69,7 +51,6 @@ public class WifiConnection {
 
         if(null == mConnection) {
             mConnection = new WifiConnection();
-            mRunning = false;
         }
         return mConnection;
     }
@@ -77,58 +58,37 @@ public class WifiConnection {
     /**
      * 
      */
-    public void stop() {
-        Logger.Logit("Stopping WIFI");
-        mRunning = false;
-        if(null != mThread) {
-            mThread.interrupt();
-        }
-    }
-
-    /**
-     * 
-     */
     public void start(final Preferences pref) {
-        
-        Logger.Logit("Starting WiFi Listener");
 
-        mRunning = true;
-        
-        /*
-         * Thread that reads WIFI
-         */
-        mThread = new Thread() {
+        super.start(new GenericCallback() {
             @Override
-            public void run() {
-        
-                Logger.Logit("WiFi reading data");
-
+            public Object callback(Object o, Object o1) {
                 BufferProcessor bp = new BufferProcessor();
 
                 byte[] buffer = new byte[8192];
-                
+
                 /*
-                 * This state machine will keep trying to connect to 
+                 * This state machine will keep trying to connect to
                  * ADBS/GPS receiver
                  */
-                while(mRunning) {
-                    
+                while(isRunning()) {
+
                     int red = 0;
-                    
+
                     /*
                      * Read.
                      */
                     red = read(buffer);
                     if(red <= 0) {
-                        if(!mRunning) {
+                        if(isStopped()) {
                             break;
                         }
                         try {
                             Thread.sleep(1000);
                         } catch (Exception e) {
-                            
+
                         }
-                        
+
                         /*
                          * Try to reconnect
                          */
@@ -145,19 +105,13 @@ public class WifiConnection {
                     bp.put(buffer, red);
                     LinkedList<String> objs = bp.decode(pref);
                     for(String s : objs) {
-                        if(mHelper != null) {
-                            try {
-                                mHelper.sendDataText(s);
-                            } catch (Exception e) {
-                            }
-                        }
+                        sendDataToHelper(s);
                     }
                 }
+                return null;
             }
-        };
-        mThread.start();
+        });
     }
-    
         
     /**
      * 
@@ -167,8 +121,6 @@ public class WifiConnection {
      */
     public boolean connect(int port) {
         
-        Logger.Logit("Listening on port " + port);
-
         mPort = port;
         
         /*
@@ -185,8 +137,8 @@ public class WifiConnection {
             return false;
         }
 
-        mConnected = true;
-        Logger.Logit("Success!");
+
+        super.connect();
 
         return true;
     }
@@ -196,8 +148,6 @@ public class WifiConnection {
      */
     public void disconnect() {
         
-        Logger.Logit("Disconnecting from device");
-
         /*
          * Exit
          */
@@ -207,9 +157,8 @@ public class WifiConnection {
         catch(Exception e2) {
             Logger.Logit("Error stream close");
         }
-        
-        mConnected = false;
-        Logger.Logit("Listener stopped");
+
+        super.disconnect();
     }
     
     /**
@@ -224,50 +173,12 @@ public class WifiConnection {
         catch(Exception e) {
             return -1;
         }
-        
-        if(pkt.getLength() > 0) {
-            String file = null;
-            synchronized(this) {
-                file = mFileSave;
-            }
-            if(file != null) {
-                try {
-                    FileOutputStream output = new FileOutputStream(file, true);
-                    output.write(buffer, 0, pkt.getLength());
-                    output.close();
-                } catch(Exception e) {
-                }
-            }
-        }
 
+        saveToFile(pkt.getLength(), buffer);
         
         return pkt.getLength();
     }
 
-
-    /**
-     * 
-     * @param helper
-     */
-    public void setHelper(IHelper helper) {
-        mHelper = helper;
-    }
-
-    /**
-     * 
-     * @return
-     */
-    public String getFileSave() {
-        return mFileSave;
-    }
-    
-    /**
-     * 
-     */
-    public boolean isConnected() {
-        return mConnected;
-    }
-    
     /**
      * 
      * @return

@@ -21,8 +21,8 @@ import com.apps4av.avarehelper.nmea.GGAPacket;
 import com.apps4av.avarehelper.nmea.RMBPacket;
 import com.apps4av.avarehelper.nmea.RMCPacket;
 import com.apps4av.avarehelper.storage.Preferences;
+import com.apps4av.avarehelper.utils.GenericCallback;
 import com.apps4av.avarehelper.utils.Logger;
-import com.ds.avare.IHelper;
 
 import org.json.JSONObject;
 
@@ -37,20 +37,15 @@ import java.util.UUID;
  * @author zkhan
  *
  */
-public class BlueToothConnectionOut {
+public class BlueToothConnectionOut extends Connection {
 
-    private static BluetoothAdapter mBtAdapter = null;
-    private static BluetoothSocket mBtSocket = null;
-    private static OutputStream mStream = null;
-    private static boolean mRunning = false;
+    private BluetoothAdapter mBtAdapter = null;
+    private BluetoothSocket mBtSocket = null;
+    private OutputStream mStream = null;
     private boolean mSecure = true;
     
     private static BlueToothConnectionOut mConnection;
     
-    private static ConnectionStatus mConnectionStatus;
-    private static IHelper mHelper;
-    
-    private Thread mThread;
     private String mDevName;
 
     /*
@@ -63,6 +58,8 @@ public class BlueToothConnectionOut {
      * 
      */
     private BlueToothConnectionOut() {
+        super("Bluetooth Output");
+        mBtAdapter = BluetoothAdapter.getDefaultAdapter();
     }
 
     
@@ -74,9 +71,6 @@ public class BlueToothConnectionOut {
 
         if(null == mConnection) {
             mConnection = new BlueToothConnectionOut();
-            mBtAdapter = BluetoothAdapter.getDefaultAdapter();
-            mConnectionStatus = new ConnectionStatus();
-            mConnectionStatus.setState(ConnectionStatus.DISCONNECTED);
         }
         return mConnection;
     }
@@ -84,61 +78,22 @@ public class BlueToothConnectionOut {
     /**
      * 
      */
-    public void stop() {
-        Logger.Logit("Stopping BT");
-        if(mConnectionStatus.getState() != ConnectionStatus.CONNECTED) {
-            Logger.Logit("Stopping BT failed because already stopped");
-            return;
-        }
-        mRunning = false;
-        if(null != mThread) {
-            mThread.interrupt();
-        }
-    }
-
-    /**
-     * 
-     */
     public void start(final Preferences pref) {
-        
-        Logger.Logit("Starting BT");
-        if(mConnectionStatus.getState() != ConnectionStatus.CONNECTED) {
-            Logger.Logit("Starting BT failed because already started");
-            return;
-        }
-        
-        mRunning = true;
-        
-        /*
-         * Thread that reads BT
-         */
-        mThread = new Thread() {
-            @Override
-            public void run() {
-                
-                Logger.Logit("BT writing data");
 
+        super.start(new GenericCallback() {
+            @Override
+            public Object callback(Object o, Object o1) {
                 /*
-                 * This state machine will keep trying to connect to 
+                 * This state machine will keep trying to connect to
                  * ADBS/GPS receiver
                  */
-                while(mRunning) {
-                    
+                while(isRunning()) {
+
                     /*
                      * Read data from Avare
                      */
-                    String recvd = null;
-                    try {
-                        recvd = mHelper.recvDataText();
-                    } catch (Exception e1) {
-                        try {
-                            Thread.sleep(1000);
-                        } catch (Exception e) {
-                            
-                        }
-                        continue;
-                    }
-                    
+                    String recvd = getDataFromHelper();
+
                     if(null == recvd) {
                         continue;
                     }
@@ -153,7 +108,7 @@ public class BlueToothConnectionOut {
                     try {
                         JSONObject object;
                         object = new JSONObject(recvd);
-                        Logger.Logit("sending message to BT " + mDevName + " " + 
+                        Logger.Logit("sending message to BT " + mDevName + " " +
                                 object.toString());
                         String type = object.getString("type");
                         if(type == null) {
@@ -191,29 +146,29 @@ public class BlueToothConnectionOut {
                     } catch (Exception e) {
                         continue;
                     }
-                    
+
                     if(null == buffer || null == buffer2) {
                         continue;
                     }
-                                        
+
                     /*
                      * Make NMEA messages.
                      */
-                    
+
                     /*
                      * Write.
                      */
                     int wrote = write(buffer);
                     if(wrote <= 0) {
-                        if(!mRunning) {
+                        if(isStopped()) {
                             break;
                         }
                         try {
                             Thread.sleep(1000);
                         } catch (Exception e) {
-                            
+
                         }
-                        
+
                         /*
                          * Try to reconnect
                          */
@@ -226,15 +181,15 @@ public class BlueToothConnectionOut {
 
                     wrote = write(buffer2);
                     if(wrote <= 0) {
-                        if(!mRunning) {
+                        if(isStopped()) {
                             break;
                         }
                         try {
                             Thread.sleep(1000);
                         } catch (Exception e) {
-                            
+
                         }
-                        
+
                         /*
                          * Try to reconnect
                          */
@@ -254,15 +209,15 @@ public class BlueToothConnectionOut {
                     }
                     wrote = write(buffer3);
                     if(wrote <= 0) {
-                        if(!mRunning) {
+                        if(isStopped()) {
                             break;
                         }
                         try {
                             Thread.sleep(1000);
                         } catch (Exception e) {
-                            
+
                         }
-                        
+
                         /*
                          * Try to reconnect
                          */
@@ -282,15 +237,15 @@ public class BlueToothConnectionOut {
                     }
                     wrote = write(buffer4);
                     if(wrote <= 0) {
-                        if(!mRunning) {
+                        if(isStopped()) {
                             break;
                         }
                         try {
                             Thread.sleep(1000);
                         } catch (Exception e) {
-                            
+
                         }
-                        
+
                         /*
                          * Try to reconnect
                          */
@@ -303,17 +258,9 @@ public class BlueToothConnectionOut {
 
 
                 }
+                return null;
             }
-        };
-        mThread.start();
-    }
-    
-    /**
-     * 
-     * @param state
-     */
-    private void setState(int state) {
-        mConnectionStatus.setState(state);
+        });
     }
     
     /**
@@ -349,8 +296,6 @@ public class BlueToothConnectionOut {
      */
     public boolean connect(String devNameMatch, boolean secure) {
         
-        Logger.Logit("Connecting to device " + devNameMatch);
-
         if(devNameMatch == null) {
             return false;
         }
@@ -361,16 +306,16 @@ public class BlueToothConnectionOut {
         /*
          * Only when not connected, connect
          */
-        if(mConnectionStatus.getState() != ConnectionStatus.DISCONNECTED) {
+        if(getState() != Connection.DISCONNECTED) {
             Logger.Logit("Failed! Already connected?");
 
             return false;
         }
-        setState(ConnectionStatus.CONNECTING);
+        setState(Connection.CONNECTING);
         if(null == mBtAdapter) {
             Logger.Logit("Failed! BT adapter not found");
 
-            setState(ConnectionStatus.DISCONNECTED);
+            setState(Connection.DISCONNECTED);
             return false;
         }
         Set<BluetoothDevice> pairedDevices = mBtAdapter.getBondedDevices();
@@ -380,7 +325,7 @@ public class BlueToothConnectionOut {
          */
         if(null == pairedDevices) {            
             Logger.Logit("Failed! No paired devices");
-            setState(ConnectionStatus.DISCONNECTED);
+            setState(Connection.DISCONNECTED);
             return false;
         }
         
@@ -401,7 +346,7 @@ public class BlueToothConnectionOut {
         if(null == device) {
             Logger.Logit("Failed! No such device");
 
-            setState(ConnectionStatus.DISCONNECTED);
+            setState(Connection.DISCONNECTED);
             return false;
         }
         
@@ -417,7 +362,7 @@ public class BlueToothConnectionOut {
             catch(Exception e) {
                 Logger.Logit("Failed! SPP secure socket failed");
     
-                setState(ConnectionStatus.DISCONNECTED);
+                setState(Connection.DISCONNECTED);
                 return false;
             }
         }
@@ -428,7 +373,7 @@ public class BlueToothConnectionOut {
             catch(Exception e1) {
                 Logger.Logit("Failed! SPP insecure socket failed");
                 
-                setState(ConnectionStatus.DISCONNECTED);
+                setState(Connection.DISCONNECTED);
                 return false;
             }            
         }
@@ -449,7 +394,7 @@ public class BlueToothConnectionOut {
             }
             Logger.Logit("Failed! Socket connection error");
 
-            setState(ConnectionStatus.DISCONNECTED);
+            setState(Connection.DISCONNECTED);
             return false;
         } 
 
@@ -466,12 +411,10 @@ public class BlueToothConnectionOut {
             }
             Logger.Logit("Failed! Input stream error");
 
-            setState(ConnectionStatus.DISCONNECTED);
+            setState(Connection.DISCONNECTED);
         } 
 
-        setState(ConnectionStatus.CONNECTED);
-
-        Logger.Logit("Success!");
+        super.connect();
 
         return true;
     }
@@ -481,7 +424,6 @@ public class BlueToothConnectionOut {
      */
     public void disconnect() {
         
-        Logger.Logit("Disconnecting from device");
 
         /*
          * Exit
@@ -498,9 +440,9 @@ public class BlueToothConnectionOut {
         } 
         catch(Exception e2) {
             Logger.Logit("Error socket close");
-        }    
-        setState(ConnectionStatus.DISCONNECTED);
-        Logger.Logit("Disconnected");
+        }
+
+        super.disconnect();
     }
     
     /**
@@ -517,32 +459,6 @@ public class BlueToothConnectionOut {
         }
         return wrote;
     }
-
-    /**
-     * 
-     * @return
-     */
-    public boolean isConnected() {
-        return mConnectionStatus.getState() == ConnectionStatus.CONNECTED;
-    }
-
-    /**
-     * 
-     * @return
-     */
-    public boolean isConnectedOrConnecting() {
-        return mConnectionStatus.getState() == ConnectionStatus.CONNECTED ||
-                mConnectionStatus.getState() == ConnectionStatus.CONNECTING;
-    }
-
-    /**
-     * 
-     * @param helper
-     */
-    public void setHelper(IHelper helper) {
-        mHelper = helper;
-    }
-    
     /**
      * 
      * @return
