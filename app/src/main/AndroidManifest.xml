@@ -11,8 +11,8 @@ Redistribution and use in source and binary forms, with or without modification,
 -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.apps4av.avarehelper"
-    android:versionCode="40"
-    android:versionName="3.1.0" >
+    android:versionCode="41"
+    android:versionName="4.0.1" >
 
     <uses-sdk
         android:minSdkVersion="12"
@@ -59,8 +59,7 @@ Redistribution and use in source and binary forms, with or without modification,
             <meta-data
                 android:name="android.hardware.usb.action.USB_DEVICE_ATTACHED" 
                 android:resource="@xml/device_filter" />
-            
-            
+
         </activity>
     </application>
 

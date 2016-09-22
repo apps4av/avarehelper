@@ -30,9 +30,11 @@ import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
-import com.apps4av.avarehelper.connections.ConnectionStatus;
 import com.apps4av.avarehelper.utils.GenericCallback;
 import com.apps4av.avarehelper.utils.Logger;
+
+import java.io.Serializable;
+import java.util.HashMap;
 
 public class MainActivity extends ActionBarActivity implements
     ActionBar.OnNavigationListener {
@@ -42,11 +44,19 @@ public class MainActivity extends ActionBarActivity implements
     
     private BackgroundService mService;
 
+    private HashMap<String, String> mState;
+
     private Fragment[] mFragments = new Fragment[10];
 
+    private WifiManager.MulticastLock mMulticastLock;
 
 
-        private WifiManager.MulticastLock multicastLock;
+    @Override
+    public void onSaveInstanceState(final Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putSerializable("savedState", (Serializable) mState);
+    }
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -107,9 +117,33 @@ public class MainActivity extends ActionBarActivity implements
 
         // Acquire Multicast Lock to receive multicast packets over Wifi.
         WifiManager wm = (WifiManager)getSystemService(Context.WIFI_SERVICE);
-        multicastLock = wm.createMulticastLock("avarehelper");
-        multicastLock.acquire();
+        mMulticastLock = wm.createMulticastLock("avarehelper");
+        mMulticastLock.acquire();
+
+
+        if (savedInstanceState != null) {
+            //probably orientation change
+            mState = (HashMap<String, String>) savedInstanceState.getSerializable("savedState");
+            try {
+                int id = Integer.valueOf(mState.get("fragmentIndex"));
+                if(id >= 0) {
+                    actionBar.setSelectedNavigationItem(id);
+                }
+            }
+            catch (Exception e) {
+            }
+
+        }
+        else if (mState != null) {
+                //returning from backstack, data is fine, do nothing
+        }
+        else {
+            //newly created, compute data
+            mState = new HashMap<String, String>();
+            mState.put("fragmentIndex", "0");
+        }
     }
+
     
     @Override
     protected void onDestroy() {
@@ -120,7 +154,7 @@ public class MainActivity extends ActionBarActivity implements
         getApplicationContext().unbindService(mConnection);        
 
         // Release multicast lock.
-        multicastLock.release();
+        mMulticastLock.release();
     }
    
     /**
@@ -173,7 +207,10 @@ public class MainActivity extends ActionBarActivity implements
 
     	FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-        
+
+        // Store fragment we are showing now
+        mState.put("fragmentIndex", Integer.toString(itemPosition));
+
         switch(itemPosition) {
         
             case 0:
