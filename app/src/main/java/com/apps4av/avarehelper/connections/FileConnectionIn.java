@@ -12,6 +12,8 @@ Redistribution and use in source and binary forms, with or without modification,
 
 package com.apps4av.avarehelper.connections;
 
+import android.content.Context;
+
 import com.apps4av.avarehelper.storage.Preferences;
 import com.apps4av.avarehelper.utils.GenericCallback;
 import com.apps4av.avarehelper.utils.Logger;
@@ -19,7 +21,9 @@ import com.apps4av.avarehelper.utils.Logger;
 import java.io.BufferedInputStream;
 import java.io.FileInputStream;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.List;
 
 /**
  * 
@@ -37,30 +41,10 @@ public class FileConnectionIn extends Connection {
      */
     private FileConnectionIn() {
         super("File Input");
-    }
-
-    
-    /**
-     * 
-     * @return
-     */
-    public static FileConnectionIn getInstance() {
-
-        if(null == mConnection) {
-            mConnection = new FileConnectionIn();
-        }
-        return mConnection;
-    }
-
-    /**
-     * 
-     */
-    public void start(final Preferences pref) {
-
-        /*
+                /*
          * Thread that reads File
          */
-        super.start(new GenericCallback() {
+        setCallback(new GenericCallback() {
             @Override
             public Object callback(Object o, Object o1) {
                 BufferProcessor bp = new BufferProcessor();
@@ -97,7 +81,7 @@ public class FileConnectionIn extends Connection {
                      * Put both in Decode and ADBS buffers
                      */
                     bp.put(buffer, red);
-                    LinkedList<String> objs = bp.decode(pref);
+                    LinkedList<String> objs = bp.decode((Preferences)o);
                     for(String s : objs) {
                         sendDataToHelper(s);
                     }
@@ -106,7 +90,20 @@ public class FileConnectionIn extends Connection {
             }
         });
     }
+
     
+    /**
+     * 
+     * @return
+     * @param ctx
+     */
+    public static FileConnectionIn getInstance(Context ctx) {
+
+        if(null == mConnection) {
+            mConnection = new FileConnectionIn();
+        }
+        return mConnection;
+    }
 
     /**
      * 
@@ -114,13 +111,14 @@ public class FileConnectionIn extends Connection {
      * name matched this string.
      * @return
      */
-    public boolean connect(String fileName) {
+    @Override
+    public boolean connect(String to, boolean securely) {
         
-        if(fileName == null) {
+        if(to == null) {
             return false;
         }
         
-        mFileName = fileName;
+        mFileName = to;
         
         /*
          * Only when not connected, connect
@@ -143,14 +141,18 @@ public class FileConnectionIn extends Connection {
             setState(Connection.DISCONNECTED);
         } 
 
-        super.connect();
-
-        return true;
+        return connectConnection();
     }
-    
+
+    @Override
+    public String getParam() {
+        return mFileName;
+    }
+
     /**
      * 
      */
+    @Override
     public void disconnect() {
 
         /*
@@ -163,9 +165,24 @@ public class FileConnectionIn extends Connection {
             Logger.Logit("Error stream close");
         }
 
-        super.disconnect();
+        disconnectConnection();
     }
-    
+
+    @Override
+    public List<String> getDevices() {
+        return new ArrayList<String>();
+    }
+
+    @Override
+    public boolean isSecure() {
+        return false;
+    }
+
+    @Override
+    public String getConnDevice() {
+        return "";
+    }
+
     /**
      * 
      * @return

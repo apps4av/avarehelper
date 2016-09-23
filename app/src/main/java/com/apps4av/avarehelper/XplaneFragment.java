@@ -22,10 +22,10 @@ import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.TextView;
 
-import com.apps4av.avarehelper.connections.XplaneConnection;
+import com.apps4av.avarehelper.connections.Connection;
+import com.apps4av.avarehelper.connections.ConnectionFactory;
 import com.apps4av.avarehelper.storage.Preferences;
 import com.apps4av.avarehelper.storage.SavedEditText;
-import com.apps4av.avarehelper.utils.Logger;
 import com.apps4av.avarehelper.utils.Util;
 
 /**
@@ -35,7 +35,7 @@ import com.apps4av.avarehelper.utils.Util;
  */
 public class XplaneFragment extends Fragment {
     
-    private XplaneConnection mXp;
+    private Connection mXp;
     private SavedEditText mTextXplanePort;
     private TextView mTextXplaneIp;
     private CheckBox mXplaneCb;
@@ -59,15 +59,7 @@ public class XplaneFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 if (((CheckBox) v).isChecked()) {
-                    try {
-                        mXp.connect(Integer.parseInt(mTextXplanePort.getText().toString()));
-                    }
-                    catch (Exception e) {
-                        /*
-                         * Number parse
-                         */
-                        Logger.Logit("Invalid port");
-                    }
+                    mXp.connect(mTextXplanePort.getText().toString(), false);
                     mXp.start(new Preferences(getActivity()));
                 }
                 else {
@@ -81,8 +73,8 @@ public class XplaneFragment extends Fragment {
         /*
          * List of BT devices is same
          */
-        mXp = XplaneConnection.getInstance();
-        
+        mXp = ConnectionFactory.getConnection("XplaneConnection", mContext);
+
         setStates();
         
         return view;  
@@ -94,11 +86,7 @@ public class XplaneFragment extends Fragment {
      */
     private void setStates() {
         mXplaneCb.setChecked(mXp.isConnected());
-
-        if(mXp.getPort() != 0) {
-            mTextXplanePort.setText("" + mXp.getPort());
-        }
-
+        mTextXplanePort.setText(mXp.getParam());
     }
 
     @Override  

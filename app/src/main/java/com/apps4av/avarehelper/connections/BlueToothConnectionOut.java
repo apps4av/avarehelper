@@ -15,12 +15,12 @@ package com.apps4av.avarehelper.connections;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
+import android.content.Context;
 
 import com.apps4av.avarehelper.nmea.BODPacket;
 import com.apps4av.avarehelper.nmea.GGAPacket;
 import com.apps4av.avarehelper.nmea.RMBPacket;
 import com.apps4av.avarehelper.nmea.RMCPacket;
-import com.apps4av.avarehelper.storage.Preferences;
 import com.apps4av.avarehelper.utils.GenericCallback;
 import com.apps4av.avarehelper.utils.Logger;
 
@@ -59,28 +59,7 @@ public class BlueToothConnectionOut extends Connection {
      */
     private BlueToothConnectionOut() {
         super("Bluetooth Output");
-        mBtAdapter = BluetoothAdapter.getDefaultAdapter();
-    }
-
-    
-    /**
-     * 
-     * @return
-     */
-    public static BlueToothConnectionOut getInstance() {
-
-        if(null == mConnection) {
-            mConnection = new BlueToothConnectionOut();
-        }
-        return mConnection;
-    }
-
-    /**
-     * 
-     */
-    public void start(final Preferences pref) {
-
-        super.start(new GenericCallback() {
+        setCallback(new GenericCallback() {
             @Override
             public Object callback(Object o, Object o1) {
                 /*
@@ -261,39 +240,30 @@ public class BlueToothConnectionOut extends Connection {
                 return null;
             }
         });
+        mBtAdapter = BluetoothAdapter.getDefaultAdapter();
     }
+
     
     /**
      * 
      * @return
+     * @param ctx
      */
-    public List<String> getDevices() {
-        List<String> list = new ArrayList<String>();
-        if(null == mBtAdapter) {
-            return list;
-        }
+    public static BlueToothConnectionOut getInstance(Context ctx) {
 
-        Set<BluetoothDevice> pairedDevices = mBtAdapter.getBondedDevices();
-        
-        /*
-         * Find devices
-         */
-        if(null == pairedDevices) {            
-            return list;
+        if(null == mConnection) {
+            mConnection = new BlueToothConnectionOut();
         }
-        for(BluetoothDevice bt : pairedDevices) {
-            list.add((String)bt.getName());
-        }
-        
-        return list;
+        return mConnection;
     }
-    
+
     /**
      * 
      * A device name devNameMatch, will connect to first device whose
      * name matched this string.
      * @return
      */
+    @Override
     public boolean connect(String devNameMatch, boolean secure) {
         
         if(devNameMatch == null) {
@@ -414,14 +384,18 @@ public class BlueToothConnectionOut extends Connection {
             setState(Connection.DISCONNECTED);
         } 
 
-        super.connect();
-
-        return true;
+        return connectConnection();
     }
-    
+
+    @Override
+    public String getParam() {
+        return mDevName;
+    }
+
     /**
      * 
      */
+    @Override
     public void disconnect() {
         
 
@@ -442,7 +416,7 @@ public class BlueToothConnectionOut extends Connection {
             Logger.Logit("Error socket close");
         }
 
-        super.disconnect();
+        disconnectConnection();
     }
     
     /**
@@ -459,10 +433,37 @@ public class BlueToothConnectionOut extends Connection {
         }
         return wrote;
     }
+
+    /**
+     *
+     * @return
+     */
+    public List<String> getDevices() {
+        List<String> list = new ArrayList<String>();
+        if(null == mBtAdapter) {
+            return list;
+        }
+
+        Set<BluetoothDevice> pairedDevices = mBtAdapter.getBondedDevices();
+
+        /*
+         * Find devices
+         */
+        if(null == pairedDevices) {
+            return list;
+        }
+        for(BluetoothDevice bt : pairedDevices) {
+            list.add((String)bt.getName());
+        }
+
+        return list;
+    }
+
     /**
      * 
      * @return
      */
+    @Override
     public boolean isSecure() {
         return mSecure;
     }
@@ -471,6 +472,7 @@ public class BlueToothConnectionOut extends Connection {
      * 
      * @return
      */
+    @Override
     public String getConnDevice() {
         return mDevName;
     }

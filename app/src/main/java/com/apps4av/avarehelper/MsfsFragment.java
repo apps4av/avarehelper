@@ -22,10 +22,10 @@ import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.TextView;
 
-import com.apps4av.avarehelper.connections.MsfsConnection;
+import com.apps4av.avarehelper.connections.Connection;
+import com.apps4av.avarehelper.connections.ConnectionFactory;
 import com.apps4av.avarehelper.storage.Preferences;
 import com.apps4av.avarehelper.storage.SavedEditText;
-import com.apps4av.avarehelper.utils.Logger;
 import com.apps4av.avarehelper.utils.Util;
 
 /**
@@ -35,7 +35,7 @@ import com.apps4av.avarehelper.utils.Util;
  */
 public class MsfsFragment extends Fragment {
     
-    private MsfsConnection mMsfs;
+    private Connection mMsfs;
     private SavedEditText mTextMsfsPort;
     private TextView mTextMsfsIp;
     private CheckBox mMsfsCb;
@@ -58,15 +58,7 @@ public class MsfsFragment extends Fragment {
             @Override
             public void onClick(View v) {
               if (((CheckBox) v).isChecked()) {
-                  try {
-                      mMsfs.connect(Integer.parseInt(mTextMsfsPort.getText().toString()));
-                  }
-                  catch (Exception e) {
-                      /*
-                       * Number parse
-                       */
-                      Logger.Logit("Invalid port");
-                  }
+                  mMsfs.connect(mTextMsfsPort.getText().toString(), false);
                   mMsfs.start(new Preferences(getActivity()));
               }
               else {
@@ -81,7 +73,7 @@ public class MsfsFragment extends Fragment {
         /*
          * Get Connection
          */
-        mMsfs = MsfsConnection.getInstance();
+        mMsfs = ConnectionFactory.getConnection("MsfsConnection", mContext);
         
         setStates();
         return view;  
@@ -99,11 +91,7 @@ public class MsfsFragment extends Fragment {
      */
     private void setStates() {
         mMsfsCb.setChecked(mMsfs.isConnected());
-
-        if(mMsfs.getPort() != 0) {
-            mTextMsfsPort.setText("" + mMsfs.getPort());
-        }
-
+        mTextMsfsPort.setText(mMsfs.getParam());
     }
     
 } 

@@ -34,7 +34,6 @@ Redistribution and use in source and binary forms, with or without modification,
         android:layout_margin="10dp"
         android:inputType="number"
         android:layout_below="@+id/main_connectwifi_image"
-        android:text="@string/WifiPort"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"/>
     <CheckBox

@@ -144,13 +144,6 @@ Redistribution and use in source and binary forms, with or without modification,
 		android:layout_height="wrap_content">  
 		
 	    <Button
-	        android:id="@+id/main_button_gpssim_apply"
-	        android:layout_width="wrap_content"
-	        android:layout_margin="10dp"
-	        android:layout_height="wrap_content"
-	        android:enabled="false"
-	        android:text="@string/Apply"/>    
-	    <Button
 	        android:id="@+id/main_button_gpssim_start"
 	        android:layout_width="wrap_content"
 	        android:layout_margin="10dp"

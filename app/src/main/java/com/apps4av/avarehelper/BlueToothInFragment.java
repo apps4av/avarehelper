@@ -23,7 +23,8 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.Spinner;
 
-import com.apps4av.avarehelper.connections.BlueToothConnectionIn;
+import com.apps4av.avarehelper.connections.Connection;
+import com.apps4av.avarehelper.connections.ConnectionFactory;
 import com.apps4av.avarehelper.storage.Preferences;
 import com.apps4av.avarehelper.storage.SavedEditText;
 
@@ -36,7 +37,7 @@ import java.util.List;
  */
 public class BlueToothInFragment extends Fragment {
 
-    private BlueToothConnectionIn mBt;
+    private static Connection mBt;
     private List<String> mList;
     private Spinner mSpinner;
     private Context mContext;
@@ -63,7 +64,7 @@ public class BlueToothInFragment extends Fragment {
         /*
          * List of BT devices is same
          */
-        mBt = BlueToothConnectionIn.getInstance();
+        mBt = ConnectionFactory.getConnection("BlueToothConnectionIn", mContext);
         
         mList = mBt.getDevices();
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(mContext,

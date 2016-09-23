@@ -11,18 +11,20 @@ Redistribution and use in source and binary forms, with or without modification,
 */
 package com.apps4av.avarehelper.connections;
 
+import com.apps4av.avarehelper.storage.Preferences;
 import com.apps4av.avarehelper.utils.GenericCallback;
 import com.apps4av.avarehelper.utils.Logger;
 import com.ds.avare.IHelper;
 
 import java.io.FileOutputStream;
+import java.util.List;
 
 /**
  * 
  * @author zkhan
  *
  */
-public class Connection {
+public abstract class Connection {
 
     protected static final int CONNECTED = 1;
     protected static final int CONNECTING = 2;
@@ -40,6 +42,8 @@ public class Connection {
 
     private String mFileSave = null;
 
+    private GenericCallback mCb;
+
     /**
      * 
      */
@@ -47,6 +51,10 @@ public class Connection {
         mState = DISCONNECTED;
         mRunning = false;
         mName = name;
+    }
+
+    protected void setCallback(GenericCallback cb) {
+        mCb = cb;
     }
 
     /**
@@ -114,22 +122,6 @@ public class Connection {
         return getState() == Connection.CONNECTED;
     }
 
-    /**
-     *
-     */
-    public void disconnect() {
-        setState(Connection.DISCONNECTED);
-        Logger.Logit(mName + " :Disconnected");
-    }
-
-    /**
-     *
-     */
-    public void connect() {
-        setState(Connection.CONNECTED);
-        Logger.Logit(mName + " :Connected");
-    }
-
 
     /**
      *
@@ -160,7 +152,7 @@ public class Connection {
     /**
      *
      */
-    public void start(final GenericCallback cb) {
+    public void start(final Preferences pref) {
         Logger.Logit("Starting " + mName);
         if (getState() != Connection.CONNECTED) {
             Logger.Logit(mName + ": Starting failed because already started");
@@ -174,7 +166,7 @@ public class Connection {
             @Override
             public void run() {
                 mRunning = true;
-                cb.callback(null, null);
+                mCb.callback((Object)pref, null);
             }
         };
         mThread.start();
@@ -227,4 +219,23 @@ public class Connection {
         return data;
     }
 
+    public void disconnectConnection() {
+        setState(Connection.DISCONNECTED);
+        Logger.Logit(mName + " :Disconnected");
+    }
+
+
+    public boolean connectConnection() {
+        setState(Connection.CONNECTED);
+        Logger.Logit(mName + " :Connected");
+        return true;
+    }
+
+
+    public abstract List<String> getDevices();
+    public abstract boolean isSecure();
+    public abstract String getConnDevice();
+    public abstract void disconnect();
+    public abstract boolean connect(String param, boolean securely);
+    public abstract String getParam();
 }

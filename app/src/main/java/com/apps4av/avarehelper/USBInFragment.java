@@ -21,7 +21,8 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.Button;
 
-import com.apps4av.avarehelper.connections.USBConnectionIn;
+import com.apps4av.avarehelper.connections.Connection;
+import com.apps4av.avarehelper.connections.ConnectionFactory;
 import com.apps4av.avarehelper.storage.Preferences;
 import com.apps4av.avarehelper.storage.SavedEditText;
 
@@ -32,7 +33,7 @@ import com.apps4av.avarehelper.storage.SavedEditText;
  */
 public class USBInFragment extends Fragment {
 
-    private USBConnectionIn mUSB;
+    private Connection mUSB;
     private Context mContext;
     private Button mConnectButton;
     private Button mConnectFileSaveButton;
@@ -58,7 +59,7 @@ public class USBInFragment extends Fragment {
         /*
          * List of BT devices is same
          */
-        mUSB = USBConnectionIn.getInstance(mContext);
+        mUSB = ConnectionFactory.getConnection("USBConnectionIn", mContext);
         
         mConnectButton = (Button) view.findViewById(R.id.usbin_button_connect);
         mConnectButton.setOnClickListener(new OnClickListener() {
@@ -79,7 +80,7 @@ public class USBInFragment extends Fragment {
                  */
                 if (!mUSB.isConnected()) {
                     mConnectButton.setText(getString(R.string.Connect));
-                    mUSB.connect(mParamsText.getText().toString());
+                    mUSB.connect(mParamsText.getText().toString(), false);
                     if (mUSB.isConnected()) {
                         mUSB.start(new Preferences(getActivity()));
                     }
@@ -131,7 +132,7 @@ public class USBInFragment extends Fragment {
             mConnectFileSaveButton.setText(mContext.getString(R.string.Save));
         }
 
-        mParamsText.setText(mUSB.getParams());
+        mParamsText.setText(mUSB.getParam());
 
     }
     

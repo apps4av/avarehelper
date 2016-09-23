@@ -19,14 +19,8 @@ import android.content.ServiceConnection;
 import android.os.Binder;
 import android.os.IBinder;
 
-import com.apps4av.avarehelper.connections.BlueToothConnectionIn;
-import com.apps4av.avarehelper.connections.BlueToothConnectionOut;
-import com.apps4av.avarehelper.connections.FileConnectionIn;
-import com.apps4av.avarehelper.connections.GPSSimulatorConnection;
-import com.apps4av.avarehelper.connections.MsfsConnection;
-import com.apps4av.avarehelper.connections.USBConnectionIn;
-import com.apps4av.avarehelper.connections.WifiConnection;
-import com.apps4av.avarehelper.connections.XplaneConnection;
+import com.apps4av.avarehelper.connections.Connection;
+import com.apps4av.avarehelper.connections.ConnectionFactory;
 import com.apps4av.avarehelper.utils.GenericCallback;
 import com.ds.avare.IHelper;
 
@@ -43,14 +37,14 @@ public class BackgroundService extends Service {
 
     private IBinder mHelperService;
     
-    private BlueToothConnectionIn mBtInCon;
-    private BlueToothConnectionOut mBtOutCon;
-    private FileConnectionIn mFileInCon;
-    private GPSSimulatorConnection mGpsSimCon;
-    private USBConnectionIn mUsbInCon;
-    private WifiConnection mWifiCon;
-    private XplaneConnection mXplaneCon;
-    private MsfsConnection mMsfsCon;
+    private Connection mBtInCon;
+    private Connection mBtOutCon;
+    private Connection mFileInCon;
+    private Connection mGpsSimCon;
+    private Connection mUsbInCon;
+    private Connection mWifiCon;
+    private Connection mXplaneCon;
+    private Connection mMsfsCon;
     private Timer mTimer;
     private GenericCallback mCb;
 
@@ -126,14 +120,14 @@ public class BackgroundService extends Service {
     public void onCreate() {
         super.onCreate();
         
-        mBtInCon = BlueToothConnectionIn.getInstance();
-        mBtOutCon = BlueToothConnectionOut.getInstance();
-        mFileInCon = FileConnectionIn.getInstance();
-        mGpsSimCon = GPSSimulatorConnection.getInstance();
-        mUsbInCon = USBConnectionIn.getInstance(this);
-        mWifiCon = WifiConnection.getInstance();
-        mXplaneCon = XplaneConnection.getInstance();
-        mMsfsCon = MsfsConnection.getInstance();
+        mBtInCon = ConnectionFactory.getConnection("BlueToothConnectionIn", this);
+        mBtOutCon = ConnectionFactory.getConnection("BlueToothConnectionOut", this);
+        mFileInCon = ConnectionFactory.getConnection("FileConnectionIn", this);
+        mGpsSimCon = ConnectionFactory.getConnection("GPSSimulatorConnection", this);
+        mUsbInCon = ConnectionFactory.getConnection("USBConnectionIn", this);
+        mWifiCon = ConnectionFactory.getConnection("WifiConnection", this);
+        mXplaneCon = ConnectionFactory.getConnection("XplaneConnection", this);
+        mMsfsCon = ConnectionFactory.getConnection("MsfsConnection", this);
         mHelperService = null;
         
         mTimer = new Timer();
@@ -168,31 +162,6 @@ public class BackgroundService extends Service {
         }
         
         super.onDestroy();        
-    }
-
-    public BlueToothConnectionIn getBlueToothConnectionIn() {
-    	return mBtInCon;
-    }
-    public BlueToothConnectionOut getBlueToothConnectionOut() {
-    	return mBtOutCon;
-    }
-    public FileConnectionIn getFileConnectionIn() { 
-    	return mFileInCon;
-    }
-    public GPSSimulatorConnection getGPSSimulatorConnection() {
-    	return mGpsSimCon;
-    }
-    public USBConnectionIn getUSBConnectionIn() {
-    	return mUsbInCon;
-    }
-    public WifiConnection getWifiConnection() {
-    	return mWifiCon;
-    }
-    public XplaneConnection getXplaneConnection() {
-    	return mXplaneCon;
-    }
-    public MsfsConnection getMsfsConnection() {
-    	return mMsfsCon;
     }
 
     public void setStatusCallback(GenericCallback cb) {

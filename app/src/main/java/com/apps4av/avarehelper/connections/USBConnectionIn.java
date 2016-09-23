@@ -21,7 +21,9 @@ import com.apps4av.avarehelper.utils.Logger;
 import com.hoho.android.usbserial.driver.UsbSerialDriver;
 import com.hoho.android.usbserial.driver.UsbSerialProber;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.List;
 
 
 /**
@@ -42,26 +44,7 @@ public class USBConnectionIn extends Connection {
      */
     private USBConnectionIn() {
         super("USB Input");
-    }
-
-    /**
-     * 
-     * @return
-     */
-    public static USBConnectionIn getInstance(Context ctx) {
-        if(null == mConnection) {
-            mConnection = new USBConnectionIn();
-            mUsbManager = (UsbManager) ctx.getSystemService(Context.USB_SERVICE);
-        }
-        return mConnection;
-    }
-
-    /**
-     * 
-     */
-    public void start(final Preferences pref) {
-
-        super.start(new GenericCallback() {
+        setCallback(new GenericCallback() {
             @Override
             public Object callback(Object o, Object o1) {
                 BufferProcessor bp = new BufferProcessor();
@@ -101,7 +84,7 @@ public class USBConnectionIn extends Connection {
                         Logger.Logit("Disconnected from USB device, retrying to connect");
 
                         disconnect();
-                        connect(mParams);
+                        connect(mParams, false);
                         continue;
                     }
 
@@ -109,7 +92,7 @@ public class USBConnectionIn extends Connection {
                      * Put both in Decode and ADBS buffers
                      */
                     bp.put(buffer, red);
-                    LinkedList<String> objs = bp.decode(pref);
+                    LinkedList<String> objs = bp.decode((Preferences)o);
                     for(String s : objs) {
                         sendDataToHelper(s);
                     }
@@ -121,11 +104,24 @@ public class USBConnectionIn extends Connection {
 
     /**
      * 
+     * @return
+     */
+    public static USBConnectionIn getInstance(Context ctx) {
+        if(null == mConnection) {
+            mConnection = new USBConnectionIn();
+            mUsbManager = (UsbManager) ctx.getSystemService(Context.USB_SERVICE);
+        }
+        return mConnection;
+    }
+
+    /**
+     * 
      * A device name devNameMatch, will connect to first device whose
      * name matched this string.
      * @return
      */
-    public boolean connect(String params) {
+    @Override
+    public boolean connect(String params, boolean secure) {
         
         mParams = params;
         mDriver = UsbSerialProber.findFirstDevice(mUsbManager);
@@ -173,13 +169,18 @@ public class USBConnectionIn extends Connection {
             return false;
         } 
 
-        super.connect();
-        return true;
+        return connectConnection();
     }
-    
+
+    @Override
+    public String getParam() {
+        return mParams;
+    }
+
     /**
      * 
      */
+    @Override
     public void disconnect() {
         
         try {
@@ -192,9 +193,24 @@ public class USBConnectionIn extends Connection {
         /*
          * Exit
          */
-        super.disconnect();
+        disconnectConnection();
     }
-    
+
+    @Override
+    public List<String> getDevices() {
+        return new ArrayList<String>();
+    }
+
+    @Override
+    public boolean isSecure() {
+        return false;
+    }
+
+    @Override
+    public String getConnDevice() {
+        return "";
+    }
+
     /**
      * 
      * @return
@@ -212,12 +228,4 @@ public class USBConnectionIn extends Connection {
         return red;
     }
 
-    /**
-     * 
-     * @return
-     */
-    public String getParams() {
-        return mParams;
-    }
-    
 }

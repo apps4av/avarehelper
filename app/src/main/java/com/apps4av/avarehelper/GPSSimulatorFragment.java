@@ -11,7 +11,9 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CheckBox;
 
+import com.apps4av.avarehelper.connections.Connection;
 import com.apps4av.avarehelper.connections.GPSSimulatorConnection;
+import com.apps4av.avarehelper.storage.Preferences;
 import com.apps4av.avarehelper.storage.SavedEditText;
 
 /**
@@ -21,7 +23,7 @@ import com.apps4av.avarehelper.storage.SavedEditText;
  */
 public class GPSSimulatorFragment extends Fragment {
 
-	private GPSSimulatorConnection mGPSSim;
+	private Connection mGPSSim;
 	private CheckBox mLandAtCb;
 	private CheckBox mFlyToCb;
 	private SavedEditText mTextLat;
@@ -30,7 +32,6 @@ public class GPSSimulatorFragment extends Fragment {
 	private SavedEditText mTextSpeed;
 	private SavedEditText mTextAltitude;
 	private Button mButtonStart;
-	private Button mButtonApply;
 
 	private Context mContext;
 
@@ -48,16 +49,7 @@ public class GPSSimulatorFragment extends Fragment {
 		return ret;
 	}
 
-	private void apply() {
-		// Make sure there are valid values
-		mGPSSim.apply(getValidValue(mTextHeading.getText().toString()),
-				getValidValue(mTextSpeed.getText().toString()),
-				getValidValue(mTextAltitude.getText().toString()),
-				mFlyToCb.isChecked(),
-				mLandAtCb.isChecked());
-	}
-
-	@Override  
+	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {  
 		mContext = container.getContext();
 
@@ -70,7 +62,6 @@ public class GPSSimulatorFragment extends Fragment {
 		mTextAltitude = (SavedEditText)view.findViewById(R.id.main_gpssim_altitude);
 		mTextSpeed = (SavedEditText)view.findViewById(R.id.main_gpssim_speed);
 		mTextHeading = (SavedEditText)view.findViewById(R.id.main_gpssim_heading);
-		mButtonApply =(Button)view.findViewById(R.id.main_button_gpssim_apply);
 		mButtonStart = (Button)view.findViewById(R.id.main_button_gpssim_start);
 
 		mButtonStart.setOnClickListener(new OnClickListener() {
@@ -81,28 +72,26 @@ public class GPSSimulatorFragment extends Fragment {
                     mGPSSim.disconnect();
                 }
 				else {
-					apply();
-                    mGPSSim.connect();
-                    mGPSSim.start(getValidValue(mTextLat.getText().toString()),
-                            getValidValue(mTextLon.getText().toString()));
+                    mGPSSim.connect(
+                            getValidValue(mTextLat.getText().toString()) + "," +
+                            getValidValue(mTextLon.getText().toString()) + "," +
+                            getValidValue(mTextHeading.getText().toString()) + "," +
+                            getValidValue(mTextSpeed.getText().toString()) + "," +
+                            getValidValue(mTextAltitude.getText().toString()) + "," +
+                            mFlyToCb.isChecked() + "," +
+                            mLandAtCb.isChecked(),
+                            false);
+                    mGPSSim.start(new Preferences(mContext));
 				}
 
 				setStates();
 			}
 		});
 
-		mButtonApply.setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				if (mGPSSim.isConnected()) {
-					apply();
-				}
-			}
-		});
 		/*
 		 * Get Connection
 		 */
-		mGPSSim = GPSSimulatorConnection.getInstance();
+		mGPSSim = GPSSimulatorConnection.getInstance(mContext);
 
 		setStates();
 
@@ -114,23 +103,25 @@ public class GPSSimulatorFragment extends Fragment {
 		super.onDestroyView();
 	}
 
-	private void setStates() {
+    private void setStates() {
 		if(mGPSSim.isConnected()) {
 			mButtonStart.setText(mContext.getString(R.string.Stop));
-			mButtonApply.setEnabled(true);
 		}
 		else {
 			mButtonStart.setText(mContext.getString(R.string.Start));
-			mButtonApply.setEnabled(false);
 		}
 
-		mLandAtCb.setChecked(mGPSSim.getLandAtDest());
-		mFlyToCb.setChecked(mGPSSim.getFlyToDest());
-		mTextLat.setText(String.format("%.4f", mGPSSim.getLatitudeInit()));
-		mTextLon.setText(String.format("%.4f", mGPSSim.getLongitudeInit()));
-		mTextAltitude.setText(String.format("%.0f", mGPSSim.getAltitudeInFeet()));
-		mTextHeading.setText(String.format("%.0f", mGPSSim.getBearing()));
-		mTextSpeed.setText(String.format("%.0f", mGPSSim.getSpeedInKnots()));
-	}    
+        // lat, lon, alt, bearing, speed, landatdest, flytodest
+        String params[] = mGPSSim.getParam().split(",");
+
+
+		mTextLat.setText(String.format("%.4f", getValidValue(params[0])));
+		mTextLon.setText(String.format("%.4f", getValidValue(params[1])));
+        mTextHeading.setText(String.format("%.0f", getValidValue(params[2])));
+        mTextSpeed.setText(String.format("%.0f", getValidValue(params[3])));
+		mTextAltitude.setText(String.format("%.0f", getValidValue(params[4])));
+        mFlyToCb.setChecked(Boolean.parseBoolean(params[5]));
+        mLandAtCb.setChecked(Boolean.parseBoolean(params[6]));
+	}
 
 } 

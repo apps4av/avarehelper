@@ -12,8 +12,9 @@ Redistribution and use in source and binary forms, with or without modification,
 
 package com.apps4av.avarehelper.connections;
 
+import android.content.Context;
+
 import com.apps4av.avarehelper.nmea.Ownship;
-import com.apps4av.avarehelper.storage.Preferences;
 import com.apps4av.avarehelper.utils.GenericCallback;
 import com.apps4av.avarehelper.utils.Logger;
 
@@ -22,6 +23,8 @@ import org.json.JSONObject;
 
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 
@@ -35,34 +38,15 @@ public class MsfsConnection extends Connection {
     
     DatagramSocket mSocket;
     
-    private int mPort = 0;
+    private int mPort = 49002;
 
     /**
      * 
      */
     private MsfsConnection() {
         super("MSFS Input");
-    }
 
-    
-    /**
-     * 
-     * @return
-     */
-    public static MsfsConnection getInstance() {
-
-        if(null == mConnection) {
-            mConnection = new MsfsConnection();
-        }
-        return mConnection;
-    }
-
-    /**
-     * 
-     */
-    public void start(final Preferences pref) {
-
-        super.start(new GenericCallback() {
+        setCallback(new GenericCallback() {
             @Override
             public Object callback(Object o, Object o1) {
                 byte[] buffer = new byte[16384];
@@ -101,7 +85,7 @@ public class MsfsConnection extends Connection {
                         Logger.Logit("Listener error, re-starting listener");
 
                         disconnect();
-                        connect(mPort);
+                        connect(Integer.toString(mPort), false);
                         continue;
                     }
 
@@ -140,6 +124,20 @@ public class MsfsConnection extends Connection {
         });
     }
 
+    
+    /**
+     * 
+     * @return
+     * @param ctx
+     */
+    public static MsfsConnection getInstance(Context ctx) {
+
+        if(null == mConnection) {
+            mConnection = new MsfsConnection();
+        }
+        return mConnection;
+    }
+
         
     /**
      * 
@@ -147,9 +145,15 @@ public class MsfsConnection extends Connection {
      * name matched this string.
      * @return
      */
-    public boolean connect(int port) {
-        
-        mPort = port;
+    @Override
+    public boolean connect(String to, boolean secure) {
+
+        try {
+            mPort = Integer.parseInt(to);
+        }
+        catch (Exception e) {
+            return false;
+        }
         
         /*
          * Make socket
@@ -164,13 +168,18 @@ public class MsfsConnection extends Connection {
             return false;
         }
 
-        super.connect();
-        return true;
+        return connectConnection();
     }
-    
+
+    @Override
+    public String getParam() {
+        return Integer.toString(mPort);
+    }
+
     /**
      * 
      */
+    @Override
     public void disconnect() {
         
         /*
@@ -183,9 +192,24 @@ public class MsfsConnection extends Connection {
             Logger.Logit("Error stream close");
         }
 
-        super.disconnect();
+        disconnectConnection();
     }
-    
+
+    @Override
+    public List<String> getDevices() {
+        return new ArrayList<String>();
+    }
+
+    @Override
+    public boolean isSecure() {
+        return false;
+    }
+
+    @Override
+    public String getConnDevice() {
+        return "";
+    }
+
     /**
      * 
      * @return
@@ -202,15 +226,5 @@ public class MsfsConnection extends Connection {
         saveToFile(pkt.getLength(), buffer);
         return pkt.getLength();
     }
-
-
-    /**
-     * 
-     * @return
-     */
-    public int getPort() {
-        return mPort;
-    }
-
 
 }

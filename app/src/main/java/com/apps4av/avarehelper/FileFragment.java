@@ -69,7 +69,7 @@ public class FileFragment extends Fragment {
                 String val = mTextFile.getText().toString();
                 if(null != val && (!mFile.isConnected())) {                    
                     mConnectButton.setText(mContext.getString(R.string.Start));
-                    mFile.connect(val);
+                    mFile.connect(val, false);
                     if(mFile.isConnected()) {
                         mFile.start(new Preferences(getActivity()));
                     }
@@ -81,7 +81,7 @@ public class FileFragment extends Fragment {
         /*
          * List of BT devices is same
          */
-        mFile = FileConnectionIn.getInstance();
+        mFile = FileConnectionIn.getInstance(mContext);
 
         setStates();
         return view;

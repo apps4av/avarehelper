@@ -22,10 +22,10 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CheckBox;
 
+import com.apps4av.avarehelper.connections.Connection;
 import com.apps4av.avarehelper.connections.WifiConnection;
 import com.apps4av.avarehelper.storage.Preferences;
 import com.apps4av.avarehelper.storage.SavedEditText;
-import com.apps4av.avarehelper.utils.Logger;
 
 /**
  * 
@@ -34,7 +34,7 @@ import com.apps4av.avarehelper.utils.Logger;
  */
 public class WiFiInFragment extends Fragment {
     
-    private WifiConnection mWifi;
+    private Connection mWifi;
     private SavedEditText mTextWifiPort;
     private CheckBox mWifiCb;
     private Context mContext;
@@ -52,7 +52,7 @@ public class WiFiInFragment extends Fragment {
          * WIFI connection
          */
 
-        mWifi = WifiConnection.getInstance();
+        mWifi = WifiConnection.getInstance(mContext);
 
         mTextFileSave = (SavedEditText)view.findViewById(R.id.main_file_name_save);
         mWifiCb = (CheckBox)view.findViewById(R.id.main_button_connectwifi);
@@ -63,15 +63,7 @@ public class WiFiInFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 if (((CheckBox) v).isChecked()) {
-                    try {
-                        mWifi.connect(Integer.parseInt(mTextWifiPort.getText().toString()));
-                    }
-                    catch (Exception e) {
-                        /*
-                         * Number parse
-                         */
-                        Logger.Logit("Invalid port");
-                    }
+                    mWifi.connect(mTextWifiPort.getText().toString(), false);
                     mWifi.start(new Preferences(getActivity()));
                 }
                 else {
@@ -119,9 +111,7 @@ public class WiFiInFragment extends Fragment {
             mConnectFileSaveButton.setText(mContext.getString(R.string.Save));
         }
 
-        if(mWifi.getPort() != 0) {
-            mTextWifiPort.setText("" + mWifi.getPort());
-        }
+        mTextWifiPort.setText(mWifi.getParam());
 
     }
 

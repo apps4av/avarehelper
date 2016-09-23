@@ -12,7 +12,8 @@ Redistribution and use in source and binary forms, with or without modification,
 
 package com.apps4av.avarehelper.connections;
 
-import com.apps4av.avarehelper.storage.Preferences;
+import android.content.Context;
+
 import com.apps4av.avarehelper.utils.GenericCallback;
 import com.apps4av.avarehelper.utils.Logger;
 
@@ -20,6 +21,8 @@ import org.json.JSONObject;
 
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 
@@ -33,7 +36,7 @@ public class XplaneConnection extends Connection {
 
     DatagramSocket mSocket;
     
-    private int mPort = 0;
+    private int mPort = 49002;
     
 
     /**
@@ -41,29 +44,7 @@ public class XplaneConnection extends Connection {
      */
     private XplaneConnection() {
         super("XPlane Input");
-    }
-
-    
-    /**
-     * 
-     * @return
-     */
-    public static XplaneConnection getInstance() {
-
-        if(null == mConnection) {
-            mConnection = new XplaneConnection();
-        }
-        return mConnection;
-    }
-
-
-    /**
-     * 
-     */
-    public void start(final Preferences pref) {
-
-
-        super.start(new GenericCallback() {
+        setCallback(new GenericCallback() {
             @Override
             public Object callback(Object o, Object o1) {
                 byte[] buffer = new byte[1024];
@@ -97,7 +78,7 @@ public class XplaneConnection extends Connection {
                         Logger.Logit("Listener error, re-starting listener");
 
                         disconnect();
-                        connect(mPort);
+                        connect(Integer.toString(mPort), false);
                         continue;
                     }
 
@@ -129,6 +110,20 @@ public class XplaneConnection extends Connection {
             }
         });
     }
+
+    
+    /**
+     * 
+     * @return
+     * @param ctx
+     */
+    public static XplaneConnection getInstance(Context ctx) {
+
+        if(null == mConnection) {
+            mConnection = new XplaneConnection();
+        }
+        return mConnection;
+    }
     
         
     /**
@@ -137,9 +132,15 @@ public class XplaneConnection extends Connection {
      * name matched this string.
      * @return
      */
-    public boolean connect(int port) {
-        
-        mPort = port;
+    @Override
+    public boolean connect(String to, boolean secure) {
+
+        try {
+            mPort = Integer.parseInt(to);
+        }
+        catch (Exception e) {
+            return false;
+        }
         
         /*
          * Make socket
@@ -154,14 +155,18 @@ public class XplaneConnection extends Connection {
             return false;
         }
 
-        super.connect();
-
-        return true;
+        return connectConnection();
     }
-    
+
+    @Override
+    public String getParam() {
+        return Integer.toString(mPort);
+    }
+
     /**
      * 
      */
+    @Override
     public void disconnect() {
 
         /*
@@ -174,9 +179,24 @@ public class XplaneConnection extends Connection {
             Logger.Logit("Error stream close");
         }
 
-        super.disconnect();
+        disconnectConnection();
     }
-    
+
+    @Override
+    public List<String> getDevices() {
+        return new ArrayList<String>();
+    }
+
+    @Override
+    public boolean isSecure() {
+        return false;
+    }
+
+    @Override
+    public String getConnDevice() {
+        return "";
+    }
+
     /**
      * 
      * @return
@@ -191,15 +211,5 @@ public class XplaneConnection extends Connection {
         }
         return pkt.getLength();
     }
-
-
-    /**
-     * 
-     * @return
-     */
-    public int getPort() {
-        return mPort;
-    }
-
 
 }

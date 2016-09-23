@@ -30,14 +30,7 @@ import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
-import com.apps4av.avarehelper.connections.BlueToothConnectionIn;
-import com.apps4av.avarehelper.connections.BlueToothConnectionOut;
-import com.apps4av.avarehelper.connections.FileConnectionIn;
-import com.apps4av.avarehelper.connections.GPSSimulatorConnection;
-import com.apps4av.avarehelper.connections.MsfsConnection;
-import com.apps4av.avarehelper.connections.USBConnectionIn;
-import com.apps4av.avarehelper.connections.WifiConnection;
-import com.apps4av.avarehelper.connections.XplaneConnection;
+import com.apps4av.avarehelper.connections.ConnectionFactory;
 import com.apps4av.avarehelper.utils.GenericCallback;
 import com.apps4av.avarehelper.utils.Logger;
 
@@ -274,24 +267,6 @@ public class MainActivity extends ActionBarActivity implements
         return true;
     }
 
-    /*
-     * Find names of all running connections.
-     */
-    public static String getConnections(Context ctx) {
-        String s = "";
-        s += BlueToothConnectionIn.getInstance().isConnected() ? "," + ctx.getString(R.string.Bluetooth) : "";
-        s += WifiConnection.getInstance().isConnected() ?  "," + ctx.getString(R.string.WIFI) : "";
-        s += XplaneConnection.getInstance().isConnected() ? "," + ctx.getString(R.string.XPlane) : "";
-        s += MsfsConnection.getInstance().isConnected() ? "," + ctx.getString(R.string.MSFS) : "";
-        s += BlueToothConnectionOut.getInstance().isConnected() ? "," + ctx.getString(R.string.AP) : "";
-        s += FileConnectionIn.getInstance().isConnected() ? "," + ctx.getString(R.string.Play) : "";
-        s += GPSSimulatorConnection.getInstance().isConnected() ? "," + ctx.getString(R.string.GPSSIM) : "";
-        s += USBConnectionIn.getInstance(ctx).isConnected() ? "," + ctx.getString(R.string.USBIN) : "";
-        if(s.startsWith(",")) {
-            s = s.substring(1);
-        }
-        return "(" + s + ")";
-    }
 
     /**
      * This leak warning is not an issue if we do not post delayed messages, which is true here.
@@ -300,7 +275,7 @@ public class MainActivity extends ActionBarActivity implements
         @Override
         public void handleMessage(Message msg) {
             if((Boolean)msg.obj) {
-            	mTextStatus.setText(getString(R.string.Connected) + " " + getConnections(getApplicationContext()));
+            	mTextStatus.setText(getString(R.string.Connected) + " " + ConnectionFactory.getActiveConnections(getApplicationContext()));
             }
             else {
             	mTextStatus.setText(getString(R.string.NotConnected));

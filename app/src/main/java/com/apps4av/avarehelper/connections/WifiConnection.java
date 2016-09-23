@@ -12,13 +12,17 @@ Redistribution and use in source and binary forms, with or without modification,
 
 package com.apps4av.avarehelper.connections;
 
+import android.content.Context;
+
 import com.apps4av.avarehelper.storage.Preferences;
 import com.apps4av.avarehelper.utils.GenericCallback;
 import com.apps4av.avarehelper.utils.Logger;
 
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
+import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.List;
 
 /**
  * 
@@ -32,7 +36,7 @@ public class WifiConnection extends Connection {
 
     DatagramSocket mSocket;
     
-    private int mPort = 0;
+    private int mPort = 43211;
     
 
     /**
@@ -40,27 +44,7 @@ public class WifiConnection extends Connection {
      */
     private WifiConnection() {
         super("WIFI Input");
-    }
-
-
-    /**
-     * 
-     * @return
-     */
-    public static WifiConnection getInstance() {
-
-        if(null == mConnection) {
-            mConnection = new WifiConnection();
-        }
-        return mConnection;
-    }
-
-    /**
-     * 
-     */
-    public void start(final Preferences pref) {
-
-        super.start(new GenericCallback() {
+        setCallback(new GenericCallback() {
             @Override
             public Object callback(Object o, Object o1) {
                 BufferProcessor bp = new BufferProcessor();
@@ -95,7 +79,7 @@ public class WifiConnection extends Connection {
                         Logger.Logit("Listener error, re-starting listener");
 
                         disconnect();
-                        connect(mPort);
+                        connect(Integer.toString(mPort), false);
                         continue;
                     }
 
@@ -103,7 +87,7 @@ public class WifiConnection extends Connection {
                      * Put both in Decode and ADBS buffers
                      */
                     bp.put(buffer, red);
-                    LinkedList<String> objs = bp.decode(pref);
+                    LinkedList<String> objs = bp.decode((Preferences)o);
                     for(String s : objs) {
                         sendDataToHelper(s);
                     }
@@ -112,16 +96,36 @@ public class WifiConnection extends Connection {
             }
         });
     }
-        
+
+
+    /**
+     * 
+     * @return
+     * @param ctx
+     */
+    public static WifiConnection getInstance(Context ctx) {
+
+        if(null == mConnection) {
+            mConnection = new WifiConnection();
+        }
+        return mConnection;
+    }
+
     /**
      * 
      * A device name devNameMatch, will connect to first device whose
      * name matched this string.
      * @return
      */
-    public boolean connect(int port) {
-        
-        mPort = port;
+    @Override
+    public boolean connect(String to, boolean secure) {
+
+        try {
+            mPort = Integer.parseInt(to);
+        }
+        catch (Exception e) {
+            return false;
+        }
         
         /*
          * Make socket
@@ -137,15 +141,19 @@ public class WifiConnection extends Connection {
             return false;
         }
 
+        return connectConnection();
 
-        super.connect();
-
-        return true;
     }
-    
+
+    @Override
+    public String getParam() {
+        return Integer.toString(mPort);
+    }
+
     /**
      * 
      */
+    @Override
     public void disconnect() {
         
         /*
@@ -158,9 +166,24 @@ public class WifiConnection extends Connection {
             Logger.Logit("Error stream close");
         }
 
-        super.disconnect();
+        disconnectConnection();
     }
-    
+
+    @Override
+    public List<String> getDevices() {
+        return new ArrayList<String>();
+    }
+
+    @Override
+    public boolean isSecure() {
+        return false;
+    }
+
+    @Override
+    public String getConnDevice() {
+        return "";
+    }
+
     /**
      * 
      * @return
@@ -177,14 +200,6 @@ public class WifiConnection extends Connection {
         saveToFile(pkt.getLength(), buffer);
         
         return pkt.getLength();
-    }
-
-    /**
-     * 
-     * @return
-     */
-    public int getPort() {
-        return mPort;
     }
 
 }

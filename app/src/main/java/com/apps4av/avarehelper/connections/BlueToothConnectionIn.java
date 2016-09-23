@@ -15,6 +15,7 @@ package com.apps4av.avarehelper.connections;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
+import android.content.Context;
 
 import com.apps4av.avarehelper.storage.Preferences;
 import com.apps4av.avarehelper.utils.GenericCallback;
@@ -53,28 +54,7 @@ public class BlueToothConnectionIn extends Connection {
      */
     private BlueToothConnectionIn() {
         super("Bluetooth Input");
-        mBtAdapter = BluetoothAdapter.getDefaultAdapter();
-    }
-
-    /**
-     * 
-     * @return
-     */
-    public static BlueToothConnectionIn getInstance() {
-
-        if(null == mConnection) {
-            mConnection = new BlueToothConnectionIn();
-        }
-        return mConnection;
-    }
-
-
-    /**
-     * 
-     */
-    public void start(final Preferences pref) {
-
-        super.start(new GenericCallback() {
+        setCallback(new GenericCallback() {
             @Override
             public Object callback(Object o, Object o1) {
                 BufferProcessor bp = new BufferProcessor();
@@ -117,7 +97,7 @@ public class BlueToothConnectionIn extends Connection {
                      * Put both in Decode and ADBS buffers
                      */
                     bp.put(buffer, red);
-                    LinkedList<String> objs = bp.decode(pref);
+                    LinkedList<String> objs = bp.decode((Preferences)o);
                     for (String s : objs) {
                         sendDataToHelper(s);
                     }
@@ -125,32 +105,23 @@ public class BlueToothConnectionIn extends Connection {
                 return null;
             }
         });
+        mBtAdapter = BluetoothAdapter.getDefaultAdapter();
     }
-    
+
     /**
      * 
      * @return
+     * @param ctx
      */
-    public List<String> getDevices() {
-        List<String> list = new ArrayList<String>();
-        if(null == mBtAdapter) {
-            return list;
+    public static BlueToothConnectionIn getInstance(Context ctx) {
+
+        if(null == mConnection) {
+            mConnection = new BlueToothConnectionIn();
         }
-        Set<BluetoothDevice> pairedDevices = mBtAdapter.getBondedDevices();
-        
-        /*
-         * Find devices
-         */
-        if(null == pairedDevices) {            
-            return list;
-        }
-        for(BluetoothDevice bt : pairedDevices) {
-            list.add((String)bt.getName());
-        }
-        
-        return list;
+        return mConnection;
     }
-    
+
+
     /**
      * 
      * A device name devNameMatch, will connect to first device whose
@@ -277,11 +248,14 @@ public class BlueToothConnectionIn extends Connection {
             setState(Connection.DISCONNECTED);
         }
 
-        super.connect();
-
-        return true;
+        return connectConnection();
     }
-    
+
+    @Override
+    public String getParam() {
+        return mDevName;
+    }
+
     /**
      * 
      */
@@ -303,7 +277,8 @@ public class BlueToothConnectionIn extends Connection {
         catch(Exception e2) {
             Logger.Logit("Error socket close");
         }
-        super.disconnect();
+
+        disconnectConnection();
     }
     
     /**
@@ -327,14 +302,42 @@ public class BlueToothConnectionIn extends Connection {
      * 
      * @return
      */
+    @Override
     public boolean isSecure() {
         return mSecure;
     }
 
     /**
+     *
+     * @return
+     */
+    @Override
+    public List<String> getDevices() {
+        List<String> list = new ArrayList<String>();
+        if(null == mBtAdapter) {
+            return list;
+        }
+        Set<BluetoothDevice> pairedDevices = mBtAdapter.getBondedDevices();
+
+        /*
+         * Find devices
+         */
+        if(null == pairedDevices) {
+            return list;
+        }
+        for(BluetoothDevice bt : pairedDevices) {
+            list.add((String)bt.getName());
+        }
+
+        return list;
+    }
+
+
+    /**
      * 
      * @return
      */
+    @Override
     public String getConnDevice() {
         return mDevName;
     }
