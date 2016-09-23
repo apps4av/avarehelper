@@ -26,146 +26,146 @@ import java.util.List;
 
 /**
  * 
- * @author rasii
+ * @author rasii, zkhan
  *
  */
 public class GPSSimulatorConnection extends Connection {
-	private static double KNOTS_TO_MS = 0.514444f;
-	private static double FEET_TO_METERS = 0.3048f;
+    private static double KNOTS_TO_MS = 0.514444f;
+    private static double FEET_TO_METERS = 0.3048f;
 
-	private static GPSSimulatorConnection mConnection;
+    private static GPSSimulatorConnection mConnection;
 
-	private double mBearing = 45;
-	private double mSpeed = 150f * KNOTS_TO_MS;
-	private double mAltitude = 5000 * FEET_TO_METERS;
-	private double mLon = -94.7376f;
-	private double mLat = 38.8476f;
-	private double mLonInit = -94.7376f;
-	private double mLatInit = 38.8476f;
+    private double mBearing = 45;
+    private double mSpeed = 150f * KNOTS_TO_MS;
+    private double mAltitude = 5000 * FEET_TO_METERS;
+    private double mLon = -94.7376f;
+    private double mLat = 38.8476f;
+    private double mLonInit = -94.7376f;
+    private double mLatInit = 38.8476f;
 
-	private boolean mLandAtDest = false;
-	private boolean mFlyToDest = false;
-	private boolean mDestValid = false;
-	private double mDestDistance = -1;
-	private double mDestBearing = -1;
-	private double mDestElevation = 0;
+    private boolean mLandAtDest = false;
+    private boolean mFlyToDest = false;
+    private boolean mDestValid = false;
+    private double mDestDistance = -1;
+    private double mDestBearing = -1;
+    private double mDestElevation = 0;
 
-	/**
-	 * 
-	 */
-	 private GPSSimulatorConnection() {
-		 super("GPS Simulator Input");
-         setCallback(new GenericCallback() {
-             @Override
-             public Object callback(Object o, Object o1) {
+    /**
+     *
+     */
+    private GPSSimulatorConnection() {
+        super("GPS Simulator Input");
+        setCallback(new GenericCallback() {
+            @Override
+            public Object callback(Object o, Object o1) {
 
-                 double bearing = mBearing;
-                  /*
-                   * Start the GPS Simulator
-                   */
-                 while (isRunning()) {
-                     double time = 1; // in seconds
-                     if (isStopped()) {
-                         break;
-                     }
+                double bearing = mBearing;
+                /*
+                 * Start the GPS Simulator
+                 */
+                while (isRunning()) {
+                    double time = 1; // in seconds
+                    if (isStopped()) {
+                        break;
+                    }
 
-                     try {
-                         Thread.sleep((long) (time * 1000));
-                     } catch (Exception e) {
+                    try {
+                        Thread.sleep((long) (time * 1000));
+                    } catch (Exception e) {
 
-                     }
+                    }
 
-                     if (mFlyToDest && mDestValid) {
-                         // Just keep last bearing if we're getting really close, we don't want
-                         // crazy swings at destination passage
-                         if (mDestDistance > 0.1) {
-                             bearing = mDestBearing;
-                         }
-                     } else {
-                         bearing = mBearing;
-                     }
+                    if (mFlyToDest && mDestValid) {
+                        // Just keep last bearing if we're getting really close, we don't want
+                        // crazy swings at destination passage
+                        if (mDestDistance > 0.1) {
+                            bearing = mDestBearing;
+                        }
+                    } else {
+                        bearing = mBearing;
+                    }
 
-                     double speed = mSpeed;
-                     double altitude = mAltitude;
+                    double speed = mSpeed;
+                    double altitude = mAltitude;
 
-                     // See if we're supposed to land, only do it at the final destination
-                     // This is pretty simple logic, but it's something...
-                     if (mLandAtDest && mDestValid) {
-                         // Get close then stop
-                         if (mDestDistance < 10) {
-                             // This is somewhat random, but will simulate a descent
-                             altitude = mDestElevation + ((mAltitude - mDestElevation) * (mDestDistance / 10.0));
+                    // See if we're supposed to land, only do it at the final destination
+                    // This is pretty simple logic, but it's something...
+                    if (mLandAtDest && mDestValid) {
+                        // Get close then stop
+                        if (mDestDistance < 10) {
+                            // This is somewhat random, but will simulate a descent
+                            altitude = mDestElevation + ((mAltitude - mDestElevation) * (mDestDistance / 10.0));
 
-                             // Slow down as we get close, stop when we're really close
-                             if (mDestDistance < 0.1) {
-                                 speed = 0;
-                                 altitude = mDestElevation;
-                             } else if (mDestDistance < 1) {
-                                 speed = Math.max(mSpeed * mDestDistance / 2.0, 20 * KNOTS_TO_MS);
-                             } else if (mDestDistance < 5) {
-                                 speed = mSpeed * ((mDestDistance + 5) / 10.0);
-                             }
-                         }
-                     }
+                            // Slow down as we get close, stop when we're really close
+                            if (mDestDistance < 0.1) {
+                                speed = 0;
+                                altitude = mDestElevation;
+                            } else if (mDestDistance < 1) {
+                                speed = Math.max(mSpeed * mDestDistance / 2.0, 20 * KNOTS_TO_MS);
+                            } else if (mDestDistance < 5) {
+                                speed = mSpeed * ((mDestDistance + 5) / 10.0);
+                            }
+                        }
+                    }
 
-                     double earthRadius = 6371000f; // Earth Radius in meters
-                     double distance = speed * time;
-                     double degToRad = Math.PI / 180.0;
-                     double radToDeg = 180.0 / Math.PI;
-                     double lat2 = Math.asin(Math.sin(degToRad * mLat) *
-                             Math.cos(distance / earthRadius) +
-                             Math.cos(degToRad * mLat) *
-                                     Math.sin(distance / earthRadius) *
-                                     Math.cos(degToRad * bearing));
-                     double lon2 = degToRad * mLon + Math.atan2(Math.sin(degToRad * bearing) *
-                                     Math.sin(distance / earthRadius) *
-                                     Math.cos(degToRad * mLat),
-                             Math.cos(distance / earthRadius) -
-                                     Math.sin(degToRad * mLat) * Math.sin(lat2));
+                    double earthRadius = 6371000f; // Earth Radius in meters
+                    double distance = speed * time;
+                    double degToRad = Math.PI / 180.0;
+                    double radToDeg = 180.0 / Math.PI;
+                    double lat2 = Math.asin(Math.sin(degToRad * mLat) *
+                            Math.cos(distance / earthRadius) +
+                            Math.cos(degToRad * mLat) *
+                                    Math.sin(distance / earthRadius) *
+                                    Math.cos(degToRad * bearing));
+                    double lon2 = degToRad * mLon + Math.atan2(Math.sin(degToRad * bearing) *
+                                    Math.sin(distance / earthRadius) *
+                                    Math.cos(degToRad * mLat),
+                            Math.cos(distance / earthRadius) -
+                                    Math.sin(degToRad * mLat) * Math.sin(lat2));
 
-                     // Now convert radians to degrees
-                     mLat = lat2 * radToDeg;
-                     mLon = lon2 * radToDeg;
+                    // Now convert radians to degrees
+                    mLat = lat2 * radToDeg;
+                    mLon = lon2 * radToDeg;
 
                       /*
                        * Make a GPS location message
                        */
-                     JSONObject object = new JSONObject();
-                     try {
-                         object.put("type", "ownship");
-                         object.put("longitude", mLon);
-                         object.put("latitude", mLat);
-                         object.put("speed", speed);
-                         object.put("bearing", bearing);
-                         object.put("altitude", altitude);
-                         object.put("time", System.currentTimeMillis());
-                     } catch (JSONException e1) {
-                         continue;
-                     }
+                    JSONObject object = new JSONObject();
+                    try {
+                        object.put("type", "ownship");
+                        object.put("longitude", mLon);
+                        object.put("latitude", mLat);
+                        object.put("speed", speed);
+                        object.put("bearing", bearing);
+                        object.put("altitude", altitude);
+                        object.put("time", System.currentTimeMillis());
+                    } catch (JSONException e1) {
+                        continue;
+                    }
 
-                     sendDataToHelper(object.toString());
+                    sendDataToHelper(object.toString());
 
-                     // See if we got anything from Avare, but since it will block, do not bombard
-                     mHandler.removeMessages(0);
-                     mHandler.sendEmptyMessage(0);
+                    // See if we got anything from Avare, but since it will block, do not bombard
+                    mHandler.removeMessages(0);
+                    mHandler.sendEmptyMessage(0);
 
-                 }
+                }
 
-                 return null;
-             }
-         });
-     }
+                return null;
+            }
+        });
+    }
 
-	 /**
-	  * 
-	  * @return
-	  */
-     public static GPSSimulatorConnection getInstance(Context ctx) {
-          if(null == mConnection) {
-			  mConnection = new GPSSimulatorConnection();
-          }
-          return mConnection;
-	  }
+    /**
+     *
+     * @return
+     */
+    public static GPSSimulatorConnection getInstance(Context ctx) {
+        if(null == mConnection) {
+            mConnection = new GPSSimulatorConnection();
+        }
+        return mConnection;
+    }
 
     /**
      * Handler to get data from Avare
@@ -243,11 +243,11 @@ public class GPSSimulatorConnection extends Connection {
     public String getParam() {
         return
                 mLatInit + "," +
-                mLonInit + "," +
-                mBearing + "," +
-                (mSpeed / KNOTS_TO_MS) + "," +
-                (mAltitude / FEET_TO_METERS) + "," +
-                mFlyToDest + "," +
-                mLandAtDest;
+                        mLonInit + "," +
+                        mBearing + "," +
+                        (mSpeed / KNOTS_TO_MS) + "," +
+                        (mAltitude / FEET_TO_METERS) + "," +
+                        mFlyToDest + "," +
+                        mLandAtDest;
     }
 }
