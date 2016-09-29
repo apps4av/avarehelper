@@ -150,6 +150,14 @@ public class WifiConnection extends Connection {
         return Integer.toString(mPort);
     }
 
+    public void setParam(String param) {
+        try {
+            mPort=Integer.valueOf(param);
+        }
+        catch(Exception e) {
+        }
+    }
+
     /**
      * 
      */
