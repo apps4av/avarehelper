@@ -238,4 +238,8 @@ public abstract class Connection {
     public abstract void disconnect();
     public abstract boolean connect(String param, boolean securely);
     public abstract String getParam();
+
+    // TODO should be abstract
+    public void setParam(String param) {}
+
 }
