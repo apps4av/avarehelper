@@ -13,7 +13,6 @@ package com.apps4av.avarehelper;
 
 
 import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -115,17 +114,6 @@ public class WiFiInFragment extends Fragment {
         // if port text not blank, set the connections port
         if(mTextWifiPort.length()>0) {
             mWifi.setParam(mTextWifiPort.toString());
-
-            // auto start listening
-            mWifiCb.setChecked(true);
-            mWifiCb.callOnClick();
-
-            // fire up avare
-            Intent launchIntent;
-            launchIntent = mContext.getPackageManager().getLaunchIntentForPackage("com.ds.avare");
-            if (launchIntent != null) {
-                startActivity(launchIntent);//null pointer check in case package name was not found
-            }
         }
         else {
             // nothing set, use default
