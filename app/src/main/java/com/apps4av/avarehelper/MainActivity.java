@@ -31,6 +31,7 @@ import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
 import com.apps4av.avarehelper.connections.ConnectionFactory;
+import com.apps4av.avarehelper.storage.Preferences;
 import com.apps4av.avarehelper.utils.GenericCallback;
 import com.apps4av.avarehelper.utils.Logger;
 
@@ -39,7 +40,9 @@ import java.util.HashMap;
 
 public class MainActivity extends ActionBarActivity implements
     ActionBar.OnNavigationListener {
-    
+
+    private final int mPrefFragment = 1;
+
     private TextView mTextLog;
     private TextView mTextStatus;
     
@@ -147,6 +150,16 @@ public class MainActivity extends ActionBarActivity implements
             //newly created, compute data
             mState = new HashMap<String, String>();
             mState.put("fragmentIndex", "0");
+            // attempt to load last selected fragment
+            try {
+                Preferences p=new Preferences(this);
+                int id = Integer.valueOf(p.getEditTextValue(mPrefFragment));
+                if(id >= 0) {
+                    actionBar.setSelectedNavigationItem(id);
+                }
+            }
+            catch (Exception e) {
+            }
         }
     }
 
@@ -216,6 +229,10 @@ public class MainActivity extends ActionBarActivity implements
 
         // Store fragment we are showing now
         mState.put("fragmentIndex", Integer.toString(itemPosition));
+
+        // save current fragment
+        Preferences p = new Preferences(this);
+        p.setEditTextValue(mPrefFragment,Integer.toString(itemPosition));
 
         switch(itemPosition) {
         
