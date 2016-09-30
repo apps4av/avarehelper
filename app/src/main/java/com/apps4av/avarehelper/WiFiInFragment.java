@@ -111,7 +111,14 @@ public class WiFiInFragment extends Fragment {
             mConnectFileSaveButton.setText(mContext.getString(R.string.Save));
         }
 
-        mTextWifiPort.setText(mWifi.getParam());
+        // if port text not blank, set the connections port
+        if(mTextWifiPort.length()>0) {
+            mWifi.setParam(mTextWifiPort.toString());
+        }
+        else {
+            // nothing set, use default
+            mTextWifiPort.setText(mWifi.getParam());
+        }
 
     }
 
