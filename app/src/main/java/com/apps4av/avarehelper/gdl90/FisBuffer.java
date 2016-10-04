@@ -24,6 +24,9 @@ public class FisBuffer {
 
     private int mSize;
     private byte mBuffer[];
+    private float mLat;
+    private float mLon;
+    private int mTisbSiteID;
     private LinkedList<Product> mProducts;
     
     /**
@@ -36,11 +39,14 @@ public class FisBuffer {
      * @param lat
      * @param lon
      */
-    public FisBuffer(byte buffer[], int offset, int slotId, int fisbId, boolean pvalid, float lat, float lon) {
+    public FisBuffer(byte buffer[], int offset, int slotId, int fisbId, boolean pvalid, float lat, float lon, int tisbSiteID) {
         mSize = 424;
         mBuffer = buffer;
         mProducts = new LinkedList<Product>();
         mBuffer = new byte[mSize];
+        mLat = lat;
+        mLon = lon;
+        mTisbSiteID = tisbSiteID;
         System.arraycopy(buffer, offset, mBuffer, 0, mSize);
     }
     
@@ -89,4 +95,11 @@ public class FisBuffer {
     public LinkedList<Product> getProducts() {
         return mProducts;
     }
+    public float getLat() {
+        return mLat;
+    }
+    public float getLon() {
+        return mLon;
+    }
+    public int getTISid() { return mTisbSiteID; }
 }
