@@ -51,7 +51,6 @@ public class Preferences {
 
     /**
      * 
-     * @param tags
      */
     public void setEditTextValue(int id, String val) {
         mPref.edit().putString("EditText" + id, val).commit();
@@ -67,10 +66,23 @@ public class Preferences {
 
     /**
      * 
-     * @param tags
      */
     public void setCheckboxValue(int id, boolean val) {
         mPref.edit().putBoolean("Checkbox" + id, val).commit();
     }
 
+    /**
+     *
+     */
+    public int getFragmentIndex() {
+        return mPref.getInt("fragmentindex", 0);
+    }
+
+    /**
+     *
+     * @param fragmentIndex
+     */
+    public void setFragmentIndex(int fragmentIndex) {
+        mPref.edit().putInt("fragmentindex", fragmentIndex).commit();
+    }
 }

@@ -31,6 +31,7 @@ import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
 import com.apps4av.avarehelper.connections.ConnectionFactory;
+import com.apps4av.avarehelper.storage.Preferences;
 import com.apps4av.avarehelper.utils.GenericCallback;
 import com.apps4av.avarehelper.utils.Logger;
 
@@ -46,6 +47,7 @@ public class MainActivity extends ActionBarActivity implements
     private BackgroundService mService;
 
     private HashMap<String, String> mState;
+    private Preferences mPref;
 
     private Fragment[] mFragments = new Fragment[10];
 
@@ -74,7 +76,8 @@ public class MainActivity extends ActionBarActivity implements
         mTextStatus = (TextView)view.findViewById(R.id.main_text_status);
         Logger.setTextView(mTextLog);
         setContentView(view);
-        
+
+        mPref = new Preferences(getApplicationContext());
         /*
          * Start service now, bind later. This will be no-op if service is already running
          */
@@ -146,7 +149,14 @@ public class MainActivity extends ActionBarActivity implements
         else {
             //newly created, compute data
             mState = new HashMap<String, String>();
-            mState.put("fragmentIndex", "0");
+            try {
+                int id = mPref.getFragmentIndex();
+                if(id >= 0) {
+                    actionBar.setSelectedNavigationItem(id);
+                }
+            }
+            catch (Exception e) {
+            }
         }
     }
 
@@ -216,6 +226,7 @@ public class MainActivity extends ActionBarActivity implements
 
         // Store fragment we are showing now
         mState.put("fragmentIndex", Integer.toString(itemPosition));
+        mPref.setFragmentIndex(itemPosition);
 
         switch(itemPosition) {
         
