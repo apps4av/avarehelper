@@ -90,8 +90,8 @@ public class MainActivity extends ActionBarActivity implements
         actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
         Bundle args = new Bundle();
         int pos = 0;
-        mFragments[pos++] = new BlueToothInFragment();
         mFragments[pos++] = new WiFiInFragment();
+        mFragments[pos++] = new BlueToothInFragment();
         mFragments[pos++] = new XplaneFragment();
         mFragments[pos++] = new MsfsFragment();
         mFragments[pos++] = new BlueToothOutFragment();
@@ -111,9 +111,9 @@ public class MainActivity extends ActionBarActivity implements
         new ArrayAdapter<String>(actionBar.getThemedContext(),
                 android.R.layout.simple_list_item_1,
                 android.R.id.text1, new String[] {
-                getString(R.string.Bluetooth), 
-                getString(R.string.WIFI), 
-                getString(R.string.XPlane), 
+                getString(R.string.WIFI),
+                getString(R.string.Bluetooth),
+                getString(R.string.XPlane),
                 getString(R.string.MSFS), 
                 getString(R.string.AP), 
                 getString(R.string.Play), 
@@ -231,15 +231,15 @@ public class MainActivity extends ActionBarActivity implements
         switch(itemPosition) {
         
             case 0:
-                BlueToothInFragment btin = (BlueToothInFragment) mFragments[itemPosition];
-                fragmentTransaction.replace(R.id.detailFragment, btin);
-                break;
-                
-            case 1:
                 WiFiInFragment wfin = (WiFiInFragment) mFragments[itemPosition];
                 fragmentTransaction.replace(R.id.detailFragment, wfin);
                 break;
-           
+            case 1:
+                BlueToothInFragment btin = (BlueToothInFragment) mFragments[itemPosition];
+                fragmentTransaction.replace(R.id.detailFragment, btin);
+                break;
+
+
             case 2:
                 XplaneFragment xp = (XplaneFragment) mFragments[itemPosition];
                 fragmentTransaction.replace(R.id.detailFragment, xp);

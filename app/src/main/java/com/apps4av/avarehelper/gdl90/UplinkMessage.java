@@ -85,7 +85,7 @@ public class UplinkMessage extends Message {
        
        // byte 9-432: application data (multiple iFrames).
        skip = 3 + 8;
-       mFis = new FisBuffer(msg, skip, slotID, tisbSiteID, positionValid, degLat, degLon);
+       mFis = new FisBuffer(msg, skip, slotID, tisbSiteID, positionValid, degLat, degLon, tisbSiteID);
        
        /*
         * Now decode all.
