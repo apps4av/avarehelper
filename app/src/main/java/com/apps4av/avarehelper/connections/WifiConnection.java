@@ -36,7 +36,7 @@ public class WifiConnection extends Connection {
 
     DatagramSocket mSocket;
     
-    private int mPort = 43211;
+    private int mPort = 4000;
     
 
     /**

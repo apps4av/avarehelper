@@ -227,10 +227,16 @@ public class BufferProcessor {
                 /*
                  * Send an uplink nexrad message
                  */
+                float lat, lon;
+                int TISid;
                 FisBuffer fis = ((UplinkMessage) m).getFis();
                 if(null == fis) {
                     continue;
                 }
+                // Get the tower longitude/latitude from the FisBuffer for passing to Avare
+                lat = fis.getLat();
+                lon = fis.getLon();
+                TISid = fis.getTISid();
                 LinkedList<Product> pds = fis.getProducts();
                 for(Product p : pds) {
                     if(p instanceof Id6364Product) {
@@ -411,6 +417,9 @@ public class BufferProcessor {
                             object.put("time", time);
                             object.put("location", pn.getLocation());
                             object.put("data", data);
+                            object.put("towerlon", lon);
+                            object.put("towerlat", lat);
+                            object.put("tisid", TISid);
                         } catch (JSONException e1) {
                             continue;
                         }
