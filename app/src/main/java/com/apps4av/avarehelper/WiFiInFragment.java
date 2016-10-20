@@ -82,11 +82,13 @@ public class WiFiInFragment extends Fragment {
                  * If connected, disconnect
                  */
                 String val = mTextFileSave.getText().toString();
-                if(mWifi.getFileSave() != null) {
-                    mWifi.setFileSave(null);
+                if(mConnectFileSaveButton.getText().equals(mContext.getString(R.string.Save))) {
+                    mConnectFileSaveButton.setText(mContext.getString(R.string.Saving));
+                    mWifi.setFileSave(val);
                 }
                 else {
-                    mWifi.setFileSave(val);
+                    mConnectFileSaveButton.setText(mContext.getString(R.string.Save));
+                    mWifi.setFileSave(null);
                 }
                 setStates();
             }
@@ -102,17 +104,6 @@ public class WiFiInFragment extends Fragment {
      */
     private void setStates() {
         mWifiCb.setChecked(mWifi.isConnected());
-
-        if(mWifi.getFileSave() != null) {
-            mConnectFileSaveButton.setText(mContext.getString(R.string.Saving));
-            mTextFileSave.setText(mWifi.getFileSave());
-        }
-        else {
-            mConnectFileSaveButton.setText(mContext.getString(R.string.Save));
-        }
-
-        mTextWifiPort.setText(mWifi.getParam());
-
     }
 
 

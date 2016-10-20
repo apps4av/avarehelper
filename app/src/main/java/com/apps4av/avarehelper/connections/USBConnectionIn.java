@@ -35,7 +35,7 @@ public class USBConnectionIn extends Connection {
 
     private static USBConnectionIn mConnection;
     private static UsbManager mUsbManager;
-    private String mParams = "230400,8,n,1";
+    private String mParams;
     private UsbSerialDriver mDriver = null;
 
 
@@ -172,11 +172,6 @@ public class USBConnectionIn extends Connection {
         return connectConnection();
     }
 
-    @Override
-    public String getParam() {
-        return mParams;
-    }
-
     /**
      * 
      */
@@ -201,10 +196,6 @@ public class USBConnectionIn extends Connection {
         return new ArrayList<String>();
     }
 
-    @Override
-    public boolean isSecure() {
-        return false;
-    }
 
     @Override
     public String getConnDevice() {

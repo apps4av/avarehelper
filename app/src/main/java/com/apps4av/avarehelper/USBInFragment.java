@@ -43,7 +43,6 @@ public class USBInFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
-        // TODO Auto-generated method stub
 
         mContext = container.getContext();
         
@@ -98,13 +97,13 @@ public class USBInFragment extends Fragment {
                  * If connected, disconnect
                  */
                 String val = mTextFileSave.getText().toString();
-                if(mUSB.getFileSave() != null) {
-                    mConnectFileSaveButton.setText(mContext.getString(R.string.Save));
-                    mUSB.setFileSave(null);
-                }
-                else {
+                if(mConnectFileSaveButton.getText().equals(mContext.getString(R.string.Save))) {
                     mConnectFileSaveButton.setText(mContext.getString(R.string.Saving));
                     mUSB.setFileSave(val);
+                }
+                else {
+                    mConnectFileSaveButton.setText(mContext.getString(R.string.Save));
+                    mUSB.setFileSave(null);
                 }
                 setStates();
             }
@@ -123,17 +122,6 @@ public class USBInFragment extends Fragment {
         } else {
             mConnectButton.setText(getString(R.string.Connect));
         }
-
-        if(mUSB.getFileSave() != null) {
-            mConnectFileSaveButton.setText(mContext.getString(R.string.Saving));
-            mTextFileSave.setText(mUSB.getFileSave());
-        }
-        else {
-            mConnectFileSaveButton.setText(mContext.getString(R.string.Save));
-        }
-
-        mParamsText.setText(mUSB.getParam());
-
     }
     
     @Override

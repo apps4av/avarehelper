@@ -34,6 +34,7 @@ Redistribution and use in source and binary forms, with or without modification,
         android:id="@+id/main_msfs_port"
         android:layout_margin="10dp"
         android:inputType="number"
+        android:text="49002"
         android:layout_below="@+id/main_image_msfs"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"/>

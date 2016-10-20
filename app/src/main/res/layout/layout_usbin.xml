@@ -34,6 +34,7 @@ Redistribution and use in source and binary forms, with or without modification,
         android:id="@+id/usbin_params_text"
         android:layout_margin="10dp"
         android:inputType="text"
+        android:text="230400,8,n,1"
         android:layout_below="@+id/usbin_connect_image"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

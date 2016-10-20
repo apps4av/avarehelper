@@ -68,14 +68,6 @@ public abstract class Connection {
     }
 
     /**
-     *
-     */
-    public String getFileSave() {
-        return mFileSave;
-    }
-
-
-    /**
      * Save data from connection to file
      * @param red
      * @param buffer
@@ -84,7 +76,7 @@ public abstract class Connection {
         if(red > 0) {
             String file = null;
             synchronized(this) {
-                file = getFileSave();
+                file = mFileSave;
             }
             if(file != null) {
                 try {
@@ -233,9 +225,7 @@ public abstract class Connection {
 
 
     public abstract List<String> getDevices();
-    public abstract boolean isSecure();
     public abstract String getConnDevice();
     public abstract void disconnect();
     public abstract boolean connect(String param, boolean securely);
-    public abstract String getParam();
 }

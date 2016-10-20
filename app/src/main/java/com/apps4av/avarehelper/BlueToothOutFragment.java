@@ -20,12 +20,12 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.CheckBox;
 import android.widget.Spinner;
 
 import com.apps4av.avarehelper.connections.Connection;
 import com.apps4av.avarehelper.connections.ConnectionFactory;
 import com.apps4av.avarehelper.storage.Preferences;
+import com.apps4av.avarehelper.storage.SavedCheckbox;
 
 import java.util.List;
 
@@ -41,7 +41,7 @@ public class BlueToothOutFragment extends Fragment {
     private Spinner mSpinner;
     private Context mContext;
     private Button mConnectButton;
-    private CheckBox mSecureCb;
+    private SavedCheckbox mSecureCb;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -66,7 +66,7 @@ public class BlueToothOutFragment extends Fragment {
 
         mSpinner.setAdapter(adapter);
 
-        mSecureCb = (CheckBox) view.findViewById(R.id.main_cb_btout);
+        mSecureCb = (SavedCheckbox) view.findViewById(R.id.main_cb_btout);
         
         mConnectButton = (Button) view.findViewById(R.id.main_button_connect_out);
         mConnectButton.setOnClickListener(new OnClickListener() {
@@ -111,7 +111,6 @@ public class BlueToothOutFragment extends Fragment {
         } else {
             mConnectButton.setText(getString(R.string.Connect));
         }
-        mSecureCb.setChecked(mBt.isSecure());
         int loc = mList.indexOf(mBt.getConnDevice());
         if(loc >= 0) {
             mSpinner.setSelection(loc);            

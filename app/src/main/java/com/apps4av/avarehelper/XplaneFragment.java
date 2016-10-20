@@ -86,7 +86,6 @@ public class XplaneFragment extends Fragment {
      */
     private void setStates() {
         mXplaneCb.setChecked(mXp.isConnected());
-        mTextXplanePort.setText(mXp.getParam());
     }
 
     @Override  

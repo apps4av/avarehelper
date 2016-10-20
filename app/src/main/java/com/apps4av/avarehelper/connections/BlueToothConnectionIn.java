@@ -251,11 +251,6 @@ public class BlueToothConnectionIn extends Connection {
         return connectConnection();
     }
 
-    @Override
-    public String getParam() {
-        return mDevName;
-    }
-
     /**
      * 
      */
@@ -296,15 +291,6 @@ public class BlueToothConnectionIn extends Connection {
 
         saveToFile(red, buffer);
         return red;
-    }
-
-    /**
-     * 
-     * @return
-     */
-    @Override
-    public boolean isSecure() {
-        return mSecure;
     }
 
     /**

@@ -98,11 +98,6 @@ public class FileFragment extends Fragment {
         else {
             mConnectButton.setText(mContext.getString(R.string.Start));                        
         }
-
-        if(mFile.getFileName() != null) {
-            mTextFile.setText(mFile.getFileName());
-        }
-
     }
 
 

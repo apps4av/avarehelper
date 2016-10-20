@@ -118,13 +118,6 @@ public class MainActivity extends ActionBarActivity implements
         WifiManager wm = (WifiManager)getSystemService(Context.WIFI_SERVICE);
         mMulticastLock = wm.createMulticastLock("avarehelper");
         mMulticastLock.acquire();
-
-        // Start from last location
-        int id = mPref.getFragmentIndex();
-        if(id >= 0) {
-            actionBar.setSelectedNavigationItem(id);
-        }
-
     }
 
     
@@ -183,6 +176,15 @@ public class MainActivity extends ActionBarActivity implements
          */
         Intent intent = new Intent(getApplicationContext(), BackgroundService.class);
         getApplicationContext().bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
+
+        // Start from last location
+        int id = mPref.getFragmentIndex();
+        if(id >= 0) {
+            getSupportActionBar().setSelectedNavigationItem(id);
+        }
+        else {
+            getSupportActionBar().setSelectedNavigationItem(0);
+        }
     }
 
     @Override

@@ -36,7 +36,7 @@ public class WifiConnection extends Connection {
 
     DatagramSocket mSocket;
     
-    private int mPort = 43211;
+    private int mPort;
     
 
     /**
@@ -145,11 +145,6 @@ public class WifiConnection extends Connection {
 
     }
 
-    @Override
-    public String getParam() {
-        return Integer.toString(mPort);
-    }
-
     /**
      * 
      */
@@ -172,11 +167,6 @@ public class WifiConnection extends Connection {
     @Override
     public List<String> getDevices() {
         return new ArrayList<String>();
-    }
-
-    @Override
-    public boolean isSecure() {
-        return false;
     }
 
     @Override

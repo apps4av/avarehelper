@@ -13,8 +13,6 @@ Redistribution and use in source and binary forms, with or without modification,
 package com.apps4av.avarehelper.connections;
 
 import android.content.Context;
-import android.os.Handler;
-import android.os.Message;
 
 import com.apps4av.avarehelper.utils.GenericCallback;
 
@@ -50,7 +48,44 @@ public class GPSSimulatorConnection extends Connection {
     private double mDestBearing = -1;
     private double mDestElevation = 0;
 
+
     /**
+     * Get Dest from Avare
+     */
+    void runInBackground() {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                while (isRunning()) {
+                    String recvd = getDataFromHelper();
+                    if (null == recvd) {
+                        mDestValid = false;
+                    }
+                    else {
+
+                        try {
+                            JSONObject object = new JSONObject(recvd);
+                            String type = object.getString("type");
+                            if (type == null) {
+                                mDestValid = false;
+                            }
+                            else if (type.equals("ownship")) {
+                                mDestBearing = object.getDouble("destBearing");
+                                mDestDistance = object.getDouble("destDistance");
+                                mDestElevation = object.getDouble("destElev") * FEET_TO_METERS;
+                                mDestValid = true;
+                            }
+                        } catch (JSONException e) {
+                            mDestValid = false;
+                        }
+                    }
+                }
+            }
+        }).start();
+    }
+
+    /**
+     *
      *
      */
     private GPSSimulatorConnection() {
@@ -60,6 +95,8 @@ public class GPSSimulatorConnection extends Connection {
             public Object callback(Object o, Object o1) {
 
                 double bearing = mBearing;
+                runInBackground();
+
                 /*
                  * Start the GPS Simulator
                  */
@@ -144,11 +181,6 @@ public class GPSSimulatorConnection extends Connection {
                     }
 
                     sendDataToHelper(object.toString());
-
-                    // See if we got anything from Avare, but since it will block, do not bombard
-                    mHandler.removeMessages(0);
-                    mHandler.sendEmptyMessage(0);
-
                 }
 
                 return null;
@@ -167,46 +199,9 @@ public class GPSSimulatorConnection extends Connection {
         return mConnection;
     }
 
-    /**
-     * Handler to get data from Avare
-     */
-    Handler mHandler = new Handler(){
-        @Override
-        public void handleMessage(Message msg){
-            String recvd = getDataFromHelper();
-
-            if (null == recvd) {
-                mDestValid = false;
-            }
-            else {
-
-                try {
-                    JSONObject object = new JSONObject(recvd);
-                    String type = object.getString("type");
-                    if (type == null) {
-                        mDestValid = false;
-                    }
-                    else if (type.equals("ownship")) {
-                        mDestBearing = object.getDouble("destBearing");
-                        mDestDistance = object.getDouble("destDistance");
-                        mDestElevation = object.getDouble("destElev") * FEET_TO_METERS;
-                        mDestValid = true;
-                    }
-                } catch (JSONException e) {
-                    mDestValid = false;
-                }
-            }
-        }
-    };
-
     @Override
     public List<String> getDevices() {
         return new ArrayList<String>();
-    }
-
-    @Override
-    public boolean isSecure() {
-        return false;
     }
 
     @Override
@@ -237,17 +232,5 @@ public class GPSSimulatorConnection extends Connection {
             return false;
         }
         return connectConnection();
-    }
-
-    @Override
-    public String getParam() {
-        return
-                mLatInit + "," +
-                        mLonInit + "," +
-                        mBearing + "," +
-                        (mSpeed / KNOTS_TO_MS) + "," +
-                        (mAltitude / FEET_TO_METERS) + "," +
-                        mFlyToDest + "," +
-                        mLandAtDest;
     }
 }

@@ -20,12 +20,12 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.CheckBox;
 import android.widget.Spinner;
 
 import com.apps4av.avarehelper.connections.Connection;
 import com.apps4av.avarehelper.connections.ConnectionFactory;
 import com.apps4av.avarehelper.storage.Preferences;
+import com.apps4av.avarehelper.storage.SavedCheckbox;
 import com.apps4av.avarehelper.storage.SavedEditText;
 
 import java.util.List;
@@ -44,7 +44,7 @@ public class BlueToothInFragment extends Fragment {
     private Button mConnectButton;
     private Button mConnectFileSaveButton;
     private SavedEditText mTextFileSave;
-    private CheckBox mSecureCb;
+    private SavedCheckbox mSecureCb;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -73,7 +73,7 @@ public class BlueToothInFragment extends Fragment {
 
         mSpinner.setAdapter(adapter);
 
-        mSecureCb = (CheckBox) view.findViewById(R.id.main_cb_btin);
+        mSecureCb = (SavedCheckbox) view.findViewById(R.id.main_cb_btin);
         mConnectButton = (Button) view.findViewById(R.id.main_button_connect);
         mConnectButton.setOnClickListener(new OnClickListener() {
 
@@ -112,13 +112,13 @@ public class BlueToothInFragment extends Fragment {
                  * If connected, disconnect
                  */
                 String val = mTextFileSave.getText().toString();
-                if(mBt.getFileSave() != null) {
-                    mConnectFileSaveButton.setText(mContext.getString(R.string.Save));
-                    mBt.setFileSave(null);
-                }
-                else {
+                if(mConnectFileSaveButton.getText().equals(mContext.getString(R.string.Save))) {
                     mConnectFileSaveButton.setText(mContext.getString(R.string.Saving));
                     mBt.setFileSave(val);
+                }
+                else {
+                    mConnectFileSaveButton.setText(mContext.getString(R.string.Save));
+                    mBt.setFileSave(null);
                 }
                 setStates();
             }
@@ -137,20 +137,10 @@ public class BlueToothInFragment extends Fragment {
         } else {
             mConnectButton.setText(getString(R.string.Connect));
         }
-        mSecureCb.setChecked(mBt.isSecure());
         int loc = mList.indexOf(mBt.getConnDevice());
         if(loc >= 0) {
             mSpinner.setSelection(loc);            
         }
-
-        if(mBt.getFileSave() != null) {
-            mConnectFileSaveButton.setText(mContext.getString(R.string.Saving));
-            mTextFileSave.setText(mBt.getFileSave());
-        }
-        else {
-            mConnectFileSaveButton.setText(mContext.getString(R.string.Save));
-        }
-
     }
     
     @Override

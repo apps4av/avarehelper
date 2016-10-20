@@ -21,11 +21,11 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.CheckBox;
 
 import com.apps4av.avarehelper.connections.Connection;
 import com.apps4av.avarehelper.connections.GPSSimulatorConnection;
 import com.apps4av.avarehelper.storage.Preferences;
+import com.apps4av.avarehelper.storage.SavedCheckbox;
 import com.apps4av.avarehelper.storage.SavedEditText;
 
 /**
@@ -36,8 +36,8 @@ import com.apps4av.avarehelper.storage.SavedEditText;
 public class GPSSimulatorFragment extends Fragment {
 
     private Connection mGPSSim;
-    private CheckBox mLandAtCb;
-    private CheckBox mFlyToCb;
+    private SavedCheckbox mLandAtCb;
+    private SavedCheckbox mFlyToCb;
     private SavedEditText mTextLat;
     private SavedEditText mTextLon;
     private SavedEditText mTextHeading;
@@ -67,8 +67,8 @@ public class GPSSimulatorFragment extends Fragment {
 
         View view = inflater.inflate(R.layout.layout_gpssim, container, false);
 
-        mLandAtCb = (CheckBox)view.findViewById(R.id.main_button_gpssim_land_at);
-        mFlyToCb = (CheckBox)view.findViewById(R.id.main_button_gpssim_fly_to);
+        mLandAtCb = (SavedCheckbox)view.findViewById(R.id.main_button_gpssim_land_at);
+        mFlyToCb = (SavedCheckbox)view.findViewById(R.id.main_button_gpssim_fly_to);
         mTextLon = (SavedEditText)view.findViewById(R.id.main_gpssim_lon);
         mTextLat = (SavedEditText)view.findViewById(R.id.main_gpssim_lat);
         mTextAltitude = (SavedEditText)view.findViewById(R.id.main_gpssim_altitude);
@@ -122,18 +122,6 @@ public class GPSSimulatorFragment extends Fragment {
         else {
             mButtonStart.setText(mContext.getString(R.string.Start));
         }
-
-        // lat, lon, alt, bearing, speed, landatdest, flytodest
-        String params[] = mGPSSim.getParam().split(",");
-
-
-        mTextLat.setText(String.format("%.4f", getValidValue(params[0])));
-        mTextLon.setText(String.format("%.4f", getValidValue(params[1])));
-        mTextHeading.setText(String.format("%.0f", getValidValue(params[2])));
-        mTextSpeed.setText(String.format("%.0f", getValidValue(params[3])));
-        mTextAltitude.setText(String.format("%.0f", getValidValue(params[4])));
-        mFlyToCb.setChecked(Boolean.parseBoolean(params[5]));
-        mLandAtCb.setChecked(Boolean.parseBoolean(params[6]));
     }
 
 }

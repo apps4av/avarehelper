@@ -144,10 +144,6 @@ public class FileConnectionIn extends Connection {
         return connectConnection();
     }
 
-    @Override
-    public String getParam() {
-        return mFileName;
-    }
 
     /**
      * 
@@ -171,11 +167,6 @@ public class FileConnectionIn extends Connection {
     @Override
     public List<String> getDevices() {
         return new ArrayList<String>();
-    }
-
-    @Override
-    public boolean isSecure() {
-        return false;
     }
 
     @Override

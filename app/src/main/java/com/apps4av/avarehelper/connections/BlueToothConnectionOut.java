@@ -387,11 +387,6 @@ public class BlueToothConnectionOut extends Connection {
         return connectConnection();
     }
 
-    @Override
-    public String getParam() {
-        return mDevName;
-    }
-
     /**
      * 
      */
@@ -457,15 +452,6 @@ public class BlueToothConnectionOut extends Connection {
         }
 
         return list;
-    }
-
-    /**
-     * 
-     * @return
-     */
-    @Override
-    public boolean isSecure() {
-        return mSecure;
     }
 
     /**

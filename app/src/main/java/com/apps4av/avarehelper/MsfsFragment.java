@@ -91,7 +91,6 @@ public class MsfsFragment extends Fragment {
      */
     private void setStates() {
         mMsfsCb.setChecked(mMsfs.isConnected());
-        mTextMsfsPort.setText(mMsfs.getParam());
     }
     
 } 

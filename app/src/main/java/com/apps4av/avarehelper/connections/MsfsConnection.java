@@ -38,7 +38,7 @@ public class MsfsConnection extends Connection {
     
     DatagramSocket mSocket;
     
-    private int mPort = 49002;
+    private int mPort;
 
     /**
      * 
@@ -171,11 +171,6 @@ public class MsfsConnection extends Connection {
         return connectConnection();
     }
 
-    @Override
-    public String getParam() {
-        return Integer.toString(mPort);
-    }
-
     /**
      * 
      */
@@ -198,11 +193,6 @@ public class MsfsConnection extends Connection {
     @Override
     public List<String> getDevices() {
         return new ArrayList<String>();
-    }
-
-    @Override
-    public boolean isSecure() {
-        return false;
     }
 
     @Override
