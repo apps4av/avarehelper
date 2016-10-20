@@ -35,9 +35,6 @@ import com.apps4av.avarehelper.storage.Preferences;
 import com.apps4av.avarehelper.utils.GenericCallback;
 import com.apps4av.avarehelper.utils.Logger;
 
-import java.io.Serializable;
-import java.util.HashMap;
-
 public class MainActivity extends ActionBarActivity implements
     ActionBar.OnNavigationListener {
     
@@ -46,19 +43,12 @@ public class MainActivity extends ActionBarActivity implements
     
     private BackgroundService mService;
 
-    private HashMap<String, String> mState;
     private Preferences mPref;
 
     private Fragment[] mFragments = new Fragment[10];
 
     private WifiManager.MulticastLock mMulticastLock;
 
-
-    @Override
-    public void onSaveInstanceState(final Bundle outState) {
-        super.onSaveInstanceState(outState);
-        outState.putSerializable("savedState", (Serializable) mState);
-    }
 
     // On back press, act like home button and go to background.
     @Override
@@ -129,35 +119,12 @@ public class MainActivity extends ActionBarActivity implements
         mMulticastLock = wm.createMulticastLock("avarehelper");
         mMulticastLock.acquire();
 
+        // Start from last location
+        int id = mPref.getFragmentIndex();
+        if(id >= 0) {
+            actionBar.setSelectedNavigationItem(id);
+        }
 
-        if (savedInstanceState != null) {
-            //probably orientation change
-            mState = (HashMap<String, String>) savedInstanceState.getSerializable("savedState");
-            try {
-                int id = Integer.valueOf(mState.get("fragmentIndex"));
-                if(id >= 0) {
-                    actionBar.setSelectedNavigationItem(id);
-                }
-            }
-            catch (Exception e) {
-            }
-
-        }
-        else if (mState != null) {
-                //returning from backstack, data is fine, do nothing
-        }
-        else {
-            //newly created, compute data
-            mState = new HashMap<String, String>();
-            try {
-                int id = mPref.getFragmentIndex();
-                if(id >= 0) {
-                    actionBar.setSelectedNavigationItem(id);
-                }
-            }
-            catch (Exception e) {
-            }
-        }
     }
 
     
@@ -225,7 +192,6 @@ public class MainActivity extends ActionBarActivity implements
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
 
         // Store fragment we are showing now
-        mState.put("fragmentIndex", Integer.toString(itemPosition));
         mPref.setFragmentIndex(itemPosition);
 
         switch(itemPosition) {

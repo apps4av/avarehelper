@@ -17,7 +17,11 @@ Redistribution and use in source and binary forms, with or without modification,
     <uses-sdk
         android:minSdkVersion="12"
         android:targetSdkVersion="19" />
-    
+
+
+    <uses-feature android:name="android.hardware.bluetooth" android:required="false" />
+    <uses-feature android:name="android.hardware.wifi" android:required="false" />
+
     <uses-permission android:name="android.permission.BLUETOOTH" />
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
     <uses-permission android:name="android.permission.INTERNET" />
