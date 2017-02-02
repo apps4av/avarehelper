@@ -215,7 +215,7 @@ public class BufferProcessor {
                         // invalid
                         continue;
                     }
-                    object.put("altitude", (double) altitude);
+                    object.put("altitude", (double)((OwnshipGeometricAltitudeMessage)m).mAltitudeWGS84);
                     object.put("time", (long) m.getTime());
                 } catch (JSONException e1) {
                     continue;
