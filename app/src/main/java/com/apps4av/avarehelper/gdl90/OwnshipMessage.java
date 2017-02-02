@@ -33,7 +33,7 @@ public class OwnshipMessage extends Message {
     public int mHorizontalVelocity;
     public int mVerticalVelocity;
     
-    public int mAltitude;
+    public double mAltitude;
     
     boolean mIsTrackHeadingValid;
     boolean mIsTrackHeadingTrueTrackAngle;
@@ -78,7 +78,7 @@ public class OwnshipMessage extends Message {
             /*
              * In meters
              */
-            mAltitude = (int)((double)alt / 3.28084);
+            mAltitude = (double)alt / 3.28084;
         }
 
         /*
