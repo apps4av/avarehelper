@@ -11,8 +11,6 @@ Redistribution and use in source and binary forms, with or without modification,
 */
 package com.apps4av.avarehelper.gdl90;
 
-import com.apps4av.avarehelper.utils.Logger;
-
 /**
  * 
  * @author zkhan
@@ -20,13 +18,21 @@ import com.apps4av.avarehelper.utils.Logger;
  */
 public class Id8Product extends Product {
 
+    FisGraphics mFis;
+
     public Id8Product() {
         super(ProductType.PRODUCT_TYPE_NOTAMS);
     }
 
     @Override
     protected void parse(byte[] msg) {
-        Logger.Logit("Not implemented product 8");
+        mFis = new FisGraphics();
+        if(!mFis.decode(msg)) {
+            mFis = null;
+        }
     }
 
+    public FisGraphics getFis() {
+        return mFis;
+    }
 }

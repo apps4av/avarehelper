@@ -20,14 +20,22 @@ import com.apps4av.avarehelper.utils.Logger;
  */
 public class Id13Product extends Product {
 
+    FisGraphics mFis;
+
     public Id13Product() {
         super(ProductType.PRODUCT_TYPE_SUA);
     }
 
     @Override
     protected void parse(byte[] msg) {
-        Logger.Logit("Not implemented product 13");
+        mFis = new FisGraphics();
+        if(!mFis.decode(msg)) {
+            mFis = null;
+        }
+    }
 
+    public FisGraphics getFis() {
+        return mFis;
     }
 
 }

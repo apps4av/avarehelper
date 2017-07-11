@@ -65,6 +65,7 @@ public class MainActivity extends ActionBarActivity implements
         mTextLog = (TextView)view.findViewById(R.id.main_text_log);
         mTextStatus = (TextView)view.findViewById(R.id.main_text_status);
         Logger.setTextView(mTextLog);
+        Logger.setContext(this);
         setContentView(view);
 
         mPref = new Preferences(getApplicationContext());

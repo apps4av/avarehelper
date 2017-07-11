@@ -11,9 +11,13 @@ Redistribution and use in source and binary forms, with or without modification,
 */
 package com.apps4av.avarehelper.utils;
 
+import android.content.Context;
 import android.os.Handler;
 import android.os.Message;
 import android.widget.TextView;
+
+import com.apps4av.avarehelper.R;
+import com.apps4av.avarehelper.storage.Preferences;
 
 /**
  * 
@@ -23,6 +27,7 @@ import android.widget.TextView;
 public class Logger {
 
     private static TextView mTv;
+    private static Preferences mPref;
     
     public static void Logit(String msg) {
         Message m = mHandler.obtainMessage();
@@ -37,22 +42,29 @@ public class Logger {
     public static void setTextView(TextView tv) {
         mTv = tv;
     }
-    
+    public static void setContext(Context ctx) {
+        mPref = new Preferences(ctx);
+    }
+
     /**
      * This leak warning is not an issue if we do not post delayed messages, which is true here.
      */
     private static Handler mHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
+            String filter = mPref.getEditTextValue(R.id.preferences_edittext);
+            String val = (String) msg.obj;
             if(null != msg && null != mTv) {
                 String txt = mTv.getText().toString();
-                /*
-                 * Limit buffer size
-                 */
-                if(txt.length() > 1023) {
-                    txt = txt.substring(0, 1023);
+                if((filter == null) || filter.equals("") || val.contains(filter)) {
+                    /*
+                     * Limit buffer size
+                     */
+                    if (txt.length() > 1023) {
+                        txt = txt.substring(0, 1023);
+                    }
+                    mTv.setText(val + "\n" + txt);
                 }
-                mTv.setText((String)msg.obj + "\n" + txt);
             }
         }
     };

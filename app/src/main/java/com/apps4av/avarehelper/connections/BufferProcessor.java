@@ -15,8 +15,13 @@ package com.apps4av.avarehelper.connections;
 import com.apps4av.avarehelper.gdl90.BasicReportMessage;
 import com.apps4av.avarehelper.gdl90.Constants;
 import com.apps4av.avarehelper.gdl90.FisBuffer;
+import com.apps4av.avarehelper.gdl90.FisGraphics;
+import com.apps4av.avarehelper.gdl90.Id11Product;
+import com.apps4av.avarehelper.gdl90.Id12Product;
+import com.apps4av.avarehelper.gdl90.Id13Product;
 import com.apps4av.avarehelper.gdl90.Id413Product;
 import com.apps4av.avarehelper.gdl90.Id6364Product;
+import com.apps4av.avarehelper.gdl90.Id8Product;
 import com.apps4av.avarehelper.gdl90.LongReportMessage;
 import com.apps4av.avarehelper.gdl90.OwnshipGeometricAltitudeMessage;
 import com.apps4av.avarehelper.gdl90.OwnshipMessage;
@@ -26,6 +31,7 @@ import com.apps4av.avarehelper.gdl90.UplinkMessage;
 import com.apps4av.avarehelper.nmea.Ownship;
 import com.apps4av.avarehelper.nmea.RTMMessage;
 import com.apps4av.avarehelper.storage.Preferences;
+import com.apps4av.avarehelper.utils.Logger;
 import com.apps4av.avarehelper.utils.MetarFlightCategory;
 
 import org.json.JSONArray;
@@ -233,7 +239,35 @@ public class BufferProcessor {
                 }
                 LinkedList<Product> pds = fis.getProducts();
                 for(Product p : pds) {
-                    if(p instanceof Id6364Product) {
+                    if(p instanceof Id8Product) {
+                        Id8Product pn = (Id8Product)p;
+                        JSONObject object = addFisGraphics("notam", pn.getFis());
+                        if(null != object) {
+                            objs.add(object.toString());
+                        }
+                    }
+                    if(p instanceof Id11Product) {
+                        Id11Product pn = (Id11Product)p;
+                        JSONObject object = addFisGraphics("airmet", pn.getFis());
+                        if(null != object) {
+                            objs.add(object.toString());
+                        }
+                    }
+                    if(p instanceof Id12Product) {
+                        Id12Product pn = (Id12Product)p;
+                        JSONObject object = addFisGraphics("sigmet", pn.getFis());
+                        if(null != object) {
+                            objs.add(object.toString());
+                        }
+                    }
+                    if(p instanceof Id13Product) {
+                        Id13Product pn = (Id13Product)p;
+                        JSONObject object = addFisGraphics("sua", pn.getFis());
+                        if(null != object) {
+                            objs.add(object.toString());
+                        }
+                    }
+                    else if(p instanceof Id6364Product) {
                         Id6364Product pn = (Id6364Product)p;
                         JSONObject object = new JSONObject();
                         
@@ -443,5 +477,45 @@ public class BufferProcessor {
         }
 
         return objs;
+    }
+
+    /**
+     * Add Fis-B graphics products except Nexrad
+     * @param type
+     * @param fisg
+     * @return
+     */
+    private JSONObject addFisGraphics(String type, FisGraphics fisg) {
+        if(null == fisg) {
+            return null;
+        }
+        JSONObject object = new JSONObject();
+        try {
+            object.put("type", type);
+            object.put("text", null == fisg.getText() ? "" : fisg.getText());
+            object.put("location", fisg.getLocation());
+            object.put("label", fisg.getLabel());
+            object.put("startTime", fisg.getStartTime());
+            object.put("endTime", fisg.getEndTime());
+            object.put("shape", fisg.getShapeString());
+            object.put("number", fisg.getReportNumber());
+
+            if(null != fisg.getShapeString()) {
+                LinkedList<FisGraphics.Coordinate> coords = fisg.getCoordinates();
+                JSONArray arrayData = new JSONArray();
+                for (FisGraphics.Coordinate c : coords) {
+                    String lon = Double.toString(c.lon);
+                    String lat = Double.toString(c.lat);
+                    String alt = Double.toString(c.altitude);
+                    arrayData.put(lon + "," + lat + "," + alt);
+                }
+                object.put("array", arrayData);
+            }
+
+        }
+        catch (JSONException el) {
+            return null;
+        }
+        return object;
     }
 }

@@ -33,36 +33,20 @@ public class Id413Product extends Product {
         mText = "";
         mParts = null;
         int len = msg.length;
-        int holder = 0;
-        int i = 0;
-        
+
         /*
          * Decode text: begins with @METAR, @TAF, @SPECI, @SUA, @PIREP, @WINDS
          */
-        for(i = 0; i < (len - 3); i += 3) { 
-            holder = 
-                    (((int)msg[i + 0] & 0xFF) << 24) + 
-                    (((int)msg[i + 1] & 0xFF) << 16) +
-                    (((int)msg[i + 2] & 0xFF) << 8);
-            
-            /*
-             * 4 chars in 3 bytes
-             */
-            int firstChar = Constants.DLAC_CODE[((holder & 0xFC000000) >> 26) & 0x3F]; 
-            int secondChar = Constants.DLAC_CODE[((holder & 0x03F00000) >> 20) & 0x3F]; 
-            int thirdChar = Constants.DLAC_CODE[((holder & 0x000FC000) >> 14) & 0x3F];
-            int fourthChar = Constants.DLAC_CODE[((holder & 0x00003F00) >> 8) & 0x3F];
-            
-            mText += String.format("%c%c%c%c", firstChar, secondChar, thirdChar, fourthChar);
+        for(int i = 0; i < (len - 3); i += 3) {
+            mText += Dlac.decode(msg[i + 0], msg[i + 1], msg[i + 2]);
         }
 
+        mText = Dlac.format(mText);
         if(!mText.equals("")) {
-            mText = mText.split("\u001E")[0];
-            mText = mText.replaceAll("\n\t[A-Z]{1}", "\n"); /* remove invalid chars after newline */
             mParts = mText.split(" ", 3);
             Logger.Logit(mText);
         }
-        
+
     }
 
     /**

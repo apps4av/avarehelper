@@ -11,4 +11,10 @@ Redistribution and use in source and binary forms, with or without modification,
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent">
+
+    <com.apps4av.avarehelper.storage.SavedEditText
+        android:layout_width="match_parent"
+        android:id="@+id/preferences_edittext"
+        android:hint="@string/filter_hint"
+        android:layout_height="wrap_content" />
 </RelativeLayout>

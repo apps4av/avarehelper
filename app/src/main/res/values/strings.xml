@@ -63,4 +63,5 @@ Redistribution and use in source and binary forms, with or without modification,
     <string name="Preferences">Preferences</string>
     <string name="CrashText">To help improve the app, please submit this report to us via email.</string>
     <string name="CrashLabel">Avare IO has stopped unexpectedly!</string>
+    <string name="filter_hint">Filter messages</string>
 </resources>

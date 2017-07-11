@@ -20,13 +20,22 @@ import com.apps4av.avarehelper.utils.Logger;
  */
 public class Id11Product extends Product {
 
+    FisGraphics mFis;
+
     public Id11Product() {
         super(ProductType.PRODUCT_TYPE_AIRMET);
     }
 
     @Override
     protected void parse(byte[] msg) {
-        Logger.Logit("Not implemented product 11");
+        mFis = new FisGraphics();
+        if(!mFis.decode(msg)) {
+            mFis = null;
+        }
+    }
+
+    public FisGraphics getFis() {
+        return mFis;
     }
 
 }
