@@ -119,12 +119,12 @@ public class FisGraphics {
             case 0:
                 break;
             case 2:
-                length = (((int) data[6]) << 8) + ((int) data[7]);
+                length = (((int)data[6] & 0xFF) << 8) + ((int)data[7] & 0xFF);
                 if (data.length - length < 6) {
                     return false;
                 }
 
-                mReportNumber = (((int)data[8]) << 6) + ((((int)data[9]) & 0xFC) >> 2);
+                mReportNumber = (((int)data[8] & 0xFF) << 6) + (((int)data[9] & 0xFC) >> 2);
 
                 int len = length - 5;
 
@@ -139,13 +139,13 @@ public class FisGraphics {
 
                 byte recordData[] = Arrays.copyOfRange(data, 6, data.length);
 
-                mReportNumber = ((((int)data[1]) & 0x3F) << 8) + (int)data[2];
+                mReportNumber = (((int)data[1] & 0x3F) << 8) + ((int)data[2] & 0xFF);
 
                 // (6-1). (6.22 - Graphical Overlay Record Format).
                 int flag = recordData[4] & 0x01;
 
                 if (0 == flag) { // Numeric index.
-                    mLabel = Integer.toString((((int) recordData[5]) << 8) + (int) recordData[6]);
+                    mLabel = Integer.toString((((int)recordData[5] & 0xFF) << 8) + ((int) recordData[6] & 0xFF));
                     byte recordDataA[] = Arrays.copyOfRange(recordData, 7, recordData.length);
                     recordData = Arrays.copyOfRange(recordDataA, 0, recordDataA.length);
                 }
@@ -158,7 +158,7 @@ public class FisGraphics {
                     recordData = Arrays.copyOfRange(recordDataA, 0, recordDataA.length);
                 }
 
-                flag = (((int) recordData[0]) & 0x40) >> 6;
+                flag = ((int)recordData[0] & 0x40) >> 6;
 
                 if (0 == flag) { //TODO: Check.
                     byte recordDataA[] = Arrays.copyOfRange(recordData, 2, recordData.length);
@@ -169,10 +169,10 @@ public class FisGraphics {
                     recordData = Arrays.copyOfRange(recordDataA, 0, recordDataA.length);
                 }
 
-                int applicabilityOptions = (((int) recordData[0]) & 0xC0) >> 6;
-                int dtFormat = (((int) recordData[0]) & 0x30) >> 4;
-                mGeometryOverlayOptions = ((int) recordData[0]) & 0x0F;
-                int overlayVerticesCount = (((int) recordData[1]) & 0x3F) + 1; // Document instructs to add 1. (6.20).
+                int applicabilityOptions = ((int)recordData[0] & 0xC0) >> 6;
+                int dtFormat = ((int)recordData[0] & 0x30) >> 4;
+                mGeometryOverlayOptions = (int)recordData[0] & 0x0F;
+                int overlayVerticesCount = ((int)recordData[1] & 0x3F) + 1; // Document instructs to add 1. (6.20).
 
                 // Parse all of the dates.
                 switch (applicabilityOptions) {
@@ -207,16 +207,16 @@ public class FisGraphics {
                 switch (mGeometryOverlayOptions) {
                     case SHAPE_POLYGON_MSL: // Extended Range 3D Polygon (MSL).
                         for (int i = 0; i < overlayVerticesCount; i++) {
-                            int lon = (((int)recordData[6 * i]) << 11) +
-                                    (((int)recordData[6 * i + 1]) << 3) +
-                                    ((((int)recordData[6 * i + 2]) & 0xE0) >> 5);
+                            int lon = (((int)recordData[6 * i] & 0xFF) << 11) +
+                                    (((int)recordData[6 * i + 1] & 0xFF) << 3) +
+                                    (((int)recordData[6 * i + 2] & 0xE0) >> 5);
 
-                            int lat = ((((int)recordData[6 * i + 2]) & 0x1F) << 14) +
-                                    (((int)recordData[6 * i + 3]) << 6) +
-                                    ((((int)recordData[6 * i + 4]) & 0xFC) >> 2);
+                            int lat = (((int)recordData[6 * i + 2] & 0x1F) << 14) +
+                                    (((int)recordData[6 * i + 3] & 0xFF) << 6) +
+                                    (((int)recordData[6 * i + 4] & 0xFC) >> 2);
 
-                            int alt = ((((int)recordData[6 * i + 4]) & 0x03) << 8) +
-                                    ((int)recordData[6 * i + 5]);
+                            int alt = (((int)recordData[6 * i + 4] & 0x03) << 8) +
+                                    ((int)recordData[6 * i + 5] & 0xFF);
 
 
                             Coordinate c = parseLatLon(lat, lon, false);
@@ -227,16 +227,16 @@ public class FisGraphics {
 
                     case SHAPE_POINT3D_AGL: // Extended Range 3D Point (AGL). p.47.
                         if(recordData.length >= 6) {
-                            int lon = (((int)recordData[0]) << 11) +
-                                    (((int)recordData[1]) << 3) +
-                                    ((((int)recordData[2]) & 0xE0) >> 5);
+                            int lon = (((int)recordData[0] & 0xFF) << 11) +
+                                    (((int)recordData[1] & 0xFF) << 3) +
+                                    (((int)recordData[2] & 0xE0) >> 5);
 
-                            int lat = ((((int)recordData[2]) & 0x1F) << 14) +
-                                    (((int)recordData[3]) << 6) +
-                                    ((((int)recordData[4]) & 0xFC) >> 2);
+                            int lat = (((int)recordData[2] & 0x1F) << 14) +
+                                    (((int)recordData[3] & 0xFF) << 6) +
+                                    (((int)recordData[4] & 0xFC) >> 2);
 
-                            int alt = ((((int)recordData[4]) & 0x03) << 8) +
-                                    ((int)recordData[5]);
+                            int alt = (((int)recordData[4] & 0x03) << 8) +
+                                    ((int)recordData[5] & 0xFF);
 
                             Coordinate c = parseLatLon(lat, lon, false);
                             c.altitude = alt * 100;
@@ -250,19 +250,19 @@ public class FisGraphics {
                     case SHAPE_PRISM_MSL:// Extended Range Circular Prism (7 = MSL, 8 = AGL)
                         if(recordData.length >= 14) {
 
-                            int bottomLon = (((int)recordData[0]) << 10) + (((int)recordData[1]) << 2) + ((((int)recordData[2]) & 0xC0) >> 6);
-                            int bottomLat = ((((int)recordData[2]) & 0x3F) << 10) + (((int)recordData[3]) << 4) + ((((int)recordData[4]) & 0xF0) >> 4);
+                            int bottomLon = (((int)recordData[0] & 0xFF) << 10) + (((int)recordData[1] & 0xFF) << 2) + (((int)recordData[2] & 0xC0) >> 6);
+                            int bottomLat = (((int)recordData[2] & 0x3F) << 10) + (((int)recordData[3] & 0xFF) << 4) + (((int)recordData[4] & 0xF0) >> 4);
 
-                            int topLon = ((((int)recordData[4]) & 0x0F) << 14) + (((int)recordData[5]) << 6) + ((((int)recordData[6]) & 0xFC) >> 2);
-                            int topLat = ((((int)recordData[6]) & 0x03) << 16) + (((int)recordData[7]) << 8) + ((int)recordData[8]);
+                            int topLon = (((int)recordData[4] & 0x0F) << 14) + (((int)recordData[5] & 0xFF) << 6) + (((int)recordData[6] & 0xFC) >> 2);
+                            int topLat = (((int)recordData[6] & 0x03) << 16) + (((int)recordData[7] & 0xFF) << 8) + (((int)recordData[8] & 0xFF));
 
-                            int bottomAlt = (((int)recordData[9]) & 0xFE) >> 1;
-                            int topAlt = (((int)recordData[9] & 0x01) << 6) + (((int)recordData[10]) & 0xFC) >> 2;
+                            int bottomAlt = ((int)recordData[9] & 0xFE) >> 1;
+                            int topAlt = (((int)recordData[9] & 0x01) << 6) + ((int)recordData[10] & 0xFC) >> 2;
 
-                            double rLon = ((double)((((int)recordData[10]) & 0x03) << 7) + ((((int)recordData[11]) & 0xFE) >> 1)) * 0.2;
-                            double rLat = ((double)((((int)recordData[11]) & 0x01) << 8) + (int)recordData[12]) * 0.2;
+                            double rLon = ((double)(((int)recordData[10] & 0x03) << 7) + (((int)recordData[11] & 0xFE) >> 1)) * 0.2;
+                            double rLat = ((double)(((int)recordData[11] & 0x01) << 8) + ((int)recordData[12] & 0xFF)) * 0.2;
 
-                            int alpha = (int)recordData[13];
+                            int alpha = (int)recordData[13] & 0xFF;
 
                             Coordinate b = parseLatLon(bottomLat, bottomLon, true);
                             b.altitude = bottomAlt * 5;
