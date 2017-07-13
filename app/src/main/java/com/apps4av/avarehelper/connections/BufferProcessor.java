@@ -502,14 +502,22 @@ public class BufferProcessor {
 
             if(null != fisg.getShapeString()) {
                 LinkedList<FisGraphics.Coordinate> coords = fisg.getCoordinates();
-                JSONArray arrayData = new JSONArray();
+                String data = "";
                 for (FisGraphics.Coordinate c : coords) {
                     String lon = Double.toString(c.lon);
                     String lat = Double.toString(c.lat);
-                    String alt = Double.toString(c.altitude);
-                    arrayData.put(lon + "," + lat + "," + alt);
+                    data += lon + ":" + lat + ";";
                 }
-                object.put("array", arrayData);
+                if(data.length() > 1) {
+                    // remove last ;
+                    object.put("data", data.substring(0, data.length() - 1));
+                }
+                else {
+                    object.put("data", "");
+                }
+            }
+            else {
+                object.put("data", "");
             }
 
         }

@@ -86,7 +86,9 @@ public class FisGraphics {
         int count;
         int length;
 
-        mText = null;
+        mText = "";
+        mStartTime = "";
+        mEndTime = "";
         mCoordinates = new LinkedList<Coordinate>();
         mGeometryOverlayOptions = SHAPE_NONE;
         format = (((int) data[0]) & 0xF0) >> 4;
@@ -98,12 +100,6 @@ public class FisGraphics {
 
         mLocation = Dlac.decode(data[2], data[3], data[4]);
         mLocation = Dlac.format(mLocation);
-
-
-        if(!mLocation.equals("")) {
-            mLocation = mLocation.split("\u001E")[0];
-            mLocation = mLocation.replaceAll("\n\t[A-Z]{1}", "\n"); /* remove invalid chars after newline */
-        }
 
         /*
             0 - No data
@@ -117,7 +113,7 @@ public class FisGraphics {
         */
         switch (format) {
             case 0:
-                break;
+                return false;
             case 2:
                 length = (((int)data[6] & 0xFF) << 8) + ((int)data[7] & 0xFF);
                 if (data.length - length < 6) {
@@ -139,7 +135,7 @@ public class FisGraphics {
 
                 byte recordData[] = Arrays.copyOfRange(data, 6, data.length);
 
-                mReportNumber = (((int)data[1] & 0x3F) << 8) + ((int)data[2] & 0xFF);
+                mReportNumber = (((int)recordData[1] & 0x3F) << 8) + ((int)recordData[2] & 0xFF);
 
                 // (6-1). (6.22 - Graphical Overlay Record Format).
                 int flag = recordData[4] & 0x01;
@@ -177,8 +173,6 @@ public class FisGraphics {
                 // Parse all of the dates.
                 switch (applicabilityOptions) {
                     case 0: // No times given. UFN.
-                        mStartTime = "";
-                        mEndTime = "";
                         byte recordDataA[] = Arrays.copyOfRange(recordData, 2, recordData.length);
                         recordData = Arrays.copyOfRange(recordDataA, 0, recordDataA.length);
                         break;
@@ -344,7 +338,7 @@ public class FisGraphics {
             case SHAPE_PRISM_AGL:
                 return "prism";
             default:
-                return null;
+                return "";
         }
     }
 }
