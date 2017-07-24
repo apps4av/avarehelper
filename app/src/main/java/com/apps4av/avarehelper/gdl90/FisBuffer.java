@@ -37,7 +37,10 @@ public class FisBuffer {
      * @param lon
      */
     public FisBuffer(byte buffer[], int offset, int slotId, int fisbId, boolean pvalid, float lat, float lon) {
-        mSize = 424;
+        mSize = buffer.length - offset;
+        if(mSize <= 0) {
+            return;
+        }
         mBuffer = buffer;
         mProducts = new LinkedList<Product>();
         mBuffer = new byte[mSize];
