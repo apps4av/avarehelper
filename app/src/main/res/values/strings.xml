@@ -27,8 +27,10 @@ Redistribution and use in source and binary forms, with or without modification,
     <string name="MSFS">MSFS</string>
     <string name="GPSSIM">GPS Sim</string>
     <string name="USBIN">USB In</string>
+    <string name="DUMP1090">Dump 1090</string>
     <string name="XPlanePort">49002</string>
     <string name="WifiPort">43211</string>
+    <string name="IPAddress">192.168.1.1</string>
     <string name="Exit">Exit</string>
     <string name="Apply">Apply</string>
     <string name="FlyTo">Fly To Destination (if available)</string>
@@ -48,6 +50,7 @@ Redistribution and use in source and binary forms, with or without modification,
     <string name="DescFS">Connect to XPlane, Flightgear on WIFI</string>
     <string name="DescMSFS">Connect to MSFS on WIFI-NMEA</string>
     <string name="DescGPSSim">Simulate GPS</string>
+    <string name="DescDump1090">Connect to Dump1090 via URI</string>
     <string name="DescExt">Connect to GPS/ADSB units on Bluetooth</string>
     <string name="DescExtWifi">Connect to GPS/ADSB units on WiFi (Broadcast on Managed Network)</string>
     <string name="DescFile">Feed NMEA / ADSB data from a binary file</string>
