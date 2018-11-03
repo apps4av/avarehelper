@@ -46,6 +46,9 @@ public class ConnectionFactory {
         if(type.equals("XplaneConnection")) {
             return XplaneConnection.getInstance(ctx);
         }
+        if(type.equals("Dump1090Connection")) {
+            return Dump1090Connection.getInstance(ctx);
+        }
         return null;
     }
 
@@ -63,6 +66,7 @@ public class ConnectionFactory {
         s += getConnection("FileConnectionIn", ctx).isConnected() ? "," + ctx.getString(R.string.Play) : "";
         s += getConnection("GPSSimulatorConnection", ctx).isConnected() ? "," + ctx.getString(R.string.GPSSIM) : "";
         s += getConnection("USBConnectionIn", ctx).isConnected() ? "," + ctx.getString(R.string.USBIN) : "";
+        s += getConnection("Dump1090Connection", ctx).isConnected() ? "," + ctx.getString(R.string.DUMP1090) : "";
         if(s.startsWith(",")) {
             s = s.substring(1);
         }

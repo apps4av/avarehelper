@@ -23,6 +23,8 @@ import android.widget.Button;
 import android.widget.CheckBox;
 
 import com.apps4av.avarehelper.connections.Connection;
+import com.apps4av.avarehelper.connections.ConnectionFactory;
+import com.apps4av.avarehelper.storage.Preferences;
 import com.apps4av.avarehelper.storage.SavedEditText;
 
 /**
@@ -32,8 +34,8 @@ import com.apps4av.avarehelper.storage.SavedEditText;
  */
 public class Dump1090Fragment extends Fragment {
     
-    private Connection mWifi;
-    private CheckBox mConStart;
+    private Connection mDump1090;
+    private CheckBox mConState;
     private Context mContext;
     private SavedEditText mIpAddress;
 
@@ -43,11 +45,29 @@ public class Dump1090Fragment extends Fragment {
         mContext = container.getContext();
 
         View view = inflater.inflate(R.layout.layout_dump1090, container, false);
-        
+
         /*
          * Dump1090 connection
          */
         mIpAddress = (SavedEditText)view.findViewById(R.id.main_ip_address);
+        mConState = (CheckBox)view.findViewById(R.id.main_connect1090);
+        mConState.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (((CheckBox) v).isChecked()) {
+                    mDump1090.connect(mIpAddress.getText().toString(), false);
+                    mDump1090.start(new Preferences(getActivity()));
+                } else {
+                    mDump1090.stop();
+                    mDump1090.disconnect();
+                }
+            }
+        });
+
+        /*
+         * Get Connection
+         */
+        mDump1090 = ConnectionFactory.getConnection("Dump1090Connection", mContext);
 
         setStates();
         return view;  
@@ -57,8 +77,7 @@ public class Dump1090Fragment extends Fragment {
     /**
      * 
      */
-    private void setStates() { }
-
+    private void setStates() { mConState.setChecked(mDump1090.isConnected()); }
 
     @Override  
     public void onDestroyView() {  
