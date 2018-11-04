@@ -41,7 +41,7 @@ Redistribution and use in source and binary forms, with or without modification,
         android:layout_marginRight="26dp"
         android:layout_marginBottom="10dp"
         android:inputType="text"
-        android:text="10.0.0.188:8080" />
+        android:text="192.168.1.1:8080" />
     <CheckBox
         android:id="@+id/main_connect1090"
         android:layout_below="@+id/main_connectwifi_image"

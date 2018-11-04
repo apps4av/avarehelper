@@ -5,6 +5,8 @@ import android.content.Context;
 import com.apps4av.avarehelper.utils.GenericCallback;
 import com.apps4av.avarehelper.utils.Logger;
 
+import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
@@ -27,9 +29,32 @@ public class Dump1090Connection extends Connection {
             @Override
             public Object callback(Object o, Object o1) {
                 while(isRunning()) {
-                    fetchDump1090JSON();
+                    JSONArray trafficList = fetchDump1090JSON();
+
+                    if (null != trafficList) {
+                        for (int i = 0; i < trafficList.length(); i++) {
+                            JSONObject sent = new JSONObject();
+                            try {
+                                JSONObject recv = trafficList.getJSONObject(i);
+                                sent.put("type", "traffic");
+                                sent.put("longitude", recv.getDouble("lon"));
+                                sent.put("latitude", recv.getDouble("lat"));
+                                sent.put("speed", recv.getDouble("speed"));
+                                sent.put("bearing", recv.getDouble("track"));
+                                sent.put("altitude", recv.getDouble("altitude"));
+                                sent.put("callsign", recv.getString("flight").trim());
+                                sent.put("address", Integer.decode("0x" + recv.getString("hex")));
+                                sent.put("time", System.currentTimeMillis());
+                            } catch (JSONException e1) {
+                                Logger.Logit(e1.toString());
+                                continue;
+                            }
+                            sendDataToHelper(sent.toString());
+                        }
+                    }
+
                     try {
-                        Thread.sleep(3000);
+                        Thread.sleep(1000);
                     } catch(Exception e) {
                     }
                 }
@@ -75,7 +100,7 @@ public class Dump1090Connection extends Connection {
         return "";
     }
 
-    public JSONObject fetchDump1090JSON() {
+    public JSONArray fetchDump1090JSON() {
         if (null == mURL) return null;
 
         StringBuffer response = new StringBuffer();
@@ -102,19 +127,22 @@ public class Dump1090Connection extends Connection {
                 in.close();
             }
         } catch (Exception e) {
-            Logger.Logit("HTTP connection failed: " + e.toString());
             return null;
         } finally {
             if (conn != null) {
                 conn.disconnect();
             }
-            try {
-                Logger.Logit("GET: " + response.toString());
-                return new JSONObject(response.toString());
-            } catch (Exception e) {
-                Logger.Logit("Unable to convert JSON.");
-                return null;
+            if (response.length() > 0) {
+                try {
+                    JSONArray array = new JSONArray(response.toString());
+                    Logger.Logit("Get traffic JSON array of size " + array.length());
+                    return array;
+                } catch (Exception e) {
+                    Logger.Logit(e.toString());
+                    return null;
+                }
             }
+            return null;
         }
     }
 }
