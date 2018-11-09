@@ -27,11 +27,6 @@ import com.apps4av.avarehelper.connections.ConnectionFactory;
 import com.apps4av.avarehelper.storage.Preferences;
 import com.apps4av.avarehelper.storage.SavedEditText;
 
-/**
- * 
- * @author zkhan
- *
- */
 public class Dump1090Fragment extends Fragment {
     
     private Connection mDump1090;
