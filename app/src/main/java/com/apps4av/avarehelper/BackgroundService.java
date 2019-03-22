@@ -45,6 +45,7 @@ public class BackgroundService extends Service {
     private Connection mWifiCon;
     private Connection mXplaneCon;
     private Connection mMsfsCon;
+    private Connection mDump1090Con;
     private Timer mTimer;
     private GenericCallback mCb;
 
@@ -73,6 +74,7 @@ public class BackgroundService extends Service {
             mWifiCon.setHelper(IHelper.Stub.asInterface(service));
             mXplaneCon.setHelper(IHelper.Stub.asInterface(service));
             mMsfsCon.setHelper(IHelper.Stub.asInterface(service));
+            mDump1090Con.setHelper(IHelper.Stub.asInterface(service));
         }
 
         /* (non-Javadoc)
@@ -128,6 +130,7 @@ public class BackgroundService extends Service {
         mWifiCon = ConnectionFactory.getConnection("WifiConnection", this);
         mXplaneCon = ConnectionFactory.getConnection("XplaneConnection", this);
         mMsfsCon = ConnectionFactory.getConnection("MsfsConnection", this);
+        mDump1090Con = ConnectionFactory.getConnection("Dump1090Connection", this);
         mHelperService = null;
         
         mTimer = new Timer();
@@ -156,6 +159,7 @@ public class BackgroundService extends Service {
 	        mWifiCon.stop();
 	        mXplaneCon.stop();
 	        mMsfsCon.stop();
+	        mDump1090Con.stop();
         }
         catch(Exception e) {
         	
