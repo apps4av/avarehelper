@@ -14,10 +14,6 @@ Redistribution and use in source and binary forms, with or without modification,
     android:versionCode="44"
     android:versionName="4.0.4" >
 
-    <uses-sdk
-        android:minSdkVersion="12"
-        android:targetSdkVersion="19" />
-
 
     <uses-feature android:name="android.hardware.bluetooth" android:required="false" />
     <uses-feature android:name="android.hardware.wifi" android:required="false" />
