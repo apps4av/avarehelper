@@ -20,11 +20,11 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.ActionBarActivity;
+import android.app.Fragment;
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
+import android.app.ActionBar;
+import android.app.Activity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -35,7 +35,7 @@ import com.apps4av.avarehelper.storage.Preferences;
 import com.apps4av.avarehelper.utils.GenericCallback;
 import com.apps4av.avarehelper.utils.Logger;
 
-public class MainActivity extends ActionBarActivity implements
+public class MainActivity extends Activity implements
     ActionBar.OnNavigationListener {
     
     private TextView mTextLog;
@@ -76,7 +76,7 @@ public class MainActivity extends ActionBarActivity implements
         startService(intent);
 
         // Set up the action bar to show a dropdown list.
-        final ActionBar actionBar = getSupportActionBar();
+        final ActionBar actionBar = getActionBar();
         actionBar.setDisplayShowTitleEnabled(false);
         actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
         Bundle args = new Bundle();
@@ -116,7 +116,7 @@ public class MainActivity extends ActionBarActivity implements
 
 
         // Acquire Multicast Lock to receive multicast packets over Wifi.
-        WifiManager wm = (WifiManager)getSystemService(Context.WIFI_SERVICE);
+        WifiManager wm = (WifiManager)getApplicationContext().getSystemService(Context.WIFI_SERVICE);
         mMulticastLock = wm.createMulticastLock("avarehelper");
         mMulticastLock.acquire();
     }
@@ -181,17 +181,17 @@ public class MainActivity extends ActionBarActivity implements
         // Start from last location
         int id = mPref.getFragmentIndex();
         if(id >= 0) {
-            getSupportActionBar().setSelectedNavigationItem(id);
+            getActionBar().setSelectedNavigationItem(id);
         }
         else {
-            getSupportActionBar().setSelectedNavigationItem(0);
+            getActionBar().setSelectedNavigationItem(0);
         }
     }
 
     @Override
     public boolean onNavigationItemSelected(int itemPosition, long itemId) {
 
-    	FragmentManager fragmentManager = getSupportFragmentManager();
+    	FragmentManager fragmentManager = getFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
 
         // Store fragment we are showing now

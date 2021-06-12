@@ -18,7 +18,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.View.OnLongClickListener;
 import android.webkit.WebView;
-import android.support.v4.app.*;
+import android.app.Fragment;
 
 /**
  * 
