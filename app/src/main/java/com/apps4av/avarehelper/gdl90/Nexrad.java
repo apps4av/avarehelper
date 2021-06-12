@@ -24,12 +24,12 @@ public class Nexrad {
     public static final int INTENSITY[] = {
         0x00000000,
         0x00000000,
-        0xFF007F00, // dark green
-        0xFF00AF00, // light green
-        0xFF00FF00, // lighter green
-        0xFFFFFF00, // yellow
-        0xFFFF7F00, // orange
-        0xFFFF0000  // red
+        0xFF7ECE13, // light green
+        0xFF439F16, // dark green
+        0xFFEAE710, // yellow
+        0xFFEB9A13, // orange
+        0xFFFF2600, // red
+        0xFFFF40FF  // magenta
     };
 
     private int mBlock;

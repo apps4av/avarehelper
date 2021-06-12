@@ -45,7 +45,7 @@ public class MainActivity extends Activity implements
 
     private Preferences mPref;
 
-    private Fragment[] mFragments = new Fragment[10];
+    private Fragment[] mFragments = new Fragment[11];
 
     private WifiManager.MulticastLock mMulticastLock;
 
@@ -91,6 +91,7 @@ public class MainActivity extends Activity implements
         mFragments[pos++] = new USBInFragment();
         mFragments[pos++] = new HelpFragment();
         mFragments[pos++] = new PreferencesFragment();
+        mFragments[pos++] = new Dump1090Fragment();
 
         for(int i = 0; i < pos; i++) {
             mFragments[i].setArguments(args);
@@ -111,7 +112,8 @@ public class MainActivity extends Activity implements
                 getString(R.string.GPSSIM), 
                 getString(R.string.USBIN),
                 getString(R.string.Help),
-                getString(R.string.Preferences)
+                getString(R.string.Preferences),
+                "Dump1090"
                 }), this);
 
 
@@ -241,6 +243,9 @@ public class MainActivity extends Activity implements
                 PreferencesFragment pref = (PreferencesFragment) mFragments[itemPosition];
                 fragmentTransaction.replace(R.id.detailFragment, pref);
                 break;
+            case 10:
+                Dump1090Fragment d1090 = (Dump1090Fragment) mFragments[itemPosition];
+                fragmentTransaction.replace(R.id.detailFragment, d1090);
         }
 
         fragmentTransaction.commit();
