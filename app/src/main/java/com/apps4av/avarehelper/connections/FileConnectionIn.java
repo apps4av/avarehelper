@@ -13,6 +13,7 @@ Redistribution and use in source and binary forms, with or without modification,
 package com.apps4av.avarehelper.connections;
 
 import android.content.Context;
+import android.net.Uri;
 
 import com.apps4av.avarehelper.storage.Preferences;
 import com.apps4av.avarehelper.utils.GenericCallback;
@@ -32,6 +33,7 @@ import java.util.List;
  */
 public class FileConnectionIn extends Connection {
     private static FileConnectionIn mConnection;
+    private Context mContext;
 
     private InputStream mStream = null;
     private String mFileName = null;
@@ -39,9 +41,10 @@ public class FileConnectionIn extends Connection {
     /**
      * 
      */
-    private FileConnectionIn() {
+    private FileConnectionIn(Context ctx) {
+
         super("File Input");
-                /*
+        /*
          * Thread that reads File
          */
         setCallback(new GenericCallback() {
@@ -89,6 +92,8 @@ public class FileConnectionIn extends Connection {
                 return null;
             }
         });
+
+        mContext = ctx;
     }
 
     
@@ -100,7 +105,7 @@ public class FileConnectionIn extends Connection {
     public static FileConnectionIn getInstance(Context ctx) {
 
         if(null == mConnection) {
-            mConnection = new FileConnectionIn();
+            mConnection = new FileConnectionIn(ctx);
         }
         return mConnection;
     }
@@ -133,8 +138,9 @@ public class FileConnectionIn extends Connection {
         Logger.Logit("Getting input stream");
 
         try {
-            mStream = new BufferedInputStream(new FileInputStream(mFileName));
-        } 
+            Uri uri = Uri.parse(mFileName);
+            mStream = mContext.getContentResolver().openInputStream(uri);
+        }
         catch (Exception e) {
             Logger.Logit("Failed! Input stream error");
 
